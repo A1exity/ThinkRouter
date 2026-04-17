@@ -2,14 +2,15 @@
 
 ThinkRouter is an adaptive thinking-budget router for reasoning LLMs. It treats the pair `(model, thinking_budget)` as the routing decision, then records quality, cost, and latency for verifiable reasoning tasks.
 
-This repository currently implements the Day-1 MVP loop plus the first Week-2 trainable router components:
+This repository currently implements the Day-1 MVP loop plus the first Week-2 trainable router and frozen-split experiment components:
 
-1. load 20 built-in GSM8K-style samples,
-2. run 2 model configs across budgets `0`, `256`, and `1024`,
-3. evaluate numeric exact match,
+1. load built-in GSM8K-style, MATH-style, and HumanEval-style seed samples,
+2. run model configs across fixed budgets,
+3. evaluate exact-match or numeric exact-match outputs,
 4. store traces in SQLite,
-5. train lightweight difficulty and budget models from trace CSVs,
-6. inspect or run examples through Streamlit or FastAPI.
+5. export train/dev/test trace CSVs,
+6. train lightweight difficulty and budget models from train traces,
+7. inspect or run examples through Streamlit or FastAPI.
 
 ## Setup
 
@@ -50,13 +51,41 @@ Any model id starting with `mock` uses the local `MockAdapter`. Other model ids 
 python -m thinkrouter.experiments.run_day1_grid --limit 20 --db results/traces/day1.sqlite --out results/tables/day1_grid.csv
 ```
 
-This writes traces to SQLite and a CSV table for analysis.
+This writes the original 20-sample GSM8K-style smoke-test traces to SQLite and CSV.
+
+## Run Frozen Split Grid
+
+The general grid runner supports local frozen seed splits for `gsm8k`, `math`, and `humaneval` tasks. These samples are deterministic seed examples for pipeline validation; they are not a substitute for official benchmark results.
+
+Inspect split counts:
+
+```bash
+python -m thinkrouter.experiments.run_grid --summary
+```
+
+Run train/dev/test grids:
+
+```bash
+python -m thinkrouter.experiments.run_grid --task all --split train --budgets 0,256,1024 --db results/traces/train_grid.sqlite --out results/tables/train_grid.csv
+python -m thinkrouter.experiments.run_grid --task all --split dev --budgets 0,256,1024 --db results/traces/dev_grid.sqlite --out results/tables/dev_grid.csv
+python -m thinkrouter.experiments.run_grid --task all --split test --budgets 0,256,1024 --db results/traces/test_grid.sqlite --out results/tables/test_grid.csv
+```
+
+Useful options:
+
+- `--task gsm8k|math|humaneval|all`
+- `--split train|dev|test|all`
+- `--budgets 0,256,1024,4096`
+- `--models mock-cheap,mock-strong`
+- `--limit N`
 
 ## Train Router Models
 
+Train on the train split, not dev or test:
+
 ```bash
-python -m thinkrouter.experiments.train_difficulty results/tables/day1_grid.csv --out results/models/difficulty.joblib
-python -m thinkrouter.experiments.train_budget results/tables/day1_grid.csv --out results/models/budget.joblib
+python -m thinkrouter.experiments.train_difficulty results/tables/train_grid.csv --out results/models/difficulty.joblib
+python -m thinkrouter.experiments.train_budget results/tables/train_grid.csv --out results/models/budget.joblib
 ```
 
 To make FastAPI or Streamlit use the trained models, set:
@@ -67,6 +96,15 @@ THINKROUTER_BUDGET_MODEL_PATH=results/models/budget.joblib
 ```
 
 Without these variables, the router falls back to the built-in heuristic difficulty estimator and utility policy.
+
+## Analysis Scripts
+
+```bash
+python -m thinkrouter.experiments.eval_baselines results/tables/dev_grid.csv --out results/tables/dev_baseline_summary.csv
+python -m thinkrouter.experiments.make_plots results/tables/dev_grid.csv --out results/figures/dev_pareto.png
+```
+
+The current training scripts are lightweight sklearn pipelines over trace CSVs. The later project stage should replace the built-in seed samples with frozen official GSM8K, MATH-500, and HumanEval splits.
 
 ## Run API
 
@@ -88,17 +126,6 @@ streamlit run thinkrouter/ui/streamlit_app.py
 ```
 
 The demo lets you run a GSM8K-style query, choose a model and budget, optionally use the router, and inspect recent SQLite traces.
-
-## Analysis Scripts
-
-```bash
-python -m thinkrouter.experiments.eval_baselines results/tables/day1_grid.csv
-python -m thinkrouter.experiments.make_plots results/tables/day1_grid.csv
-python -m thinkrouter.experiments.train_difficulty results/tables/day1_grid.csv --out results/models/difficulty.joblib
-python -m thinkrouter.experiments.train_budget results/tables/day1_grid.csv --out results/models/budget.joblib
-```
-
-The current training scripts are lightweight sklearn pipelines over trace CSVs. The later project stage should replace the Day-1 built-in samples with frozen GSM8K, MATH-500, and HumanEval splits.
 
 ## Test
 

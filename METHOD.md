@@ -2,7 +2,7 @@
 
 ## Current MVP
 
-ThinkRouter currently implements the first project milestone: a complete traceable loop for GSM8K-style numeric reasoning tasks, plus the first trainable router components for Week 2.
+ThinkRouter currently implements the first project milestone: a complete traceable loop for GSM8K-style numeric reasoning tasks, plus the first trainable router and frozen-split experiment components for Week 2.
 
 The system has four stable boundaries:
 
@@ -21,6 +21,18 @@ The public budget levels are fixed:
 - `4096`: deep reasoning.
 
 For providers that do not expose exact reasoning-token control, the adapter maps each budget to a prompt instruction. The external API still records the selected discrete budget.
+
+## Seed Splits
+
+The repository now includes deterministic seed samples for three task types:
+
+- `gsm8k`: arithmetic word problems,
+- `math`: compact algebra, arithmetic, and geometry prompts,
+- `humaneval`: code-generation-style prompts with exact-match seed answers.
+
+These are local seed examples for pipeline validation, not official benchmark subsets. They provide stable `train`, `dev`, and `test` splits so the router training code can avoid training on dev/test traces before official datasets are wired in.
+
+The general grid runner records split metadata in each trace and supports task, split, model, budget, and limit filters.
 
 ## Model Adapters
 
@@ -46,7 +58,7 @@ The trainable router uses lightweight, explainable features instead of fine-tuni
 
 ## Difficulty Estimator
 
-`train_difficulty.py` builds a sklearn classifier from trace CSVs. Current Day-1 traces do not contain human difficulty labels, so the script derives pseudo-labels from query complexity features and task type. This is sufficient for testing the train-save-load loop; later benchmark splits should replace pseudo-labels with labels derived from train-set performance statistics.
+`train_difficulty.py` builds a sklearn classifier from trace CSVs. Current seed traces do not contain human difficulty labels, so the script derives pseudo-labels from query complexity features and task type. This is sufficient for testing the train-save-load loop; official benchmark traces should replace pseudo-labels with labels derived from train-set performance statistics.
 
 The trained model is saved as a joblib file and can be loaded by setting:
 
@@ -80,4 +92,4 @@ The current accuracy, cost, and latency estimates are still simple policy estima
 
 ## Evaluation
 
-The implemented GSM8K evaluator extracts the final numeric answer, normalizes commas and trailing decimals, and uses exact match. This follows the project's verifiable-first rule and avoids LLM-as-judge evaluation.
+The implemented GSM8K evaluator extracts the final numeric answer, normalizes commas and trailing decimals, and uses exact match. Non-GSM8K seed tasks currently use exact-match final-answer evaluation. This follows the project's verifiable-first rule and avoids LLM-as-judge evaluation.

@@ -1,17 +1,19 @@
 # RESULTS
 
-No final benchmark results have been produced yet. The current results are Day-1 MVP smoke-test results using deterministic mock models.
+No final official benchmark results have been produced yet. The current results are deterministic mock-model smoke tests for validating the experiment pipeline.
 
 ## Current Status
 
-Implemented Day-1 and initial Week-2 components:
+Implemented Day-1 and Week-2 pipeline components:
 
-- built-in 20-sample GSM8K-style development set,
+- built-in GSM8K-style, MATH-style, and HumanEval-style seed samples,
 - fixed budgets `0`, `256`, `1024`, `4096`,
 - mock and OpenAI-compatible model adapters,
 - GSM8K numeric exact-match evaluator,
+- exact-match evaluator for non-GSM8K seed tasks,
 - SQLite trace store,
 - Day-1 grid runner,
+- frozen train/dev/test grid runner,
 - FastAPI endpoints,
 - Streamlit trace demo,
 - baseline summary and Pareto plotting scripts,
@@ -19,39 +21,57 @@ Implemented Day-1 and initial Week-2 components:
 - sklearn budget predictor training,
 - optional router loading from joblib model paths.
 
-## Day-1 MVP Results
+## Frozen Seed Splits
 
-Generated artifacts:
+The local seed suite is for deterministic pipeline validation only. It is not a replacement for official GSM8K, MATH-500, or HumanEval benchmark reporting.
 
-- trace database: `results/traces/day1.sqlite`
-- grid table: `results/tables/day1_grid.csv`
-- baseline summary: `results/tables/baseline_summary.csv`
-- Pareto figure: `results/figures/pareto.png`
-- difficulty model: `results/models/difficulty.joblib`
-- budget model: `results/models/budget.joblib`
+| task | train | dev | test |
+| --- | ---: | ---: | ---: |
+| gsm8k | 12 | 4 | 4 |
+| math | 6 | 2 | 2 |
+| humaneval | 4 | 2 | 2 |
 
-Run command:
+Generated trace tables:
+
+| table | traces | task coverage |
+| --- | ---: | --- |
+| `results/tables/train_grid.csv` | 132 | gsm8k, math, humaneval |
+| `results/tables/dev_grid.csv` | 48 | gsm8k, math, humaneval |
+| `results/tables/test_grid.csv` | 48 | gsm8k, math, humaneval |
+
+The trace counts reflect 2 mock models and 3 budget levels per sample.
+
+## Generated Artifacts
+
+- Day-1 trace database: `results/traces/day1.sqlite`
+- frozen train/dev/test trace databases: `results/traces/train_grid.sqlite`, `results/traces/dev_grid.sqlite`, `results/traces/test_grid.sqlite`
+- Day-1 grid table: `results/tables/day1_grid.csv`
+- frozen split tables: `results/tables/train_grid.csv`, `results/tables/dev_grid.csv`, `results/tables/test_grid.csv`
+- Day-1 baseline summary: `results/tables/baseline_summary.csv`
+- dev baseline summary: `results/tables/dev_baseline_summary.csv`
+- Day-1 Pareto figure: `results/figures/pareto.png`
+- dev Pareto figure: `results/figures/dev_pareto.png`
+- train-split difficulty model: `results/models/difficulty.joblib`
+- train-split budget model: `results/models/budget.joblib`
+
+## Reproduction Commands
 
 ```bash
 python -m thinkrouter.experiments.run_day1_grid --limit 20 --db results/traces/day1.sqlite --out results/tables/day1_grid.csv
-python -m thinkrouter.experiments.eval_baselines results/tables/day1_grid.csv
-python -m thinkrouter.experiments.make_plots results/tables/day1_grid.csv
-python -m thinkrouter.experiments.train_difficulty results/tables/day1_grid.csv --out results/models/difficulty.joblib
-python -m thinkrouter.experiments.train_budget results/tables/day1_grid.csv --out results/models/budget.joblib
+python -m thinkrouter.experiments.eval_baselines results/tables/day1_grid.csv --out results/tables/baseline_summary.csv
+python -m thinkrouter.experiments.make_plots results/tables/day1_grid.csv --out results/figures/pareto.png
+
+python -m thinkrouter.experiments.run_grid --task all --split train --budgets 0,256,1024 --db results/traces/train_grid.sqlite --out results/tables/train_grid.csv
+python -m thinkrouter.experiments.run_grid --task all --split dev --budgets 0,256,1024 --db results/traces/dev_grid.sqlite --out results/tables/dev_grid.csv
+python -m thinkrouter.experiments.run_grid --task all --split test --budgets 0,256,1024 --db results/traces/test_grid.sqlite --out results/tables/test_grid.csv
+
+python -m thinkrouter.experiments.train_difficulty results/tables/train_grid.csv --out results/models/difficulty.joblib
+python -m thinkrouter.experiments.train_budget results/tables/train_grid.csv --out results/models/budget.joblib
+python -m thinkrouter.experiments.eval_baselines results/tables/dev_grid.csv --out results/tables/dev_baseline_summary.csv
+python -m thinkrouter.experiments.make_plots results/tables/dev_grid.csv --out results/figures/dev_pareto.png
 ```
 
-The Day-1 grid covers 20 built-in GSM8K-style samples, 2 mock model configurations, and 3 budget levels:
-
-| model | budget | accuracy | avg cost | p95 latency | n |
-| --- | ---: | ---: | ---: | ---: | ---: |
-| mock-cheap | 0 | 1.000 | 0.000000 | 0.000021 | 20 |
-| mock-cheap | 256 | 1.000 | 0.000000 | 0.000015 | 20 |
-| mock-cheap | 1024 | 1.000 | 0.000000 | 0.000021 | 20 |
-| mock-strong | 0 | 1.000 | 0.000014 | 0.000014 | 20 |
-| mock-strong | 256 | 1.000 | 0.000014 | 0.000021 | 20 |
-| mock-strong | 1024 | 1.000 | 0.000014 | 0.000015 | 20 |
-
-Because these results use deterministic mock adapters, they validate the end-to-end pipeline rather than model quality. Real benchmark results should be generated with fixed train/dev/test splits and real model adapters.
+Because these results use deterministic mock adapters, all current accuracies are expected to be perfect. The value of this stage is validating the train/dev/test experiment plumbing, not measuring model quality.
 
 ## Final Reporting Targets
 
