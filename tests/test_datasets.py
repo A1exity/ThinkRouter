@@ -40,3 +40,24 @@ def test_prepare_seed_data_writes_standard_jsonl(tmp_path) -> None:
     assert count == 2
     assert len(loaded) == 2
     assert all(sample.sample_id.startswith("gsm8k_") for sample in loaded)
+
+def test_extract_gsm8k_answer_handles_official_format() -> None:
+    from thinkrouter.experiments.prepare_data import extract_gsm8k_answer
+
+    assert extract_gsm8k_answer("Natalia sold 48 clips. #### 48") == "48"
+    assert extract_gsm8k_answer("The answer is 1,250. #### 1,250") == "1250"
+    assert extract_gsm8k_answer("Compute it. #### 12.0") == "12"
+
+
+def test_filter_samples_applies_split_and_limit() -> None:
+    from thinkrouter.experiments.prepare_data import filter_samples
+
+    samples = [
+        BenchmarkSample("a", "gsm8k", "q", "1", "train"),
+        BenchmarkSample("b", "gsm8k", "q", "2", "dev"),
+        BenchmarkSample("c", "gsm8k", "q", "3", "dev"),
+    ]
+
+    filtered = filter_samples(samples, split="dev", limit=1)
+
+    assert filtered == [samples[1]]

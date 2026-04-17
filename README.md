@@ -71,6 +71,7 @@ THINKROUTER_STRONG_COST_PER_1K=0.0006
 ```
 
 For OpenRouter, SiliconFlow, Qwen/DashScope, or vLLM, set `THINKROUTER_OPENAI_BASE_URL` to that provider's OpenAI-compatible `/v1` endpoint and use the provider model id.
+
 Qwen/DashScope low-cost smoke-test example:
 
 ```bash
@@ -117,7 +118,13 @@ python -m thinkrouter.experiments.prepare_data --source seed --task all --split 
 ```
 
 `data/splits/` is ignored by git so local benchmark exports do not get committed accidentally.
+Export a small official GSM8K subset using Hugging Face. The default split is 60 train / 20 dev / 20 test:
 
+```bash
+python -m thinkrouter.experiments.prepare_data --source gsm8k --out data/splits/gsm8k.jsonl --hf-endpoint https://hf-mirror.com --summary
+```
+
+The GSM8K export reads from `openai/gsm8k`, extracts the final numeric answer, and writes the same JSONL schema used by `run_grid --input`.
 ## Run Frozen Split Grid
 
 The general grid runner supports local frozen seed splits for `gsm8k`, `math`, and `humaneval` tasks, or an external JSONL file via `--input`. The built-in samples are deterministic seed examples for pipeline validation; they are not a substitute for official benchmark results.

@@ -42,7 +42,7 @@ External datasets should be converted to one JSON object per line:
 {"sample_id":"gsm8k_train_001","task_type":"gsm8k","split":"train","query":"...","expected_answer":"..."}
 ```
 
-`prepare_data.py` currently exports the built-in seed suite to this format. `run_grid.py --input` consumes the same format, so official GSM8K, MATH-500, and HumanEval loaders can be added without changing the model, evaluator, trace store, or router training layers.
+`prepare_data.py` exports the built-in seed suite and a small official GSM8K subset to this format. For GSM8K it reads `openai/gsm8k`, extracts the final numeric answer after `####`, and creates a fixed 60 train / 20 dev / 20 test subset by default. `run_grid.py --input` consumes the same format, so MATH-500 and HumanEval loaders can be added without changing the model, evaluator, trace store, or router training layers.
 
 ## Model Adapters
 

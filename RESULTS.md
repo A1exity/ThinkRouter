@@ -15,6 +15,7 @@ Implemented Day-1 and Week-2 pipeline components:
 - Day-1 grid runner,
 - frozen train/dev/test grid runner,
 - benchmark JSONL export and input loader,
+- official GSM8K subset export to JSONL,
 - real OpenAI-compatible endpoint configuration preflight,
 - FastAPI endpoints,
 - Streamlit trace demo,
@@ -81,6 +82,16 @@ A real endpoint can be checked with `python -m thinkrouter.experiments.smoke_rea
 Because the committed results use deterministic mock adapters, all current accuracies are expected to be perfect. The value of this stage is validating the train/dev/test and JSONL experiment plumbing, not measuring model quality.
 
 
+
+## Official GSM8K Data Export
+
+`prepare_data --source gsm8k` was used to download `openai/gsm8k` through the Hugging Face mirror and export a local JSONL subset:
+
+| file | total | train | dev | test |
+| --- | ---: | ---: | ---: | ---: |
+| `data/splits/gsm8k.jsonl` | 100 | 60 | 20 | 20 |
+
+The exported JSONL file and Hugging Face cache are local artifacts and are not committed. A 2-sample mock `run_grid --input data/splits/gsm8k.jsonl` smoke test passed, confirming the official GSM8K JSONL is compatible with the grid runner.
 ## Qwen Real-Model Smoke Tests
 
 Small provider-backed smoke tests were run with `qwen3.5-flash-2026-02-23` through DashScope OpenAI-compatible mode. These are not benchmark results; they validate that the real model path works and that budget-level traces can be recorded.
