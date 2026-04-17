@@ -1,6 +1,6 @@
 # RESULTS
 
-No final official benchmark results have been produced yet. The current results are deterministic mock-model smoke tests for validating the experiment pipeline.
+No final official benchmark results have been produced yet. The current results are deterministic mock-model smoke tests for validating the experiment pipeline. Real-model tooling is present, but no provider-backed traces have been committed.
 
 ## Current Status
 
@@ -15,6 +15,7 @@ Implemented Day-1 and Week-2 pipeline components:
 - Day-1 grid runner,
 - frozen train/dev/test grid runner,
 - benchmark JSONL export and input loader,
+- real OpenAI-compatible endpoint configuration preflight,
 - FastAPI endpoints,
 - Streamlit trace demo,
 - baseline summary and Pareto plotting scripts,
@@ -75,7 +76,9 @@ python -m thinkrouter.experiments.make_plots results/tables/dev_grid.csv --out r
 
 The JSONL interface was smoke-tested by exporting 38 seed samples to `data/splits/seed.jsonl` and running a small `run_grid --input` job. `data/splits/` and SQLite traces are intentionally ignored by git.
 
-Because these results use deterministic mock adapters, all current accuracies are expected to be perfect. The value of this stage is validating the train/dev/test and JSONL experiment plumbing, not measuring model quality.
+A real endpoint can be checked with `python -m thinkrouter.experiments.smoke_real_model --model <model-id>`. Passing `--run` performs an actual provider call and can incur cost.
+
+Because the committed results use deterministic mock adapters, all current accuracies are expected to be perfect. The value of this stage is validating the train/dev/test and JSONL experiment plumbing, not measuring model quality.
 
 ## Final Reporting Targets
 

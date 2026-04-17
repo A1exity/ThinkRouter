@@ -34,7 +34,6 @@ These are local seed examples for pipeline validation, not official benchmark su
 
 The general grid runner records split metadata in each trace and supports task, split, model, budget, and limit filters. It can read either the built-in seed samples or an external benchmark JSONL file with `sample_id`, `task_type`, `split`, `query`, and `expected_answer` fields.
 
-
 ## Benchmark JSONL Interface
 
 External datasets should be converted to one JSON object per line:
@@ -44,14 +43,16 @@ External datasets should be converted to one JSON object per line:
 ```
 
 `prepare_data.py` currently exports the built-in seed suite to this format. `run_grid.py --input` consumes the same format, so official GSM8K, MATH-500, and HumanEval loaders can be added without changing the model, evaluator, trace store, or router training layers.
+
 ## Model Adapters
 
-The MVP includes two adapter types:
+The MVP includes two adapter types and a real-endpoint smoke-test path:
 
 - `MockAdapter`: deterministic local adapter used for development and tests.
 - `OpenAICompatibleAdapter`: calls `/v1/chat/completions` through the OpenAI Python client and supports OpenAI-compatible providers, including vLLM servers.
+- `smoke_real_model.py`: validates endpoint configuration by default and only calls the provider when `--run` is passed.
 
-This keeps the local RTX 4050 machine out of the critical path. A lab server with 4090 GPUs can be connected later by exposing a vLLM OpenAI-compatible endpoint and setting `THINKROUTER_OPENAI_BASE_URL` plus model ids.
+This keeps the local RTX 4050 machine out of the critical path during development while preserving a controlled path to real LLM calls. A lab server with 4090 GPUs can be connected later by exposing a vLLM OpenAI-compatible endpoint and setting `THINKROUTER_OPENAI_BASE_URL` plus model ids.
 
 ## Query Features
 
