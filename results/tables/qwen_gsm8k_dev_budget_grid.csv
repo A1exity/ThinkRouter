@@ -1,0 +1,59 @@
+id,query,task_type,selected_model,selected_budget,output_text,score,is_correct,expected_answer,extracted_answer,prompt_tokens,completion_tokens,total_tokens,cost_usd,latency_s,created_at,metadata
+1,Nina has 50 cents and buys candy for 35 cents. How many cents are left?,gsm8k,qwen3.5-flash-2026-02-23,0,15 cents,1.0,True,15,15,51,232,283,8.122099999999999e-05,2.2583690000028582,2026-04-17 14:50:51.534590+00:00,"{'sample_id': 'gsm8k_day1_013', 'split': 'dev', 'experiment': 'jsonl_grid'}"
+2,Nina has 50 cents and buys candy for 35 cents. How many cents are left?,gsm8k,qwen3.5-flash-2026-02-23,256,"Nina starts with 50 cents and spends 35 cents on candy. To find out how much is left, subtract the cost from the initial amount ($50 - 35$).
+
+**15 cents**",1.0,True,15,15,48,480,528,0.000151536,2.988532799994573,2026-04-17 14:50:54.526663+00:00,"{'sample_id': 'gsm8k_day1_013', 'split': 'dev', 'experiment': 'jsonl_grid'}"
+3,Nina has 50 cents and buys candy for 35 cents. How many cents are left?,gsm8k,qwen3.5-flash-2026-02-23,1024,"To find out how many cents Nina has left, we can subtract the cost of the candy from the amount of money she started with.
+
+1.  **Start with the total amount:** 50 cents.
+2.  **Subtract the cost:** 35 cents.
+3.  **Calculation:** $50 - 35 = 15$.
+
+**Check:** If you add the remaining amount (15 cents) back to the cost of the candy (35 cents), you get $15 + 35 = 50$ cents, which matches the original amount.
+
+Nina has **15 cents** left.",1.0,True,15,15,51,806,857,0.00024595899999999997,6.879444199999853,2026-04-17 14:51:01.409236+00:00,"{'sample_id': 'gsm8k_day1_013', 'split': 'dev', 'experiment': 'jsonl_grid'}"
+4,Four friends each bring 6 balloons. How many balloons do they bring together?,gsm8k,qwen3.5-flash-2026-02-23,0,24 balloons,1.0,True,24,24,45,260,305,8.7535e-05,2.299079000003985,2026-04-17 14:51:04.213567+00:00,"{'sample_id': 'gsm8k_day1_014', 'split': 'dev', 'experiment': 'jsonl_grid'}"
+5,Four friends each bring 6 balloons. How many balloons do they bring together?,gsm8k,qwen3.5-flash-2026-02-23,256,"There are 4 friends, and each friend brings 6 balloons. To find the total, multiply the number of friends by the number of balloons each one brings ($4 \times 6$).
+
+**24 balloons**",1.0,True,24,24,42,359,401,0.000115087,2.6199285999973654,2026-04-17 14:51:06.837183+00:00,"{'sample_id': 'gsm8k_day1_014', 'split': 'dev', 'experiment': 'jsonl_grid'}"
+6,Four friends each bring 6 balloons. How many balloons do they bring together?,gsm8k,qwen3.5-flash-2026-02-23,1024,"To find the total number of balloons, we can multiply the number of friends by the number of balloons each friend brings.
+
+1.  **Number of friends:** 4
+2.  **Balloons per friend:** 6
+3.  **Calculation:** $4 \times 6 = 24$
+
+Alternatively, you can add the balloons together: $6 + 6 + 6 + 6 = 24$.
+
+**Answer:** They bring **24** balloons together.",1.0,True,24,24,45,532,577,0.00016559899999999997,4.32498630000191,2026-04-17 14:51:11.167316+00:00,"{'sample_id': 'gsm8k_day1_014', 'split': 'dev', 'experiment': 'jsonl_grid'}"
+7,A rope is 20 meters long. It is cut into 4 equal pieces. How long is each piece?,gsm8k,qwen3.5-flash-2026-02-23,0,5 meters.,1.0,True,5,5,53,570,623,0.000178801,5.2583910999965155,2026-04-17 14:51:16.933731+00:00,"{'sample_id': 'gsm8k_day1_015', 'split': 'dev', 'experiment': 'jsonl_grid'}"
+8,A rope is 20 meters long. It is cut into 4 equal pieces. How long is each piece?,gsm8k,qwen3.5-flash-2026-02-23,256,"To find the length of each piece, divide the total length of the rope by the number of pieces.
+
+$20 \text{ meters} \div 4 = 5 \text{ meters}$
+
+**Answer:** Each piece is 5 meters long.",1.0,True,5,5,50,346,396,0.000113652,2.135774300004414,2026-04-17 14:51:19.073770+00:00,"{'sample_id': 'gsm8k_day1_015', 'split': 'dev', 'experiment': 'jsonl_grid'}"
+9,A rope is 20 meters long. It is cut into 4 equal pieces. How long is each piece?,gsm8k,qwen3.5-flash-2026-02-23,1024,"To find the length of each piece, we need to divide the total length of the rope by the number of pieces.
+
+**Reasoning:**
+1.  **Total Length:** 20 meters
+2.  **Number of Pieces:** 4
+3.  **Operation:** Division ($20 \div 4$)
+
+**Calculation:**
+$$20 \div 4 = 5$$
+
+**Check:**
+If each of the 4 pieces is 5 meters long, then $5 \text{ meters} \times 4 \text{ pieces} = 20 \text{ meters}$. This matches the original length of the rope.
+
+**Answer:**
+Each piece is **5 meters** long.",1.0,True,5,5,53,647,700,0.00020089999999999998,3.7605717000042205,2026-04-17 14:51:22.838969+00:00,"{'sample_id': 'gsm8k_day1_015', 'split': 'dev', 'experiment': 'jsonl_grid'}"
+10,Ella scored 10 points in the first game and twice as many in the second. What is her total?,gsm8k,qwen3.5-flash-2026-02-23,0,30 points,1.0,True,30,30,53,334,387,0.00011106899999999999,2.1971260999998776,2026-04-17 14:51:25.539604+00:00,"{'sample_id': 'gsm8k_day1_016', 'split': 'dev', 'experiment': 'jsonl_grid'}"
+11,Ella scored 10 points in the first game and twice as many in the second. What is her total?,gsm8k,qwen3.5-flash-2026-02-23,256,"Ella scored 10 points in the first game. In the second game, she scored twice that amount, which is $10 \times 2 = 20$ points. Adding these together ($10 + 20$) gives her total score.
+
+**30**",1.0,True,30,30,50,447,497,0.000142639,3.174387899998692,2026-04-17 14:51:28.718650+00:00,"{'sample_id': 'gsm8k_day1_016', 'split': 'dev', 'experiment': 'jsonl_grid'}"
+12,Ella scored 10 points in the first game and twice as many in the second. What is her total?,gsm8k,qwen3.5-flash-2026-02-23,1024,"Here is the step-by-step calculation:
+
+1.  **First Game:** Ella scored **10** points.
+2.  **Second Game:** She scored twice as many as the first game ($10 \times 2$), which equals **20** points.
+3.  **Total Score:** Add the points from both games ($10 + 20$).
+
+Her total score is **30**.",1.0,True,30,30,53,589,642,0.000184254,3.6384333000023616,2026-04-17 14:51:32.361966+00:00,"{'sample_id': 'gsm8k_day1_016', 'split': 'dev', 'experiment': 'jsonl_grid'}"

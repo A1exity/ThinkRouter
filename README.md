@@ -86,6 +86,14 @@ python -m thinkrouter.experiments.smoke_real_model --model qwen3.5-flash-2026-02
 python -m thinkrouter.experiments.smoke_real_model --model qwen3.5-flash-2026-02-23 --budget 0 --run
 ```
 
+
+Small Qwen budget grid smoke test:
+
+```bash
+python -m thinkrouter.experiments.run_grid --input data/splits/seed.jsonl --task gsm8k --split dev --budgets 0,256,1024 --models qwen3.5-flash-2026-02-23 --db results/traces/qwen_gsm8k_dev_budget_grid.sqlite --out results/tables/qwen_gsm8k_dev_budget_grid.csv
+python -m thinkrouter.experiments.eval_baselines results/tables/qwen_gsm8k_dev_budget_grid.csv --out results/tables/qwen_gsm8k_dev_budget_summary.csv
+python -m thinkrouter.experiments.make_plots results/tables/qwen_gsm8k_dev_budget_grid.csv --out results/figures/qwen_gsm8k_dev_budget_pareto.png
+```
 ## Run Day-1 Grid
 
 ```bash

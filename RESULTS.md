@@ -81,13 +81,28 @@ A real endpoint can be checked with `python -m thinkrouter.experiments.smoke_rea
 Because the committed results use deterministic mock adapters, all current accuracies are expected to be perfect. The value of this stage is validating the train/dev/test and JSONL experiment plumbing, not measuring model quality.
 
 
-## Qwen Real-Model Smoke Test
+## Qwen Real-Model Smoke Tests
 
-A small provider-backed smoke test was run with `qwen3.5-flash-2026-02-23` through DashScope OpenAI-compatible mode. This is not a benchmark result; it only validates that the real model path works.
+Small provider-backed smoke tests were run with `qwen3.5-flash-2026-02-23` through DashScope OpenAI-compatible mode. These are not benchmark results; they validate that the real model path works and that budget-level traces can be recorded.
 
-| file | rows | task | split | budget | accuracy | total estimated cost | avg latency |
-| --- | ---: | --- | --- | ---: | ---: | ---: | ---: |
+| file | rows | task | split | budgets | accuracy | total estimated cost | avg latency |
+| --- | ---: | --- | --- | --- | ---: | ---: | ---: |
 | `results/tables/qwen_gsm8k_dev_smoke.csv` | 4 | gsm8k | dev | 0 | 1.000 | 0.000500 | 3.022s |
+| `results/tables/qwen_gsm8k_dev_budget_grid.csv` | 12 | gsm8k | dev | 0,256,1024 | 1.000 | 0.001778 | 3.461s |
+
+Budget-grid summary:
+
+| budget | accuracy | avg cost | p95 latency | n |
+| ---: | ---: | ---: | ---: | ---: |
+| 0 | 1.000 | 0.000115 | 4.814s | 4 |
+| 256 | 1.000 | 0.000131 | 3.147s | 4 |
+| 1024 | 1.000 | 0.000199 | 6.496s | 4 |
+
+Generated artifacts:
+
+- `results/tables/qwen_gsm8k_dev_budget_grid.csv`
+- `results/tables/qwen_gsm8k_dev_budget_summary.csv`
+- `results/figures/qwen_gsm8k_dev_budget_pareto.png`
 
 The local `.env` file contains the API key and is intentionally ignored by git. SQLite traces under `results/traces/` are also ignored.
 ## Final Reporting Targets
