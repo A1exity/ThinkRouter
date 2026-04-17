@@ -1,6 +1,6 @@
 # RESULTS
 
-No final official benchmark results have been produced yet. The current results are deterministic mock-model smoke tests for validating the experiment pipeline. Real-model tooling is present, but no provider-backed traces have been committed.
+No final official benchmark results have been produced yet. Most committed results are deterministic mock-model smoke tests for validating the experiment pipeline. A small provider-backed Qwen smoke result has now been recorded separately.
 
 ## Current Status
 
@@ -80,6 +80,16 @@ A real endpoint can be checked with `python -m thinkrouter.experiments.smoke_rea
 
 Because the committed results use deterministic mock adapters, all current accuracies are expected to be perfect. The value of this stage is validating the train/dev/test and JSONL experiment plumbing, not measuring model quality.
 
+
+## Qwen Real-Model Smoke Test
+
+A small provider-backed smoke test was run with `qwen3.5-flash-2026-02-23` through DashScope OpenAI-compatible mode. This is not a benchmark result; it only validates that the real model path works.
+
+| file | rows | task | split | budget | accuracy | total estimated cost | avg latency |
+| --- | ---: | --- | --- | ---: | ---: | ---: | ---: |
+| `results/tables/qwen_gsm8k_dev_smoke.csv` | 4 | gsm8k | dev | 0 | 1.000 | 0.000500 | 3.022s |
+
+The local `.env` file contains the API key and is intentionally ignored by git. SQLite traces under `results/traces/` are also ignored.
 ## Final Reporting Targets
 
 The final report should include:

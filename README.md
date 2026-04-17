@@ -70,7 +70,21 @@ THINKROUTER_STRONG_MODEL=gpt-4o-mini
 THINKROUTER_STRONG_COST_PER_1K=0.0006
 ```
 
-For OpenRouter, SiliconFlow, or vLLM, set `THINKROUTER_OPENAI_BASE_URL` to that provider's OpenAI-compatible `/v1` endpoint and use the provider model id.
+For OpenRouter, SiliconFlow, Qwen/DashScope, or vLLM, set `THINKROUTER_OPENAI_BASE_URL` to that provider's OpenAI-compatible `/v1` endpoint and use the provider model id.
+Qwen/DashScope low-cost smoke-test example:
+
+```bash
+THINKROUTER_OPENAI_BASE_URL=https://dashscope.aliyuncs.com/compatible-mode/v1
+THINKROUTER_STRONG_MODEL=qwen3.5-flash-2026-02-23
+THINKROUTER_STRONG_COST_PER_1K=0.000287
+```
+
+Then validate and run one real call:
+
+```bash
+python -m thinkrouter.experiments.smoke_real_model --model qwen3.5-flash-2026-02-23
+python -m thinkrouter.experiments.smoke_real_model --model qwen3.5-flash-2026-02-23 --budget 0 --run
+```
 
 ## Run Day-1 Grid
 

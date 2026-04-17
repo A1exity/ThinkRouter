@@ -3,9 +3,10 @@ from __future__ import annotations
 from thinkrouter.experiments.real_model import check_openai_compatible_config
 
 
-def test_real_model_config_reports_missing_for_mock_defaults(monkeypatch) -> None:
-    monkeypatch.delenv("THINKROUTER_OPENAI_BASE_URL", raising=False)
-    monkeypatch.delenv("THINKROUTER_OPENAI_API_KEY", raising=False)
+def test_real_model_config_reports_missing_for_mock_defaults(monkeypatch, tmp_path) -> None:
+    monkeypatch.chdir(tmp_path)
+    monkeypatch.setenv("THINKROUTER_OPENAI_BASE_URL", "")
+    monkeypatch.setenv("THINKROUTER_OPENAI_API_KEY", "")
     monkeypatch.setenv("THINKROUTER_STRONG_MODEL", "mock-strong")
 
     check = check_openai_compatible_config()
