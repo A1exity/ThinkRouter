@@ -14,6 +14,7 @@ Implemented Day-1 and Week-2 pipeline components:
 - SQLite trace store,
 - Day-1 grid runner,
 - frozen train/dev/test grid runner,
+- benchmark JSONL export and input loader,
 - FastAPI endpoints,
 - Streamlit trace demo,
 - baseline summary and Pareto plotting scripts,
@@ -61,9 +62,10 @@ python -m thinkrouter.experiments.run_day1_grid --limit 20 --db results/traces/d
 python -m thinkrouter.experiments.eval_baselines results/tables/day1_grid.csv --out results/tables/baseline_summary.csv
 python -m thinkrouter.experiments.make_plots results/tables/day1_grid.csv --out results/figures/pareto.png
 
-python -m thinkrouter.experiments.run_grid --task all --split train --budgets 0,256,1024 --db results/traces/train_grid.sqlite --out results/tables/train_grid.csv
-python -m thinkrouter.experiments.run_grid --task all --split dev --budgets 0,256,1024 --db results/traces/dev_grid.sqlite --out results/tables/dev_grid.csv
-python -m thinkrouter.experiments.run_grid --task all --split test --budgets 0,256,1024 --db results/traces/test_grid.sqlite --out results/tables/test_grid.csv
+python -m thinkrouter.experiments.prepare_data --source seed --task all --split all --out data/splits/seed.jsonl --summary
+python -m thinkrouter.experiments.run_grid --input data/splits/seed.jsonl --task all --split train --budgets 0,256,1024 --db results/traces/train_grid.sqlite --out results/tables/train_grid.csv
+python -m thinkrouter.experiments.run_grid --input data/splits/seed.jsonl --task all --split dev --budgets 0,256,1024 --db results/traces/dev_grid.sqlite --out results/tables/dev_grid.csv
+python -m thinkrouter.experiments.run_grid --input data/splits/seed.jsonl --task all --split test --budgets 0,256,1024 --db results/traces/test_grid.sqlite --out results/tables/test_grid.csv
 
 python -m thinkrouter.experiments.train_difficulty results/tables/train_grid.csv --out results/models/difficulty.joblib
 python -m thinkrouter.experiments.train_budget results/tables/train_grid.csv --out results/models/budget.joblib
@@ -71,7 +73,9 @@ python -m thinkrouter.experiments.eval_baselines results/tables/dev_grid.csv --o
 python -m thinkrouter.experiments.make_plots results/tables/dev_grid.csv --out results/figures/dev_pareto.png
 ```
 
-Because these results use deterministic mock adapters, all current accuracies are expected to be perfect. The value of this stage is validating the train/dev/test experiment plumbing, not measuring model quality.
+The JSONL interface was smoke-tested by exporting 38 seed samples to `data/splits/seed.jsonl` and running a small `run_grid --input` job. `data/splits/` and SQLite traces are intentionally ignored by git.
+
+Because these results use deterministic mock adapters, all current accuracies are expected to be perfect. The value of this stage is validating the train/dev/test and JSONL experiment plumbing, not measuring model quality.
 
 ## Final Reporting Targets
 

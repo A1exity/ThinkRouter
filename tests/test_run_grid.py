@@ -51,3 +51,31 @@ def test_run_grid_limit_applies_to_samples(tmp_path, monkeypatch) -> None:
 
     assert len(traces) == 4
     assert len({trace.metadata["sample_id"] for trace in traces}) == 1
+
+def test_run_grid_uses_jsonl_input(tmp_path, monkeypatch) -> None:
+    from thinkrouter.experiments.datasets import write_samples_jsonl
+    from thinkrouter.experiments.sample_data import BenchmarkSample
+
+    monkeypatch.setenv("THINKROUTER_CHEAP_MODEL", "mock-cheap")
+    monkeypatch.setenv("THINKROUTER_STRONG_MODEL", "mock-strong")
+    input_path = tmp_path / "samples.jsonl"
+    write_samples_jsonl(
+        [
+            BenchmarkSample("jsonl_1", "gsm8k", "What is 6 + 1?", "7", "dev"),
+            BenchmarkSample("jsonl_2", "math", "Compute 2^3.", "8", "train"),
+        ],
+        input_path,
+    )
+
+    traces = run_grid(
+        db_path=str(tmp_path / "grid.sqlite"),
+        input_path=str(input_path),
+        task_type="gsm8k",
+        split="dev",
+        budgets=[0],
+        model_ids=["mock-cheap"],
+    )
+
+    assert len(traces) == 1
+    assert traces[0].metadata["sample_id"] == "jsonl_1"
+    assert traces[0].metadata["experiment"] == "jsonl_grid"

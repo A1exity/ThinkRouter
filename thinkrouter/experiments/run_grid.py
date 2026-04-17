@@ -10,6 +10,7 @@ from thinkrouter.app.evaluators import get_evaluator
 from thinkrouter.app.models import ModelConfig, build_adapter, default_model_configs
 from thinkrouter.app.schemas import ModelRequest, TraceRecord, model_to_dict
 from thinkrouter.app.store import TraceStore
+from thinkrouter.experiments.datasets import load_samples_jsonl, summarize_samples
 from thinkrouter.experiments.sample_data import BenchmarkSample, load_frozen_samples, summarize_frozen_samples
 
 DEFAULT_BUDGETS = [0, 256, 1024]
@@ -50,6 +51,17 @@ def select_model_configs(model_ids: list[str] | None = None) -> list[ModelConfig
     return selected
 
 
+def load_grid_samples(
+    input_path: str | None = None,
+    task_type: str = "all",
+    split: str = "dev",
+    limit: int | None = None,
+) -> list[BenchmarkSample]:
+    if input_path:
+        return load_samples_jsonl(input_path, task_type=task_type, split=split, limit=limit)
+    return load_frozen_samples(task_type=task_type, split=split, limit=limit)
+
+
 def run_grid(
     db_path: str,
     task_type: str = "all",
@@ -57,11 +69,13 @@ def run_grid(
     budgets: list[int] | None = None,
     model_ids: list[str] | None = None,
     limit: int | None = None,
-    experiment: str = "frozen_grid",
+    experiment: str | None = None,
+    input_path: str | None = None,
 ) -> list[TraceRecord]:
     load_dotenv()
     budgets = budgets or DEFAULT_BUDGETS
-    samples = load_frozen_samples(task_type=task_type, split=split, limit=limit)
+    experiment = experiment or ("jsonl_grid" if input_path else "frozen_grid")
+    samples = load_grid_samples(input_path=input_path, task_type=task_type, split=split, limit=limit)
     configs = select_model_configs(model_ids)
     store = TraceStore(db_path)
     traces: list[TraceRecord] = []
@@ -116,21 +130,31 @@ def traces_to_dataframe(traces: list[TraceRecord]) -> pd.DataFrame:
     return pd.DataFrame([model_to_dict(trace) for trace in traces])
 
 
+def _print_summary(input_path: str | None) -> None:
+    if input_path:
+        samples = load_samples_jsonl(input_path, task_type="all", split="all")
+        summary = summarize_samples(samples)
+    else:
+        summary = summarize_frozen_samples()
+    for (task, split), count in sorted(summary.items()):
+        print(f"{task},{split},{count}")
+
+
 def main() -> None:
-    parser = argparse.ArgumentParser(description="Run a ThinkRouter grid over frozen seed splits.")
+    parser = argparse.ArgumentParser(description="Run a ThinkRouter grid over frozen seed splits or a benchmark JSONL file.")
+    parser.add_argument("--input", default=None, help="Optional benchmark JSONL path. Defaults to built-in frozen seed samples.")
     parser.add_argument("--db", default="results/traces/grid.sqlite", help="SQLite trace database path.")
     parser.add_argument("--out", default="results/tables/grid.csv", help="CSV output path.")
     parser.add_argument("--task", default="all", choices=["gsm8k", "math", "humaneval", "all"], help="Task subset to run.")
-    parser.add_argument("--split", default="dev", choices=["train", "dev", "test", "all"], help="Frozen split to run.")
+    parser.add_argument("--split", default="dev", choices=["train", "dev", "test", "all"], help="Split to run.")
     parser.add_argument("--budgets", default="0,256,1024", help="Comma-separated budget levels.")
     parser.add_argument("--models", default=None, help="Comma-separated model ids. Defaults to configured cheap and strong models.")
     parser.add_argument("--limit", type=int, default=None, help="Optional sample limit after task/split filtering.")
-    parser.add_argument("--summary", action="store_true", help="Print frozen sample counts and exit.")
+    parser.add_argument("--summary", action="store_true", help="Print sample counts and exit.")
     args = parser.parse_args()
 
     if args.summary:
-        for (task, split), count in sorted(summarize_frozen_samples().items()):
-            print(f"{task},{split},{count}")
+        _print_summary(args.input)
         return
 
     traces = run_grid(
@@ -140,6 +164,7 @@ def main() -> None:
         budgets=parse_csv_ints(args.budgets),
         model_ids=parse_csv_strings(args.models),
         limit=args.limit,
+        input_path=args.input,
     )
     df = traces_to_dataframe(traces)
     out_path = Path(args.out)

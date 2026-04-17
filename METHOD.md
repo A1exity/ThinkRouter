@@ -32,8 +32,18 @@ The repository now includes deterministic seed samples for three task types:
 
 These are local seed examples for pipeline validation, not official benchmark subsets. They provide stable `train`, `dev`, and `test` splits so the router training code can avoid training on dev/test traces before official datasets are wired in.
 
-The general grid runner records split metadata in each trace and supports task, split, model, budget, and limit filters.
+The general grid runner records split metadata in each trace and supports task, split, model, budget, and limit filters. It can read either the built-in seed samples or an external benchmark JSONL file with `sample_id`, `task_type`, `split`, `query`, and `expected_answer` fields.
 
+
+## Benchmark JSONL Interface
+
+External datasets should be converted to one JSON object per line:
+
+```json
+{"sample_id":"gsm8k_train_001","task_type":"gsm8k","split":"train","query":"...","expected_answer":"..."}
+```
+
+`prepare_data.py` currently exports the built-in seed suite to this format. `run_grid.py --input` consumes the same format, so official GSM8K, MATH-500, and HumanEval loaders can be added without changing the model, evaluator, trace store, or router training layers.
 ## Model Adapters
 
 The MVP includes two adapter types:

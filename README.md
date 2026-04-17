@@ -2,15 +2,16 @@
 
 ThinkRouter is an adaptive thinking-budget router for reasoning LLMs. It treats the pair `(model, thinking_budget)` as the routing decision, then records quality, cost, and latency for verifiable reasoning tasks.
 
-This repository currently implements the Day-1 MVP loop plus the first Week-2 trainable router and frozen-split experiment components:
+This repository currently implements the Day-1 MVP loop plus the first Week-2 trainable router, frozen-split experiment components, and a JSONL benchmark interface:
 
 1. load built-in GSM8K-style, MATH-style, and HumanEval-style seed samples,
 2. run model configs across fixed budgets,
 3. evaluate exact-match or numeric exact-match outputs,
 4. store traces in SQLite,
-5. export train/dev/test trace CSVs,
-6. train lightweight difficulty and budget models from train traces,
-7. inspect or run examples through Streamlit or FastAPI.
+5. export benchmark samples to standard JSONL,
+6. run train/dev/test trace CSVs from either built-in seed data or JSONL input,
+7. train lightweight difficulty and budget models from train traces,
+8. inspect or run examples through Streamlit or FastAPI.
 
 ## Setup
 
@@ -53,9 +54,25 @@ python -m thinkrouter.experiments.run_day1_grid --limit 20 --db results/traces/d
 
 This writes the original 20-sample GSM8K-style smoke-test traces to SQLite and CSV.
 
+## Prepare JSONL Data
+
+ThinkRouter uses a simple JSONL benchmark format so official datasets can be converted once and reused by the grid runner:
+
+```json
+{"sample_id":"gsm8k_train_001","task_type":"gsm8k","split":"train","query":"...","expected_answer":"..."}
+```
+
+Export the built-in seed suite to JSONL:
+
+```bash
+python -m thinkrouter.experiments.prepare_data --source seed --task all --split all --out data/splits/seed.jsonl --summary
+```
+
+`data/splits/` is ignored by git so local benchmark exports do not get committed accidentally.
+
 ## Run Frozen Split Grid
 
-The general grid runner supports local frozen seed splits for `gsm8k`, `math`, and `humaneval` tasks. These samples are deterministic seed examples for pipeline validation; they are not a substitute for official benchmark results.
+The general grid runner supports local frozen seed splits for `gsm8k`, `math`, and `humaneval` tasks, or an external JSONL file via `--input`. The built-in samples are deterministic seed examples for pipeline validation; they are not a substitute for official benchmark results.
 
 Inspect split counts:
 
@@ -63,7 +80,7 @@ Inspect split counts:
 python -m thinkrouter.experiments.run_grid --summary
 ```
 
-Run train/dev/test grids:
+Run train/dev/test grids from built-in seed data:
 
 ```bash
 python -m thinkrouter.experiments.run_grid --task all --split train --budgets 0,256,1024 --db results/traces/train_grid.sqlite --out results/tables/train_grid.csv
@@ -71,8 +88,15 @@ python -m thinkrouter.experiments.run_grid --task all --split dev --budgets 0,25
 python -m thinkrouter.experiments.run_grid --task all --split test --budgets 0,256,1024 --db results/traces/test_grid.sqlite --out results/tables/test_grid.csv
 ```
 
+Run a grid from JSONL input:
+
+```bash
+python -m thinkrouter.experiments.run_grid --input data/splits/seed.jsonl --task gsm8k --split dev --budgets 0,256 --models mock-cheap --db results/traces/jsonl_dev.sqlite --out results/tables/jsonl_dev.csv
+```
+
 Useful options:
 
+- `--input path/to/samples.jsonl`
 - `--task gsm8k|math|humaneval|all`
 - `--split train|dev|test|all`
 - `--budgets 0,256,1024,4096`
