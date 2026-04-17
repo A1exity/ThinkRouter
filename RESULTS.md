@@ -116,6 +116,27 @@ Generated artifacts:
 - `results/figures/qwen_gsm8k_dev_budget_pareto.png`
 
 The local `.env` file contains the API key and is intentionally ignored by git. SQLite traces under `results/traces/` are also ignored.
+
+## Official GSM8K Qwen Dev Smoke Test
+
+A small official GSM8K provider-backed run was executed on the exported `data/splits/gsm8k.jsonl` dev split using `qwen3.5-flash-2026-02-23`. This is still a smoke test, not a final benchmark, because it covers only 5 examples and one real model.
+
+| file | rows | task | split | limit | budgets | accuracy | total estimated cost |
+| --- | ---: | --- | --- | ---: | --- | ---: | ---: |
+| `results/tables/qwen_gsm8k_official_dev5.csv` | 10 | gsm8k | dev | 5 | 0,256 | 1.000 | 0.002365 |
+
+Budget summary:
+
+| budget | accuracy | avg cost | p95 latency | n |
+| ---: | ---: | ---: | ---: | ---: |
+| 0 | 1.000 | 0.000203 | 9.785s | 5 |
+| 256 | 1.000 | 0.000270 | 10.777s | 5 |
+
+Generated artifacts:
+
+- `results/tables/qwen_gsm8k_official_dev5.csv`
+- `results/tables/qwen_gsm8k_official_dev5_summary.csv`
+- `results/figures/qwen_gsm8k_official_dev5_pareto.png`
 ## Final Reporting Targets
 
 The final report should include:

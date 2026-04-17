@@ -158,6 +158,14 @@ Useful options:
 - `--models mock-cheap,mock-strong`
 - `--limit N`
 
+
+Small official GSM8K Qwen smoke test:
+
+```bash
+python -m thinkrouter.experiments.run_grid --input data/splits/gsm8k.jsonl --task gsm8k --split dev --limit 5 --budgets 0,256 --models qwen3.5-flash-2026-02-23 --db results/traces/qwen_gsm8k_official_dev5.sqlite --out results/tables/qwen_gsm8k_official_dev5.csv
+python -m thinkrouter.experiments.eval_baselines results/tables/qwen_gsm8k_official_dev5.csv --out results/tables/qwen_gsm8k_official_dev5_summary.csv
+python -m thinkrouter.experiments.make_plots results/tables/qwen_gsm8k_official_dev5.csv --out results/figures/qwen_gsm8k_official_dev5_pareto.png
+```
 ## Train Router Models
 
 Train on the train split, not dev or test:
