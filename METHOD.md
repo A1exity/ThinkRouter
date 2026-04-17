@@ -2,7 +2,7 @@
 
 ## Current MVP
 
-ThinkRouter currently implements the first project milestone: a complete traceable loop for GSM8K-style numeric reasoning tasks.
+ThinkRouter currently implements the first project milestone: a complete traceable loop for GSM8K-style numeric reasoning tasks, plus the first trainable router components for Week 2.
 
 The system has four stable boundaries:
 
@@ -31,15 +31,52 @@ The MVP includes two adapter types:
 
 This keeps the local RTX 4050 machine out of the critical path. A lab server with 4090 GPUs can be connected later by exposing a vLLM OpenAI-compatible endpoint and setting `THINKROUTER_OPENAI_BASE_URL` plus model ids.
 
-## Routing Policy
+## Query Features
 
-The current router is a heuristic policy, not the final trained router. It estimates difficulty from simple query features, evaluates utility for each model-budget pair, and selects the best option:
+The trainable router uses lightweight, explainable features instead of fine-tuning an LLM:
+
+- character and word counts,
+- digit count and digit density,
+- math-symbol count,
+- punctuation count,
+- code-marker count,
+- average word length,
+- task type,
+- selected model id for budget prediction.
+
+## Difficulty Estimator
+
+`train_difficulty.py` builds a sklearn classifier from trace CSVs. Current Day-1 traces do not contain human difficulty labels, so the script derives pseudo-labels from query complexity features and task type. This is sufficient for testing the train-save-load loop; later benchmark splits should replace pseudo-labels with labels derived from train-set performance statistics.
+
+The trained model is saved as a joblib file and can be loaded by setting:
 
 ```text
-U = alpha * estimated_accuracy - beta * estimated_cost - gamma * estimated_latency
+THINKROUTER_DIFFICULTY_MODEL_PATH=results/models/difficulty.joblib
 ```
 
-The Week-2 implementation should replace heuristic estimates with train-split statistics, a learned difficulty estimator, and a learned budget classifier.
+If no model path is configured, the router falls back to the built-in heuristic difficulty estimator.
+
+## Budget Predictor
+
+`train_budget.py` derives a target budget for each `(query, task_type, model)` group by choosing the lowest-cost, lowest-latency correct trace. If no trace is correct, it falls back to the highest-scoring trace. The resulting sklearn classifier predicts one of the fixed budget levels.
+
+The trained model is saved as a joblib file and can be loaded by setting:
+
+```text
+THINKROUTER_BUDGET_MODEL_PATH=results/models/budget.joblib
+```
+
+When loaded, the budget prediction is used as a soft hint inside the joint utility policy. It does not hard-force the selected budget.
+
+## Routing Policy
+
+The router estimates difficulty, optionally predicts a budget hint for each candidate model, evaluates utility for each model-budget pair, and selects the best option:
+
+```text
+U = alpha * estimated_accuracy - beta * estimated_cost - gamma * estimated_latency - hint_penalty
+```
+
+The current accuracy, cost, and latency estimates are still simple policy estimates. The next implementation step is to replace them with train-split aggregate statistics from real benchmark traces.
 
 ## Evaluation
 

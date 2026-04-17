@@ -1,10 +1,10 @@
-﻿# RESULTS
+# RESULTS
 
 No final benchmark results have been produced yet. The current results are Day-1 MVP smoke-test results using deterministic mock models.
 
 ## Current Status
 
-Implemented Day-1 MVP components:
+Implemented Day-1 and initial Week-2 components:
 
 - built-in 20-sample GSM8K-style development set,
 - fixed budgets `0`, `256`, `1024`, `4096`,
@@ -14,7 +14,10 @@ Implemented Day-1 MVP components:
 - Day-1 grid runner,
 - FastAPI endpoints,
 - Streamlit trace demo,
-- baseline summary and Pareto plotting scripts.
+- baseline summary and Pareto plotting scripts,
+- sklearn difficulty estimator training,
+- sklearn budget predictor training,
+- optional router loading from joblib model paths.
 
 ## Day-1 MVP Results
 
@@ -24,6 +27,8 @@ Generated artifacts:
 - grid table: `results/tables/day1_grid.csv`
 - baseline summary: `results/tables/baseline_summary.csv`
 - Pareto figure: `results/figures/pareto.png`
+- difficulty model: `results/models/difficulty.joblib`
+- budget model: `results/models/budget.joblib`
 
 Run command:
 
@@ -31,6 +36,8 @@ Run command:
 python -m thinkrouter.experiments.run_day1_grid --limit 20 --db results/traces/day1.sqlite --out results/tables/day1_grid.csv
 python -m thinkrouter.experiments.eval_baselines results/tables/day1_grid.csv
 python -m thinkrouter.experiments.make_plots results/tables/day1_grid.csv
+python -m thinkrouter.experiments.train_difficulty results/tables/day1_grid.csv --out results/models/difficulty.joblib
+python -m thinkrouter.experiments.train_budget results/tables/day1_grid.csv --out results/models/budget.joblib
 ```
 
 The Day-1 grid covers 20 built-in GSM8K-style samples, 2 mock model configurations, and 3 budget levels:
