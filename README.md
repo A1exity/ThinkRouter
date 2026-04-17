@@ -166,6 +166,14 @@ python -m thinkrouter.experiments.run_grid --input data/splits/gsm8k.jsonl --tas
 python -m thinkrouter.experiments.eval_baselines results/tables/qwen_gsm8k_official_dev5.csv --out results/tables/qwen_gsm8k_official_dev5_summary.csv
 python -m thinkrouter.experiments.make_plots results/tables/qwen_gsm8k_official_dev5.csv --out results/figures/qwen_gsm8k_official_dev5_pareto.png
 ```
+
+Official GSM8K dev20 Qwen budget grid:
+
+```bash
+python -m thinkrouter.experiments.run_grid --input data/splits/gsm8k.jsonl --task gsm8k --split dev --budgets 0,256,1024 --models qwen3.5-flash-2026-02-23 --db results/traces/qwen_gsm8k_official_dev20_budget_grid.sqlite --out results/tables/qwen_gsm8k_official_dev20_budget_grid.csv
+python -m thinkrouter.experiments.eval_baselines results/tables/qwen_gsm8k_official_dev20_budget_grid.csv --out results/tables/qwen_gsm8k_official_dev20_budget_summary.csv
+python -m thinkrouter.experiments.make_plots results/tables/qwen_gsm8k_official_dev20_budget_grid.csv --out results/figures/qwen_gsm8k_official_dev20_budget_pareto.png
+```
 ## Train Router Models
 
 Train on the train split, not dev or test:

@@ -137,6 +137,30 @@ Generated artifacts:
 - `results/tables/qwen_gsm8k_official_dev5.csv`
 - `results/tables/qwen_gsm8k_official_dev5_summary.csv`
 - `results/figures/qwen_gsm8k_official_dev5_pareto.png`
+
+## Official GSM8K Qwen Dev20 Budget Grid
+
+A larger official GSM8K dev run was executed with `qwen3.5-flash-2026-02-23` over all 20 exported dev examples and three budget levels. This is the first run where budget differences become visible.
+
+| file | rows | task | split | budgets | accuracy | total estimated cost |
+| --- | ---: | --- | --- | --- | ---: | ---: |
+| `results/tables/qwen_gsm8k_official_dev20_budget_grid.csv` | 60 | gsm8k | dev | 0,256,1024 | 0.883 | 0.023382 |
+
+Budget summary:
+
+| budget | accuracy | correct | avg cost | p95 latency | n |
+| ---: | ---: | ---: | ---: | ---: | ---: |
+| 0 | 0.950 | 19 | 0.000297 | 14.334s | 20 |
+| 256 | 0.950 | 19 | 0.000319 | 11.370s | 20 |
+| 1024 | 0.750 | 15 | 0.000553 | 28.879s | 20 |
+
+Observation: on this small GSM8K dev subset, larger budget did not improve accuracy. Budget `1024` was more expensive and slower while producing lower exact-match accuracy, which is an early overthinking or answer-format instability signal.
+
+Generated artifacts:
+
+- `results/tables/qwen_gsm8k_official_dev20_budget_grid.csv`
+- `results/tables/qwen_gsm8k_official_dev20_budget_summary.csv`
+- `results/figures/qwen_gsm8k_official_dev20_budget_pareto.png`
 ## Final Reporting Targets
 
 The final report should include:
