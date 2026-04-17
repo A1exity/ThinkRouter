@@ -1,0 +1,22 @@
+name: thinkrouter
+channels:
+  - conda-forge
+dependencies:
+  - python=3.11
+  - pip
+  - pandas
+  - numpy
+  - scikit-learn
+  - matplotlib
+  - plotly
+  - fastapi
+  - uvicorn
+  - streamlit
+  - pydantic
+  - python-dotenv
+  - requests
+  - pytest
+  - pip:
+      - openai
+      - sentence-transformers
+      - datasets
