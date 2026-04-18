@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from thinkrouter.app.evaluators import GSM8KEvaluator, MATHEvaluator, extract_last_boxed, extract_math_output_answer, extract_numeric_answer, normalize_math_answer, normalize_numeric_answer
+from thinkrouter.app.evaluators import GSM8KEvaluator, MATHEvaluator, extract_last_boxed, extract_math_output_answer, math_answers_equal, normalize_math_answer, extract_numeric_answer, normalize_numeric_answer
 
 
 def test_extract_numeric_answer_prefers_final_answer() -> None:
@@ -49,3 +49,9 @@ def test_extract_math_output_answer_falls_back_to_final_expression() -> None:
     assert extract_math_output_answer(r"After solving, x=\frac{9}{7}") == r"\frac{9}{7}"
     assert extract_math_output_answer("Equation: $2+1=3$.\n$x = \\dfrac{9}{7}$") == r"\dfrac{9}{7}"
     assert extract_math_output_answer("The graph has 2 vertical asymptotes.") == "2"
+
+
+def test_math_answers_equal_handles_simple_numeric_equivalence() -> None:
+    assert math_answers_equal(r"\frac{11}{2}", "5.5")
+    assert normalize_math_answer(r"\frac{8}{2}=4") == "4"
+    assert normalize_math_answer(r"7\%") == "7"

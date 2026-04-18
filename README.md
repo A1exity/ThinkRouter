@@ -240,6 +240,7 @@ Build the consolidated GSM8K report:
 
 ```bash
 python -m thinkrouter.experiments.make_gsm8k_report
+python -m thinkrouter.experiments.make_benchmark_report
 ```
 
 Failure analysis for a grid CSV:

@@ -178,6 +178,40 @@ Generated artifacts:
 - `results/tables/qwen_math_official_dev5_failures_regraded.csv`
 - `results/figures/qwen_math_official_dev5_pareto_regraded.png`
 
+## Official MATH Qwen Dev20 Budget Grid
+
+A larger official MATH dev run was executed with `qwen3.5-flash-2026-02-23` over all 20 exported dev examples and three budget levels. This is the second real benchmark path in the project, but it is still a dev-set result rather than a held-out MATH test result.
+
+After improving simple MATH equivalence checks and regrading, the budget summary is:
+
+| budget | regraded accuracy | avg cost | p95 latency | n |
+| ---: | ---: | ---: | ---: | ---: |
+| 0 | 0.800 | 0.001702 | 58.935s | 20 |
+| 256 | 0.700 | 0.000649 | 42.538s | 20 |
+| 1024 | 0.350 | 0.000779 | 32.662s | 20 |
+
+Offline policy summary:
+
+| policy | accuracy | avg cost | total cost | avg latency | p95 latency | n |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| fixed_budget_0 | 0.800 | 0.001702 | 0.034038 | 39.063s | 58.935s | 20 |
+| fixed_budget_256 | 0.700 | 0.000649 | 0.012984 | 15.822s | 42.538s | 20 |
+| fixed_budget_1024 | 0.350 | 0.000779 | 0.015573 | 17.870s | 32.662s | 20 |
+| oracle_lowest_cost_correct | 0.800 | 0.000486 | 0.009720 | 11.274s | 29.652s | 20 |
+| aggregate_utility_budget_256 | 0.700 | 0.000649 | 0.012984 | 15.822s | 42.538s | 20 |
+
+Interpretation: MATH is harder and more evaluator-sensitive than GSM8K. On this dev subset, budget `0` had the best accuracy but much higher cost and latency, while aggregate utility selected budget `256`. The oracle result shows cost/latency headroom from per-sample routing, but the current learned router has not yet been trained or calibrated on MATH.
+
+Generated artifacts:
+
+- `results/tables/qwen_math_official_dev20_budget_grid.csv`
+- `results/tables/qwen_math_official_dev20_budget_grid_regraded.csv`
+- `results/tables/qwen_math_official_dev20_budget_summary_regraded.csv`
+- `results/tables/qwen_math_official_dev20_policy_summary.csv`
+- `results/tables/qwen_math_official_dev20_policy_stats.csv`
+- `results/tables/qwen_math_official_dev20_failures_regraded.csv`
+- `results/figures/qwen_math_official_dev20_budget_pareto_regraded.png`
+
 ## Official GSM8K Qwen Dev20 Budget Grid
 
 A larger official GSM8K dev run was executed with `qwen3.5-flash-2026-02-23` over all 20 exported dev examples and three budget levels. This is the first run where budget differences become visible.
@@ -285,6 +319,8 @@ A consolidated report was generated from the committed dev/test policy CSVs:
 - `results/tables/qwen_gsm8k_final_policy_report.csv`
 - `results/reports/qwen_gsm8k_final_policy_report.md`
 - `results/figures/qwen_gsm8k_test20_policy_comparison.png`
+- `results/tables/qwen_multi_benchmark_policy_report.csv`
+- `results/reports/qwen_multi_benchmark_policy_report.md`
 
 Generated artifacts:
 

@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import re
 from abc import ABC, abstractmethod
+from fractions import Fraction
 
 from thinkrouter.app.schemas import EvalResult
 
@@ -42,7 +43,7 @@ class MATHEvaluator(BaseEvaluator):
     def evaluate(self, output_text: str, expected_answer: str | None) -> EvalResult:
         extracted = normalize_math_answer(extract_math_output_answer(output_text))
         expected = normalize_math_answer(expected_answer)
-        is_correct = bool(extracted and expected and extracted == expected)
+        is_correct = bool(extracted and expected and math_answers_equal(extracted, expected))
         return EvalResult(
             score=1.0 if is_correct else 0.0,
             is_correct=is_correct,
@@ -177,7 +178,42 @@ def normalize_math_answer(value: str | None) -> str | None:
     text = text.replace("\\dfrac", "\\frac").replace("\\tfrac", "\\frac")
     text = re.sub(r"\s+", "", text)
     text = strip_outer_braces(text)
+    if "=" in text:
+        text = text.split("=")[-1]
+        text = strip_outer_braces(text)
+    if text.endswith("\\%"):
+        text = text[:-2]
+    elif text.endswith("%"):
+        text = text[:-1]
     return text.lower() or None
+
+
+def math_answers_equal(left: str, right: str) -> bool:
+    if left == right:
+        return True
+    left_value = parse_simple_math_number(left)
+    right_value = parse_simple_math_number(right)
+    return left_value is not None and right_value is not None and left_value == right_value
+
+
+def parse_simple_math_number(value: str | None) -> Fraction | None:
+    if value is None:
+        return None
+    text = normalize_numeric_fragments(value)
+    frac = re.fullmatch(r"([-+]?)\\frac\{([-+]?\d+)\}\{([-+]?\d+)\}", text)
+    if frac:
+        sign = -1 if frac.group(1) == "-" else 1
+        denominator = int(frac.group(3))
+        if denominator == 0:
+            return None
+        return sign * Fraction(int(frac.group(2)), denominator)
+    if re.fullmatch(r"[-+]?\d+(?:\.\d+)?", text):
+        return Fraction(text)
+    return None
+
+
+def normalize_numeric_fragments(value: str) -> str:
+    return value.replace(",", "").strip()
 
 
 def strip_outer_braces(value: str) -> str:
