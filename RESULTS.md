@@ -212,6 +212,40 @@ Generated artifacts:
 - `results/tables/qwen_math_official_dev20_failures_regraded.csv`
 - `results/figures/qwen_math_official_dev20_budget_pareto_regraded.png`
 
+## Official MATH Qwen Test20 Budget Grid
+
+A held-out official MATH test run was executed with `qwen3.5-flash-2026-02-23` over all 20 exported test examples and three budget levels.
+
+Regraded budget summary:
+
+| budget | regraded accuracy | avg cost | p95 latency | n |
+| ---: | ---: | ---: | ---: | ---: |
+| 0 | 0.500 | 0.000604 | 32.348s | 20 |
+| 256 | 0.550 | 0.000876 | 54.652s | 20 |
+| 1024 | 0.250 | 0.001022 | 49.151s | 20 |
+
+Offline policy summary:
+
+| policy | accuracy | avg cost | total cost | avg latency | p95 latency | n |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| fixed_budget_0 | 0.500 | 0.000604 | 0.012073 | 13.984s | 32.348s | 20 |
+| fixed_budget_256 | 0.550 | 0.000876 | 0.017518 | 28.854s | 54.652s | 20 |
+| fixed_budget_1024 | 0.250 | 0.001022 | 0.020439 | 23.268s | 49.151s | 20 |
+| oracle_lowest_cost_correct | 0.600 | 0.000611 | 0.012228 | 14.560s | 36.246s | 20 |
+| aggregate_utility_budget_0 | 0.500 | 0.000604 | 0.012073 | 13.984s | 32.348s | 20 |
+
+Interpretation: on held-out MATH, budget `256` has the best fixed-budget accuracy, while aggregate utility chooses budget `0` because it is much cheaper and faster. The `1024` setting again performs poorly, reinforcing that blindly increasing the thinking budget is not reliable for this Qwen setup.
+
+Generated artifacts:
+
+- `results/tables/qwen_math_official_test20_budget_grid.csv`
+- `results/tables/qwen_math_official_test20_budget_grid_regraded.csv`
+- `results/tables/qwen_math_official_test20_budget_summary_regraded.csv`
+- `results/tables/qwen_math_official_test20_policy_summary.csv`
+- `results/tables/qwen_math_official_test20_policy_stats.csv`
+- `results/tables/qwen_math_official_test20_failures_regraded.csv`
+- `results/figures/qwen_math_official_test20_budget_pareto_regraded.png`
+
 ## Official GSM8K Qwen Dev20 Budget Grid
 
 A larger official GSM8K dev run was executed with `qwen3.5-flash-2026-02-23` over all 20 exported dev examples and three budget levels. This is the first run where budget differences become visible.
@@ -314,7 +348,7 @@ Held-out test20 results:
 
 The calibrated policy matches the best fixed-budget test accuracy and avoids the train-only fallback's accuracy drop. It still does not close the gap to the oracle, so the remaining router opportunity is per-sample budget selection rather than global fallback selection.
 
-A consolidated report was generated from the committed dev/test policy CSVs:
+A consolidated report was generated from the committed dev/test policy CSVs. The multi-benchmark report uses held-out `test20` rows for both GSM8K and MATH.
 
 - `results/tables/qwen_gsm8k_final_policy_report.csv`
 - `results/reports/qwen_gsm8k_final_policy_report.md`

@@ -10,14 +10,14 @@ This report aggregates committed Qwen policy summaries across official GSM8K and
 | gsm8k       | test20  | oracle_lowest_cost_correct              |       1    |   0.000288 |       10.3245 |             0.531784 |  20 |
 | gsm8k       | test20  | aggregate_utility_budget_256            |       0.95 |   0.000344 |       16.7214 |             0.634985 |  20 |
 | gsm8k       | test20  | safe_learned_policy_fallback_budget_256 |       0.95 |   0.000344 |       16.7214 |             0.634985 |  20 |
-| math        | dev20   | fixed_budget_0                          |       0.8  |   0.001702 |       58.9353 |             2.18563  |  20 |
-| math        | dev20   | fixed_budget_256                        |       0.7  |   0.000649 |       42.5375 |             0.833717 |  20 |
-| math        | dev20   | fixed_budget_1024                       |       0.35 |   0.000779 |       32.6618 |             1        |  20 |
-| math        | dev20   | oracle_lowest_cost_correct              |       0.8  |   0.000486 |       29.6516 |             0.624164 |  20 |
-| math        | dev20   | aggregate_utility_budget_256            |       0.7  |   0.000649 |       42.5375 |             0.833717 |  20 |
+| math        | test20  | fixed_budget_0                          |       0.5  |   0.000604 |       32.3479 |             0.59066  |  20 |
+| math        | test20  | fixed_budget_256                        |       0.55 |   0.000876 |       54.6521 |             0.857057 |  20 |
+| math        | test20  | fixed_budget_1024                       |       0.25 |   0.001022 |       49.1511 |             1        |  20 |
+| math        | test20  | oracle_lowest_cost_correct              |       0.6  |   0.000611 |       36.2456 |             0.59827  |  20 |
+| math        | test20  | aggregate_utility_budget_0              |       0.5  |   0.000604 |       32.3479 |             0.59066  |  20 |
 
 Notes:
 
 - GSM8K rows use held-out `test20` results.
-- MATH rows currently use `dev20` results; this is not yet a held-out MATH test result.
+- MATH rows use held-out `test20` results.
 - `oracle_lowest_cost_correct` is an offline upper bound and is not deployable.

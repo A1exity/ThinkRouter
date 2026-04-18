@@ -9,7 +9,7 @@ import pandas as pd
 REPORT_INPUTS = [
     ("gsm8k", "test20", "results/tables/qwen_gsm8k_official_test20_policy_summary.csv"),
     ("gsm8k", "test20", "results/tables/qwen_gsm8k_official_train60_dev20_to_test20_calibrated_policy_summary.csv"),
-    ("math", "dev20", "results/tables/qwen_math_official_dev20_policy_summary.csv"),
+    ("math", "test20", "results/tables/qwen_math_official_test20_policy_summary.csv"),
 ]
 
 
@@ -57,7 +57,7 @@ def write_markdown(df: pd.DataFrame, out_path: str) -> None:
         "Notes:",
         "",
         "- GSM8K rows use held-out `test20` results.",
-        "- MATH rows currently use `dev20` results; this is not yet a held-out MATH test result.",
+        "- MATH rows use held-out `test20` results.",
         "- `oracle_lowest_cost_correct` is an offline upper bound and is not deployable.",
     ]
     out.write_text("\n".join(lines) + "\n", encoding="utf-8")
