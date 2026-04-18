@@ -1,0 +1,47 @@
+sample_id,split,task_type,selected_model,selected_budget,expected_answer,extracted_answer,error_type,correct_budgets_for_sample,any_other_budget_correct,total_tokens,cost_usd,latency_s,query,output_preview,output_text
+gsm8k_dev_013,dev,gsm8k,qwen3.5-flash-2026-02-23,0,13,12,wrong_answer,,False,5057,0.001451359,43.04774399999587,"Carlos is planting a lemon tree. The tree will cost $90 to plant. Each year it will grow 7 lemons, which he can sell for $1.5 each. It costs $3 a year to water and feed the tree. How many years will it take before he starts earning money on the lemon tree?",12 years,12 years
+gsm8k_dev_013,dev,gsm8k,qwen3.5-flash-2026-02-23,256,13,12,wrong_answer,,False,1519,0.0004359529999999,8.241929700001492,"Carlos is planting a lemon tree. The tree will cost $90 to plant. Each year it will grow 7 lemons, which he can sell for $1.5 each. It costs $3 a year to water and feed the tree. How many years will it take before he starts earning money on the lemon tree?","First, calculate the net profit Carlos makes each year from the tree. He earns $10.50 annually from selling lemons ($1.5 \times 7$) but spends $3 annually on care, resulting in a net gain of $7.50 per year ($10.50 - $3$).  Next, divide the ","First, calculate the net profit Carlos makes each year from the tree. He earns $10.50 annually from selling lemons ($1.5 \times 7$) but spends $3 annually on care, resulting in a net gain of $7.50 per year ($10.50 - $3$).
+
+Next, divide the initial planting cost by the annual net gain to find the break-even point: $90 / $7.50 = 12$.
+
+It will take 12 years to recover the initial cost.
+
+**12 years**"
+gsm8k_dev_013,dev,gsm8k,qwen3.5-flash-2026-02-23,1024,13,12,wrong_answer,,False,3477,0.000997899,30.51519799999369,"Carlos is planting a lemon tree. The tree will cost $90 to plant. Each year it will grow 7 lemons, which he can sell for $1.5 each. It costs $3 a year to water and feed the tree. How many years will it take before he starts earning money on the lemon tree?","To determine how many years it will take for Carlos to start earning money (recover his initial investment), we need to calculate his annual net profit and see how long it takes to cover the initial planting cost.  **Step 1: Calculate the a","To determine how many years it will take for Carlos to start earning money (recover his initial investment), we need to calculate his annual net profit and see how long it takes to cover the initial planting cost.
+
+**Step 1: Calculate the annual revenue.**
+Carlos grows 7 lemons per year and sells them for $1.50 each.
+$$7 \text{ lemons} \times \$1.50/\text{lemon} = \$10.50 \text{ per year}$$
+
+**Step 2: Calculate the annual net profit.**
+We must subtract the annual maintenance costs (water and feed) from the revenue.
+$$\$10.50 \text{ (Revenue)} - \$3.00 \text{ (Maintenance)} = \$7.50 \text{ net profit per year}$$
+
+**Step 3: Calculate the break-even point.**
+Now, we divide the initial cost of planting the tree by the annual net profit to find out how many years it takes to earn back the $90.
+$$\$90 \text{ (Initial Cost)} / \$7.50 \text{ (Annual Net Profit)} = 12 \text{ years}$$
+
+**Verification:**
+*   **Year 1:** Earns $7.50 (Total recovered: $7.50)
+*   **Year 2:** Earns $7.50 (Total recovered: $15.00)
+*   ...
+*   **Year 10:** Earns $7.50 (Total recovered: $75.00)
+*   **Year 11:** Earns $7.50 (Total recovered: $82.50)
+*   **Year 12:** Earns $7.50 (Total recovered: $90.00)
+
+At the end of 12 years, Carlos has earned back the full $90 he spent to plant the tree. From that point forward, any money he earns is pure profit.
+
+**Answer:**
+It will take **12 years** before he starts earning money on the lemon tree."
+gsm8k_dev_017,dev,gsm8k,qwen3.5-flash-2026-02-23,1024,230,1,answer_format_extraction_error,"0,256",True,3692,0.001059604,26.19419030001154,"Two trains leave San Rafael at the same time. They begin traveling westward, both traveling for 80 miles. The next day, they travel northwards, covering 150 miles. What's the distance covered by each train in the two days?","Here is the step-by-step reasoning to determine the answer:  1.  **Analyze the movement of a single train:** The problem states that ""both"" trains follow the same path. We can calculate the distance for one train, which will apply to the ot","Here is the step-by-step reasoning to determine the answer:
+
+1.  **Analyze the movement of a single train:** The problem states that ""both"" trains follow the same path. We can calculate the distance for one train, which will apply to the other.
+2.  **Day 1 Travel:** The trains travel westward for **80 miles**.
+3.  **Day 2 Travel:** The trains travel northward for **150 miles**.
+4.  **Define ""Distance Covered"":** In physics and general measurement, ""distance covered"" refers to the total length of the path traveled (odometer reading), regardless of direction. This is distinct from ""displacement,"" which would be the straight-line distance from the starting point to the ending point.
+5.  **Calculate Total Distance:** To find the total distance covered by each train, we add the distance from Day 1 to the distance from Day 2.
+    $$80 \text{ miles} + 150 \text{ miles} = 230 \text{ miles}$$
+6.  **Verify the Question:** The question asks for the distance covered by **each** train, not the combined distance of both trains. Therefore, we do not multiply the result by two.
+
+**Answer:**
+Each train covers a total distance of **230 miles**."

@@ -45,23 +45,41 @@ def get_evaluator(task_type: str) -> BaseEvaluator:
 
 
 def extract_final_answer(text: str) -> str | None:
+    marker_answer = extract_marked_answer(text)
+    if marker_answer:
+        return marker_answer
+    return text.strip() if text.strip() else None
+
+
+def extract_marked_answer(text: str) -> str | None:
     patterns = [
         r"####\s*([^\n]+)",
-        r"final answer\s*[:?]\s*([^\n]+)",
-        r"answer\s*[:?]\s*([^\n]+)",
+        r"(?:final\s+answer|answer)\s*\*{0,2}\s*[:：]\s*\*{0,2}\s*([^\n]+)",
+        r"(?:final\s+answer|answer)\s*\*{0,2}\s*[:：]\s*\*{0,2}\s*\n+\s*([^\n]+)",
     ]
     for pattern in patterns:
         match = re.search(pattern, text, flags=re.IGNORECASE)
         if match:
-            return match.group(1).strip()
-    return text.strip() if text.strip() else None
+            answer = _strip_markdown_answer(match.group(1))
+            if answer:
+                return answer
+    return None
+
+
+def _strip_markdown_answer(value: str) -> str:
+    value = value.strip()
+    value = re.sub(r"^[-*\s]+", "", value)
+    value = value.replace("**", "").replace("__", "")
+    return value.strip()
 
 
 def extract_numeric_answer(text: str) -> str | None:
-    final = extract_final_answer(text) or text
-    numbers = re.findall(r"[-+]?\d[\d,]*(?:\.\d+)?", final)
-    if not numbers:
-        numbers = re.findall(r"[-+]?\d[\d,]*(?:\.\d+)?", text)
+    marked = extract_marked_answer(text)
+    if marked:
+        numbers = re.findall(r"[-+]?\d[\d,]*(?:\.\d+)?", marked)
+        if numbers:
+            return normalize_numeric_answer(numbers[0])
+    numbers = re.findall(r"[-+]?\d[\d,]*(?:\.\d+)?", text)
     if not numbers:
         return None
     return normalize_numeric_answer(numbers[-1])

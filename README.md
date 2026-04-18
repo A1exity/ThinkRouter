@@ -175,6 +175,12 @@ python -m thinkrouter.experiments.eval_baselines results/tables/qwen_gsm8k_offic
 python -m thinkrouter.experiments.make_plots results/tables/qwen_gsm8k_official_dev20_budget_grid.csv --out results/figures/qwen_gsm8k_official_dev20_budget_pareto.png
 ```
 
+
+Regrade an existing grid with the current evaluator:
+
+```bash
+python -m thinkrouter.experiments.regrade_traces results/tables/qwen_gsm8k_official_dev20_budget_grid.csv --out results/tables/qwen_gsm8k_official_dev20_budget_grid_regraded.csv
+```
 Failure analysis for a grid CSV:
 
 ```bash

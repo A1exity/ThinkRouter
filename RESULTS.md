@@ -20,6 +20,7 @@ Implemented Day-1 and Week-2 pipeline components:
 - FastAPI endpoints,
 - Streamlit trace demo,
 - baseline summary and Pareto plotting scripts,
+- failure analysis and trace regrading scripts,
 - sklearn difficulty estimator training,
 - sklearn budget predictor training,
 - optional router loading from joblib model paths.
@@ -79,9 +80,7 @@ The JSONL interface was smoke-tested by exporting 38 seed samples to `data/split
 
 A real endpoint can be checked with `python -m thinkrouter.experiments.smoke_real_model --model <model-id>`. Passing `--run` performs an actual provider call and can incur cost.
 
-Because the committed results use deterministic mock adapters, all current accuracies are expected to be perfect. The value of this stage is validating the train/dev/test and JSONL experiment plumbing, not measuring model quality.
-
-
+Because the early committed results use deterministic mock adapters, all mock accuracies are expected to be perfect. The value of those stages is validating the train/dev/test and JSONL experiment plumbing, not measuring model quality.
 
 ## Official GSM8K Data Export
 
@@ -92,6 +91,7 @@ Because the committed results use deterministic mock adapters, all current accur
 | `data/splits/gsm8k.jsonl` | 100 | 60 | 20 | 20 |
 
 The exported JSONL file and Hugging Face cache are local artifacts and are not committed. A 2-sample mock `run_grid --input data/splits/gsm8k.jsonl` smoke test passed, confirming the official GSM8K JSONL is compatible with the grid runner.
+
 ## Qwen Real-Model Smoke Tests
 
 Small provider-backed smoke tests were run with `qwen3.5-flash-2026-02-23` through DashScope OpenAI-compatible mode. These are not benchmark results; they validate that the real model path works and that budget-level traces can be recorded.
@@ -142,11 +142,13 @@ Generated artifacts:
 
 A larger official GSM8K dev run was executed with `qwen3.5-flash-2026-02-23` over all 20 exported dev examples and three budget levels. This is the first run where budget differences become visible.
 
+Original extractor result:
+
 | file | rows | task | split | budgets | accuracy | total estimated cost |
 | --- | ---: | --- | --- | --- | ---: | ---: |
 | `results/tables/qwen_gsm8k_official_dev20_budget_grid.csv` | 60 | gsm8k | dev | 0,256,1024 | 0.883 | 0.023382 |
 
-Budget summary:
+Original budget summary:
 
 | budget | accuracy | correct | avg cost | p95 latency | n |
 | ---: | ---: | ---: | ---: | ---: | ---: |
@@ -154,18 +156,17 @@ Budget summary:
 | 256 | 0.950 | 19 | 0.000319 | 11.370s | 20 |
 | 1024 | 0.750 | 15 | 0.000553 | 28.879s | 20 |
 
-Observation: on this small GSM8K dev subset, larger budget did not improve accuracy. Budget `1024` was more expensive and slower while producing lower exact-match accuracy, which is an early overthinking or answer-format instability signal.
+Failure analysis found 7 incorrect traces across 5 unique samples. Four of the five `1024` failures contained the correct numeric answer in the output but ended with another number, causing the earlier extractor to select the wrong value. Those same samples were correct at budgets `0` and `256`.
 
-Failure analysis found 7 incorrect traces across 5 unique samples:
+After improving the answer-heading extractor and regrading, 3 rows changed from incorrect to correct. The regraded summary is:
 
-| budget | error type | count |
-| ---: | --- | ---: |
-| 0 | wrong_answer | 1 |
-| 256 | wrong_answer | 1 |
-| 1024 | answer_format_extraction_error | 4 |
-| 1024 | wrong_answer | 1 |
+| budget | regraded accuracy | correct | avg cost | p95 latency | n |
+| ---: | ---: | ---: | ---: | ---: | ---: |
+| 0 | 0.950 | 19 | 0.000297 | 14.334s | 20 |
+| 256 | 0.950 | 19 | 0.000319 | 11.370s | 20 |
+| 1024 | 0.900 | 18 | 0.000553 | 28.879s | 20 |
 
-Four of the five `1024` failures contained the correct numeric answer in the output but ended with another number, causing the current exact-match extractor to select the wrong value. Those same samples were correct at budgets `0` and `256`, which supports the answer-format instability interpretation. One sample (`gsm8k_dev_013`) was wrong at all three budgets.
+Regraded interpretation: higher budget still did not improve accuracy on this subset, and `1024` remained substantially more expensive and slower. The strongest conclusion is therefore not "1024 is always worse," but "blindly increasing budget is not cost-effective and can introduce answer-format instability."
 
 Generated artifacts:
 
@@ -173,6 +174,11 @@ Generated artifacts:
 - `results/tables/qwen_gsm8k_official_dev20_budget_summary.csv`
 - `results/figures/qwen_gsm8k_official_dev20_budget_pareto.png`
 - `results/tables/qwen_gsm8k_official_dev20_failures.csv`
+- `results/tables/qwen_gsm8k_official_dev20_budget_grid_regraded.csv`
+- `results/tables/qwen_gsm8k_official_dev20_budget_summary_regraded.csv`
+- `results/tables/qwen_gsm8k_official_dev20_failures_regraded.csv`
+- `results/figures/qwen_gsm8k_official_dev20_budget_pareto_regraded.png`
+
 ## Final Reporting Targets
 
 The final report should include:
