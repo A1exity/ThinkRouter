@@ -4,6 +4,7 @@ import joblib
 import pandas as pd
 
 from thinkrouter.experiments.learned_policy_router import (
+    calibrate_policy_artifact,
     derive_policy_training_examples,
     evaluate_learned_policy,
     replay_learned_policy,
@@ -79,3 +80,34 @@ def test_safe_policy_can_be_disabled_for_raw_replay(tmp_path) -> None:
     assert raw_summary["policy"].iloc[0] == "learned_policy"
     assert "safe_fallback_budget" in safe_selected.columns
     assert "predicted_budget" in raw_selected.columns
+
+
+def test_calibrate_policy_artifact_selects_best_fixed_budget(tmp_path) -> None:
+    train_csv = tmp_path / "train.csv"
+    dev_csv = tmp_path / "dev.csv"
+    _write_policy_grid(train_csv)
+    rows = []
+    for sample_id in ["d1", "d2"]:
+        for budget in [0, 256]:
+            rows.append(
+                {
+                    "id": f"{sample_id}-{budget}",
+                    "query": "Add 1 and 2.",
+                    "task_type": "gsm8k",
+                    "selected_model": "model",
+                    "selected_budget": budget,
+                    "is_correct": budget == 256,
+                    "score": 1.0 if budget == 256 else 0.0,
+                    "cost_usd": 0.01 + budget / 100000,
+                    "latency_s": 1.0 + budget / 1000,
+                    "metadata": f"{{'sample_id': '{sample_id}', 'split': 'dev'}}",
+                }
+            )
+    pd.DataFrame(rows).to_csv(dev_csv, index=False)
+    artifact = train_learned_policy(str(train_csv))
+
+    calibrated, summary = calibrate_policy_artifact(artifact, str(dev_csv))
+
+    assert calibrated.safe_mode is True
+    assert calibrated.fallback_budget == 256
+    assert "utility" in summary.columns

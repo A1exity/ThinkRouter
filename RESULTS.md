@@ -226,7 +226,21 @@ Replaying the raw learned classifier and the safe learned policy on the separate
 | learned_policy_raw | train60 | dev20 | 0.950 | 0.000373 | 0.007465 | 8.377s | 14.455s | 20 |
 | safe_learned_policy_fallback_budget_0 | train60 | dev20 | 0.950 | 0.000297 | 0.005939 | 6.996s | 14.334s | 20 |
 
-The raw learned router predicted budget `0` for 10 dev samples, `256` for 7, and `1024` for 3. It matched the best fixed-budget accuracy on dev20, but did not beat fixed budget `0` or `256` on cost/latency. The safe policy therefore falls back to budget `0`: it preserves the raw predictions for diagnostics while preventing a cost/latency regression. The useful conclusion is that the learned-router evaluation loop is now real and cross-split, while this first feature set and small training split are not yet strong enough to outperform simple fixed-budget baselines.
+The raw learned router predicted budget `0` for 10 dev samples, `256` for 7, and `1024` for 3. It matched the best fixed-budget accuracy on dev20, but did not beat fixed budget `0` or `256` on cost/latency. Dev calibration selected fallback budget `256`, which had the highest dev utility among raw learned and fixed-budget candidates.
+
+Held-out test20 results:
+
+| policy | train split | calibration split | eval split | accuracy | avg cost | total cost | avg latency | p95 latency | n |
+| --- | --- | --- | --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| fixed_budget_0 | - | - | test20 | 0.900 | 0.000242 | 0.004836 | 6.424s | 19.652s | 20 |
+| fixed_budget_256 | - | - | test20 | 0.950 | 0.000344 | 0.006883 | 8.725s | 16.721s | 20 |
+| fixed_budget_1024 | - | - | test20 | 0.950 | 0.000542 | 0.010840 | 13.555s | 23.390s | 20 |
+| learned_policy_raw | train60 | - | test20 | 0.900 | 0.000284 | 0.005677 | 7.243s | 19.652s | 20 |
+| safe_learned_policy_fallback_budget_0 | train60 | - | test20 | 0.900 | 0.000242 | 0.004836 | 6.424s | 19.652s | 20 |
+| safe_learned_policy_fallback_budget_256 | train60 | dev20 | test20 | 0.950 | 0.000344 | 0.006883 | 8.725s | 16.721s | 20 |
+| oracle_lowest_cost_correct | - | - | test20 | 1.000 | 0.000288 | 0.005765 | 7.674s | 10.325s | 20 |
+
+The calibrated policy matches the best fixed-budget test accuracy and avoids the train-only fallback's accuracy drop. It still does not close the gap to the oracle, so the remaining router opportunity is per-sample budget selection rather than global fallback selection.
 
 Generated artifacts:
 
@@ -245,6 +259,21 @@ Generated artifacts:
 - `results/tables/qwen_gsm8k_official_train60_to_dev20_raw_learned_policy_selected.csv`
 - `results/tables/qwen_gsm8k_official_train60_to_dev20_safe_policy_summary.csv`
 - `results/tables/qwen_gsm8k_official_train60_to_dev20_safe_policy_selected.csv`
+- `results/tables/qwen_gsm8k_official_test20_budget_grid.csv`
+- `results/tables/qwen_gsm8k_official_test20_budget_grid_regraded.csv`
+- `results/tables/qwen_gsm8k_official_test20_budget_summary_regraded.csv`
+- `results/tables/qwen_gsm8k_official_test20_policy_summary.csv`
+- `results/tables/qwen_gsm8k_official_test20_policy_stats.csv`
+- `results/tables/qwen_gsm8k_official_test20_failures_regraded.csv`
+- `results/figures/qwen_gsm8k_official_test20_budget_pareto_regraded.png`
+- `results/models/qwen_gsm8k_official_train60_dev20_calibrated_policy.joblib`
+- `results/tables/qwen_gsm8k_official_dev20_calibration_summary.csv`
+- `results/tables/qwen_gsm8k_official_train60_to_test20_raw_learned_policy_summary.csv`
+- `results/tables/qwen_gsm8k_official_train60_to_test20_raw_learned_policy_selected.csv`
+- `results/tables/qwen_gsm8k_official_train60_to_test20_safe_policy_summary.csv`
+- `results/tables/qwen_gsm8k_official_train60_to_test20_safe_policy_selected.csv`
+- `results/tables/qwen_gsm8k_official_train60_dev20_to_test20_calibrated_policy_summary.csv`
+- `results/tables/qwen_gsm8k_official_train60_dev20_to_test20_calibrated_policy_selected.csv`
 
 ## Final Reporting Targets
 

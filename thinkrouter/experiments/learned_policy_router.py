@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from dataclasses import asdict, dataclass
+from dataclasses import asdict, dataclass, replace
 from typing import Any
 
 import joblib
@@ -12,7 +12,7 @@ from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import OneHotEncoder, StandardScaler
 
 from thinkrouter.app.router import make_feature_frame
-from thinkrouter.experiments.evaluate_policy import UtilityWeights, add_sample_id, aggregate_utility_policy, summarize_selection, utility
+from thinkrouter.experiments.evaluate_policy import UtilityWeights, add_sample_id, aggregate_utility_policy, fixed_budget_policy, summarize_selection, utility
 
 NUMERIC_FEATURES = [
     "char_count",
@@ -177,6 +177,53 @@ def choose_safe_fallback_budget(df: pd.DataFrame, weights: UtilityWeights) -> tu
             "aggregate_utility": float(aggregate_stats.loc[aggregate_stats["selected_budget"].astype(int) == fallback_budget, "utility"].iloc[0]),
         },
     )
+
+
+def calibrate_policy_artifact(artifact: LearnedPolicyArtifact, calibration_csv_path: str) -> tuple[LearnedPolicyArtifact, pd.DataFrame]:
+    weights = UtilityWeights(**artifact.weights)
+    df = add_sample_id(pd.read_csv(calibration_csv_path))
+    rows: list[dict[str, Any]] = []
+
+    raw_selected = replay_learned_policy(artifact, df, safe=False)
+    rows.append(summarize_selection("learned_policy_raw", raw_selected))
+    for budget in sorted(df["selected_budget"].astype(int).unique()):
+        rows.append(summarize_selection(f"fixed_budget_{budget}", fixed_budget_policy(df, budget)))
+
+    summary = pd.DataFrame(rows)
+    summary["utility"] = [utility(row, weights) for _, row in summary.iterrows()]
+    best = summary.sort_values(["utility", "accuracy", "avg_cost"], ascending=[False, False, True]).iloc[0]
+    policy_name = str(best["policy"])
+    if policy_name.startswith("fixed_budget_"):
+        fallback_budget = int(policy_name.removeprefix("fixed_budget_"))
+        calibrated = replace(
+            artifact,
+            fallback_budget=fallback_budget,
+            safe_mode=True,
+            diagnostics={
+                **(artifact.diagnostics or {}),
+                "calibration_policy": "fallback_to_calibrated_fixed_budget",
+                "calibration_fallback_budget": fallback_budget,
+                "calibration_utility": float(best["utility"]),
+                "calibration_accuracy": float(best["accuracy"]),
+                "calibration_avg_cost": float(best["avg_cost"]),
+                "calibration_avg_latency": float(best["avg_latency"]),
+            },
+        )
+    else:
+        calibrated = replace(
+            artifact,
+            fallback_budget=None,
+            safe_mode=False,
+            diagnostics={
+                **(artifact.diagnostics or {}),
+                "calibration_policy": "raw_learned_policy",
+                "calibration_utility": float(best["utility"]),
+                "calibration_accuracy": float(best["accuracy"]),
+                "calibration_avg_cost": float(best["avg_cost"]),
+                "calibration_avg_latency": float(best["avg_latency"]),
+            },
+        )
+    return calibrated, summary
 
 
 def replay_learned_policy(artifact: LearnedPolicyArtifact, df: pd.DataFrame, safe: bool = True) -> pd.DataFrame:

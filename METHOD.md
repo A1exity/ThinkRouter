@@ -101,7 +101,9 @@ U = alpha * is_correct - beta * cost - gamma * latency
 
 The target label is the budget with the highest utility. The model only receives query-side features, task type, and selected model id; it does not see the model output or correctness at inference time.
 
-Training also records a safe fallback budget: the train-split aggregate-utility budget. `evaluate_learned_policy.py` uses this safe policy by default, so raw classifier predictions are preserved for diagnostics but the selected budget falls back to the conservative train-split baseline. Passing `--unsafe` replays the raw classifier predictions directly.
+Training also records a safe fallback budget: the train-split aggregate-utility budget. `calibrate_learned_policy.py` can then use a dev grid to choose the deployment policy among raw learned routing and fixed-budget fallbacks. This keeps test data held out while preventing a weak raw router from becoming the selected policy.
+
+`evaluate_learned_policy.py` uses the safe policy by default, so raw classifier predictions are preserved for diagnostics but the selected budget falls back to the calibrated conservative policy when needed. Passing `--unsafe` replays the raw classifier predictions directly.
 
 This design is intentionally conservative. Small routing datasets can over-allocate expensive budgets, so the default learned policy must first avoid harming cost and latency relative to a simple fixed-budget baseline before it is allowed to act as the selected policy.
 

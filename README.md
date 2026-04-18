@@ -201,8 +201,10 @@ Train and replay a learned policy router. The default evaluator uses the safe po
 
 ```bash
 python -m thinkrouter.experiments.train_learned_policy results/tables/qwen_gsm8k_official_train60_budget_grid_regraded.csv --out results/models/qwen_gsm8k_official_train60_learned_policy.joblib
+python -m thinkrouter.experiments.calibrate_learned_policy results/tables/qwen_gsm8k_official_dev20_budget_grid_regraded.csv --model results/models/qwen_gsm8k_official_train60_learned_policy.joblib --out results/models/qwen_gsm8k_official_train60_dev20_calibrated_policy.joblib --summary-out results/tables/qwen_gsm8k_official_dev20_calibration_summary.csv
 python -m thinkrouter.experiments.evaluate_learned_policy results/tables/qwen_gsm8k_official_dev20_budget_grid_regraded.csv --model results/models/qwen_gsm8k_official_train60_learned_policy.joblib --out results/tables/qwen_gsm8k_official_train60_to_dev20_safe_policy_summary.csv --selected-out results/tables/qwen_gsm8k_official_train60_to_dev20_safe_policy_selected.csv
 python -m thinkrouter.experiments.evaluate_learned_policy results/tables/qwen_gsm8k_official_dev20_budget_grid_regraded.csv --model results/models/qwen_gsm8k_official_train60_learned_policy.joblib --unsafe --out results/tables/qwen_gsm8k_official_train60_to_dev20_raw_learned_policy_summary.csv --selected-out results/tables/qwen_gsm8k_official_train60_to_dev20_raw_learned_policy_selected.csv
+python -m thinkrouter.experiments.evaluate_learned_policy results/tables/qwen_gsm8k_official_test20_budget_grid_regraded.csv --model results/models/qwen_gsm8k_official_train60_dev20_calibrated_policy.joblib --out results/tables/qwen_gsm8k_official_train60_dev20_to_test20_calibrated_policy_summary.csv --selected-out results/tables/qwen_gsm8k_official_train60_dev20_to_test20_calibrated_policy_selected.csv
 ```
 
 Failure analysis for a grid CSV:
