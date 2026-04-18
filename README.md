@@ -2,7 +2,7 @@
 
 ThinkRouter is an adaptive thinking-budget router for reasoning LLMs. It treats the pair `(model, thinking_budget)` as the routing decision, then records quality, cost, and latency for verifiable reasoning tasks.
 
-This repository currently implements the Day-1 MVP loop plus the first Week-2 trainable router, frozen-split experiment components, a JSONL benchmark interface, and real OpenAI-compatible model smoke-test tooling:
+This repository currently implements the Day-1 MVP loop plus the first Week-2 trainable router, frozen-split experiment components, a JSONL benchmark interface, offline policy evaluation, and real OpenAI-compatible model smoke-test tooling:
 
 1. load built-in GSM8K-style, MATH-style, and HumanEval-style seed samples,
 2. run model configs across fixed budgets,
@@ -12,7 +12,8 @@ This repository currently implements the Day-1 MVP loop plus the first Week-2 tr
 6. run train/dev/test trace CSVs from either built-in seed data or JSONL input,
 7. train lightweight difficulty and budget models from train traces,
 8. validate or call a real OpenAI-compatible model endpoint,
-9. inspect or run examples through Streamlit or FastAPI.
+9. compare fixed-budget, oracle, and aggregate-utility policies from completed grids,
+10. inspect or run examples through Streamlit or FastAPI.
 
 ## Setup
 
@@ -181,6 +182,13 @@ Regrade an existing grid with the current evaluator:
 ```bash
 python -m thinkrouter.experiments.regrade_traces results/tables/qwen_gsm8k_official_dev20_budget_grid.csv --out results/tables/qwen_gsm8k_official_dev20_budget_grid_regraded.csv
 ```
+
+Evaluate offline routing policies from an existing grid:
+
+```bash
+python -m thinkrouter.experiments.evaluate_policy results/tables/qwen_gsm8k_official_dev20_budget_grid_regraded.csv --out results/tables/qwen_gsm8k_official_dev20_policy_summary.csv --stats-out results/tables/qwen_gsm8k_official_dev20_policy_stats.csv
+```
+
 Failure analysis for a grid CSV:
 
 ```bash

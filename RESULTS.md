@@ -168,6 +168,18 @@ After improving the answer-heading extractor and regrading, 3 rows changed from 
 
 Regraded interpretation: higher budget still did not improve accuracy on this subset, and `1024` remained substantially more expensive and slower. The strongest conclusion is therefore not "1024 is always worse," but "blindly increasing budget is not cost-effective and can introduce answer-format instability."
 
+Offline policy evaluation on the regraded grid:
+
+| policy | accuracy | avg cost | total cost | avg latency | p95 latency | n |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| fixed_budget_0 | 0.950 | 0.000297 | 0.005939 | 6.996s | 14.334s | 20 |
+| fixed_budget_256 | 0.950 | 0.000319 | 0.006385 | 6.592s | 11.370s | 20 |
+| fixed_budget_1024 | 0.900 | 0.000553 | 0.011059 | 13.159s | 28.879s | 20 |
+| oracle_lowest_cost_correct | 0.950 | 0.000233 | 0.004670 | 4.895s | 8.396s | 20 |
+| aggregate_utility_budget_256 | 0.950 | 0.000319 | 0.006385 | 6.592s | 11.370s | 20 |
+
+The oracle policy is an offline upper bound that can inspect all completed candidate traces for each sample. It is not deployable as-is, but it shows the routing headroom: per-sample selection can match the best observed accuracy while reducing cost and latency. The aggregate utility baseline selected budget `256`, which matched budget `0` accuracy with lower p95 latency but slightly higher cost.
+
 Generated artifacts:
 
 - `results/tables/qwen_gsm8k_official_dev20_budget_grid.csv`
@@ -178,6 +190,8 @@ Generated artifacts:
 - `results/tables/qwen_gsm8k_official_dev20_budget_summary_regraded.csv`
 - `results/tables/qwen_gsm8k_official_dev20_failures_regraded.csv`
 - `results/figures/qwen_gsm8k_official_dev20_budget_pareto_regraded.png`
+- `results/tables/qwen_gsm8k_official_dev20_policy_summary.csv`
+- `results/tables/qwen_gsm8k_official_dev20_policy_stats.csv`
 
 ## Final Reporting Targets
 
