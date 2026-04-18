@@ -174,6 +174,12 @@ python -m thinkrouter.experiments.run_grid --input data/splits/gsm8k.jsonl --tas
 python -m thinkrouter.experiments.eval_baselines results/tables/qwen_gsm8k_official_dev20_budget_grid.csv --out results/tables/qwen_gsm8k_official_dev20_budget_summary.csv
 python -m thinkrouter.experiments.make_plots results/tables/qwen_gsm8k_official_dev20_budget_grid.csv --out results/figures/qwen_gsm8k_official_dev20_budget_pareto.png
 ```
+
+Failure analysis for a grid CSV:
+
+```bash
+python -m thinkrouter.experiments.analyze_failures results/tables/qwen_gsm8k_official_dev20_budget_grid.csv --out results/tables/qwen_gsm8k_official_dev20_failures.csv
+```
 ## Train Router Models
 
 Train on the train split, not dev or test:

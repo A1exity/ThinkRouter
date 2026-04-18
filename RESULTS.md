@@ -156,11 +156,23 @@ Budget summary:
 
 Observation: on this small GSM8K dev subset, larger budget did not improve accuracy. Budget `1024` was more expensive and slower while producing lower exact-match accuracy, which is an early overthinking or answer-format instability signal.
 
+Failure analysis found 7 incorrect traces across 5 unique samples:
+
+| budget | error type | count |
+| ---: | --- | ---: |
+| 0 | wrong_answer | 1 |
+| 256 | wrong_answer | 1 |
+| 1024 | answer_format_extraction_error | 4 |
+| 1024 | wrong_answer | 1 |
+
+Four of the five `1024` failures contained the correct numeric answer in the output but ended with another number, causing the current exact-match extractor to select the wrong value. Those same samples were correct at budgets `0` and `256`, which supports the answer-format instability interpretation. One sample (`gsm8k_dev_013`) was wrong at all three budgets.
+
 Generated artifacts:
 
 - `results/tables/qwen_gsm8k_official_dev20_budget_grid.csv`
 - `results/tables/qwen_gsm8k_official_dev20_budget_summary.csv`
 - `results/figures/qwen_gsm8k_official_dev20_budget_pareto.png`
+- `results/tables/qwen_gsm8k_official_dev20_failures.csv`
 ## Final Reporting Targets
 
 The final report should include:
