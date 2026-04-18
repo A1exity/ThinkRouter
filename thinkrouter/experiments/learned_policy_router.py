@@ -12,7 +12,7 @@ from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import OneHotEncoder, StandardScaler
 
 from thinkrouter.app.router import make_feature_frame
-from thinkrouter.experiments.evaluate_policy import UtilityWeights, add_sample_id, summarize_selection, utility
+from thinkrouter.experiments.evaluate_policy import UtilityWeights, add_sample_id, aggregate_utility_policy, summarize_selection, utility
 
 NUMERIC_FEATURES = [
     "char_count",
@@ -33,6 +33,9 @@ class LearnedPolicyArtifact:
     weights: dict[str, float]
     label_counts: dict[int, int]
     training_rows: int
+    fallback_budget: int | None = None
+    safe_mode: bool = True
+    diagnostics: dict[str, float | int | str] | None = None
 
 
 def trace_utility(row: pd.Series, weights: UtilityWeights) -> float:
@@ -109,11 +112,15 @@ def train_learned_policy(csv_path: str, weights: UtilityWeights | None = None) -
     feature_frame = make_feature_frame(examples.to_dict("records"))
     pipeline.fit(feature_frame, labels)
     label_counts = {int(label): int(count) for label, count in labels.value_counts().sort_index().items()}
+    fallback_budget, diagnostics = choose_safe_fallback_budget(df, weights)
     return LearnedPolicyArtifact(
         pipeline=pipeline,
         weights=asdict(weights),
         label_counts=label_counts,
         training_rows=int(len(examples)),
+        fallback_budget=fallback_budget,
+        safe_mode=True,
+        diagnostics=diagnostics,
     )
 
 
@@ -151,7 +158,28 @@ def predict_policy_budgets(artifact: LearnedPolicyArtifact, df: pd.DataFrame) ->
     return examples
 
 
-def replay_learned_policy(artifact: LearnedPolicyArtifact, df: pd.DataFrame) -> pd.DataFrame:
+def choose_safe_fallback_budget(df: pd.DataFrame, weights: UtilityWeights) -> tuple[int, dict[str, float | int | str]]:
+    prepared = add_sample_id(df)
+    aggregate_selected, aggregate_stats = aggregate_utility_policy(prepared, weights)
+    fallback_budget = int(aggregate_selected["selected_budget"].iloc[0])
+    fallback_summary = summarize_selection(f"fixed_budget_{fallback_budget}", aggregate_selected)
+    oracle_examples = derive_policy_training_examples(prepared, weights)
+    label_count = int(oracle_examples["selected_budget"].nunique())
+    return (
+        fallback_budget,
+        {
+            "safe_policy": "fallback_to_aggregate_utility",
+            "fallback_budget": fallback_budget,
+            "fallback_accuracy": float(fallback_summary["accuracy"]),
+            "fallback_avg_cost": float(fallback_summary["avg_cost"]),
+            "fallback_avg_latency": float(fallback_summary["avg_latency"]),
+            "candidate_budget_count": label_count,
+            "aggregate_utility": float(aggregate_stats.loc[aggregate_stats["selected_budget"].astype(int) == fallback_budget, "utility"].iloc[0]),
+        },
+    )
+
+
+def replay_learned_policy(artifact: LearnedPolicyArtifact, df: pd.DataFrame, safe: bool = True) -> pd.DataFrame:
     prepared = add_sample_id(df)
     predictions = predict_policy_budgets(artifact, prepared)
     selected_rows: list[pd.Series] = []
@@ -160,20 +188,28 @@ def replay_learned_policy(artifact: LearnedPolicyArtifact, df: pd.DataFrame) -> 
             (prepared["sample_id"].astype(str) == str(prediction["sample_id"]))
             & (prepared["selected_model"].astype(str) == str(prediction["selected_model"]))
         ].copy()
-        exact = group[group["selected_budget"].astype(int) == int(prediction["predicted_budget"])]
+        predicted_budget = int(prediction["predicted_budget"])
+        selected_budget = int(artifact.fallback_budget) if safe and artifact.safe_mode and artifact.fallback_budget is not None else predicted_budget
+        exact = group[group["selected_budget"].astype(int) == selected_budget]
         candidates = exact if not exact.empty else group.sort_values(["cost_usd", "latency_s", "selected_budget"], ascending=[True, True, True])
         selected = candidates.iloc[0].copy()
-        selected["predicted_budget"] = int(prediction["predicted_budget"])
-        selected["policy"] = "learned_policy"
+        selected["predicted_budget"] = predicted_budget
+        selected["policy_budget"] = int(selected["selected_budget"])
+        selected["policy"] = "safe_learned_policy" if safe else "learned_policy"
+        selected["safe_fallback_budget"] = artifact.fallback_budget
         selected_rows.append(selected)
     return pd.DataFrame(selected_rows)
 
 
-def evaluate_learned_policy(csv_path: str, model_path: str) -> tuple[pd.DataFrame, pd.DataFrame]:
+def evaluate_learned_policy(csv_path: str, model_path: str, safe: bool = True) -> tuple[pd.DataFrame, pd.DataFrame]:
     artifact = load_artifact(model_path)
     df = pd.read_csv(csv_path)
-    selected = replay_learned_policy(artifact, df)
-    summary = pd.DataFrame([summarize_selection("learned_policy", selected)])
+    selected = replay_learned_policy(artifact, df, safe=safe)
+    if safe and artifact.safe_mode and artifact.fallback_budget is not None:
+        name = f"safe_learned_policy_fallback_budget_{artifact.fallback_budget}"
+    else:
+        name = "learned_policy"
+    summary = pd.DataFrame([summarize_selection(name, selected)])
     return summary, selected
 
 
@@ -182,4 +218,7 @@ def artifact_metadata(artifact: LearnedPolicyArtifact) -> dict[str, Any]:
         "training_rows": artifact.training_rows,
         "label_counts": artifact.label_counts,
         "weights": artifact.weights,
+        "fallback_budget": artifact.fallback_budget,
+        "safe_mode": artifact.safe_mode,
+        "diagnostics": artifact.diagnostics,
     }

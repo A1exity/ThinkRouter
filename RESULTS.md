@@ -217,13 +217,16 @@ Train60 offline policy summary:
 | oracle_lowest_cost_correct | 0.983 | 0.000239 | 0.014354 | 5.785s | 10.788s | 60 |
 | aggregate_utility_budget_0 | 0.983 | 0.000266 | 0.015967 | 6.703s | 10.907s | 60 |
 
-The learned policy router was trained on train60 labels derived from per-sample utility. Label counts were `0: 41`, `256: 17`, `1024: 2`. Replaying this trained router on the separate dev20 grid produced:
+The learned policy router was trained on train60 labels derived from per-sample utility. Label counts were `0: 41`, `256: 17`, `1024: 2`. Training selected a safe fallback budget of `0`, matching the train-split aggregate-utility policy.
+
+Replaying the raw learned classifier and the safe learned policy on the separate dev20 grid produced:
 
 | policy | train split | eval split | accuracy | avg cost | total cost | avg latency | p95 latency | n |
 | --- | --- | --- | ---: | ---: | ---: | ---: | ---: | ---: |
-| learned_policy | train60 | dev20 | 0.950 | 0.000373 | 0.007465 | 8.377s | 14.455s | 20 |
+| learned_policy_raw | train60 | dev20 | 0.950 | 0.000373 | 0.007465 | 8.377s | 14.455s | 20 |
+| safe_learned_policy_fallback_budget_0 | train60 | dev20 | 0.950 | 0.000297 | 0.005939 | 6.996s | 14.334s | 20 |
 
-The learned router predicted budget `0` for 10 dev samples, `256` for 7, and `1024` for 3. It matched the best fixed-budget accuracy on dev20, but did not beat fixed budget `0` or `256` on cost/latency. The useful conclusion is that the learned-router evaluation loop is now real and cross-split, while this first feature set and small training split are not yet strong enough to outperform simple fixed-budget baselines.
+The raw learned router predicted budget `0` for 10 dev samples, `256` for 7, and `1024` for 3. It matched the best fixed-budget accuracy on dev20, but did not beat fixed budget `0` or `256` on cost/latency. The safe policy therefore falls back to budget `0`: it preserves the raw predictions for diagnostics while preventing a cost/latency regression. The useful conclusion is that the learned-router evaluation loop is now real and cross-split, while this first feature set and small training split are not yet strong enough to outperform simple fixed-budget baselines.
 
 Generated artifacts:
 
@@ -238,6 +241,10 @@ Generated artifacts:
 - `results/models/qwen_gsm8k_official_train60_learned_policy.joblib`
 - `results/tables/qwen_gsm8k_official_train60_to_dev20_learned_policy_summary.csv`
 - `results/tables/qwen_gsm8k_official_train60_to_dev20_learned_policy_selected.csv`
+- `results/tables/qwen_gsm8k_official_train60_to_dev20_raw_learned_policy_summary.csv`
+- `results/tables/qwen_gsm8k_official_train60_to_dev20_raw_learned_policy_selected.csv`
+- `results/tables/qwen_gsm8k_official_train60_to_dev20_safe_policy_summary.csv`
+- `results/tables/qwen_gsm8k_official_train60_to_dev20_safe_policy_selected.csv`
 
 ## Final Reporting Targets
 

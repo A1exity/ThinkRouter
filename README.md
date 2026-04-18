@@ -197,11 +197,12 @@ Evaluate offline routing policies from an existing grid:
 python -m thinkrouter.experiments.evaluate_policy results/tables/qwen_gsm8k_official_dev20_budget_grid_regraded.csv --out results/tables/qwen_gsm8k_official_dev20_policy_summary.csv --stats-out results/tables/qwen_gsm8k_official_dev20_policy_stats.csv
 ```
 
-Train and replay a learned policy router:
+Train and replay a learned policy router. The default evaluator uses the safe policy: it keeps raw classifier predictions for diagnostics, but falls back to the train-split aggregate-utility budget when the learned selector has not established a better policy.
 
 ```bash
 python -m thinkrouter.experiments.train_learned_policy results/tables/qwen_gsm8k_official_train60_budget_grid_regraded.csv --out results/models/qwen_gsm8k_official_train60_learned_policy.joblib
-python -m thinkrouter.experiments.evaluate_learned_policy results/tables/qwen_gsm8k_official_dev20_budget_grid_regraded.csv --model results/models/qwen_gsm8k_official_train60_learned_policy.joblib --out results/tables/qwen_gsm8k_official_train60_to_dev20_learned_policy_summary.csv --selected-out results/tables/qwen_gsm8k_official_train60_to_dev20_learned_policy_selected.csv
+python -m thinkrouter.experiments.evaluate_learned_policy results/tables/qwen_gsm8k_official_dev20_budget_grid_regraded.csv --model results/models/qwen_gsm8k_official_train60_learned_policy.joblib --out results/tables/qwen_gsm8k_official_train60_to_dev20_safe_policy_summary.csv --selected-out results/tables/qwen_gsm8k_official_train60_to_dev20_safe_policy_selected.csv
+python -m thinkrouter.experiments.evaluate_learned_policy results/tables/qwen_gsm8k_official_dev20_budget_grid_regraded.csv --model results/models/qwen_gsm8k_official_train60_learned_policy.joblib --unsafe --out results/tables/qwen_gsm8k_official_train60_to_dev20_raw_learned_policy_summary.csv --selected-out results/tables/qwen_gsm8k_official_train60_to_dev20_raw_learned_policy_selected.csv
 ```
 
 Failure analysis for a grid CSV:

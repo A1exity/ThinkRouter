@@ -101,7 +101,11 @@ U = alpha * is_correct - beta * cost - gamma * latency
 
 The target label is the budget with the highest utility. The model only receives query-side features, task type, and selected model id; it does not see the model output or correctness at inference time.
 
-`evaluate_learned_policy.py` replays the trained selector on a separate grid CSV by predicting a budget for each evaluation sample, selecting the matching trace, and aggregating accuracy, cost, and latency. This is an offline replay estimate: it is deployable in structure, but it can only evaluate candidate budgets that were already run in the grid.
+Training also records a safe fallback budget: the train-split aggregate-utility budget. `evaluate_learned_policy.py` uses this safe policy by default, so raw classifier predictions are preserved for diagnostics but the selected budget falls back to the conservative train-split baseline. Passing `--unsafe` replays the raw classifier predictions directly.
+
+This design is intentionally conservative. Small routing datasets can over-allocate expensive budgets, so the default learned policy must first avoid harming cost and latency relative to a simple fixed-budget baseline before it is allowed to act as the selected policy.
+
+`evaluate_learned_policy.py` replays the selector on a separate grid CSV by predicting a budget for each evaluation sample, selecting the matching trace or the safe fallback trace, and aggregating accuracy, cost, and latency. This is an offline replay estimate: it is deployable in structure, but it can only evaluate candidate budgets that were already run in the grid.
 
 ## Routing Policy
 

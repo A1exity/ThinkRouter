@@ -59,7 +59,23 @@ def test_train_save_load_and_replay_learned_policy(tmp_path) -> None:
     summary, selected = evaluate_learned_policy(str(csv_path), str(model_path))
     replayed = replay_learned_policy(artifact, pd.read_csv(csv_path))
 
-    assert summary["policy"].iloc[0] == "learned_policy"
+    assert summary["policy"].iloc[0].startswith("safe_learned_policy")
     assert summary["n"].iloc[0] == 3
     assert set(selected["predicted_budget"]).issubset({0, 256, 1024})
     assert len(replayed) == 3
+
+
+def test_safe_policy_can_be_disabled_for_raw_replay(tmp_path) -> None:
+    csv_path = tmp_path / "grid.csv"
+    model_path = tmp_path / "policy.joblib"
+    _write_policy_grid(csv_path)
+    artifact = train_learned_policy(str(csv_path))
+    joblib.dump(artifact, model_path)
+
+    safe_summary, safe_selected = evaluate_learned_policy(str(csv_path), str(model_path), safe=True)
+    raw_summary, raw_selected = evaluate_learned_policy(str(csv_path), str(model_path), safe=False)
+
+    assert safe_summary["policy"].iloc[0].startswith("safe_learned_policy")
+    assert raw_summary["policy"].iloc[0] == "learned_policy"
+    assert "safe_fallback_budget" in safe_selected.columns
+    assert "predicted_budget" in raw_selected.columns
