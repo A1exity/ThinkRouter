@@ -207,6 +207,12 @@ python -m thinkrouter.experiments.evaluate_learned_policy results/tables/qwen_gs
 python -m thinkrouter.experiments.evaluate_learned_policy results/tables/qwen_gsm8k_official_test20_budget_grid_regraded.csv --model results/models/qwen_gsm8k_official_train60_dev20_calibrated_policy.joblib --out results/tables/qwen_gsm8k_official_train60_dev20_to_test20_calibrated_policy_summary.csv --selected-out results/tables/qwen_gsm8k_official_train60_dev20_to_test20_calibrated_policy_selected.csv
 ```
 
+Build the consolidated GSM8K report:
+
+```bash
+python -m thinkrouter.experiments.make_gsm8k_report
+```
+
 Failure analysis for a grid CSV:
 
 ```bash

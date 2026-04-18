@@ -242,6 +242,12 @@ Held-out test20 results:
 
 The calibrated policy matches the best fixed-budget test accuracy and avoids the train-only fallback's accuracy drop. It still does not close the gap to the oracle, so the remaining router opportunity is per-sample budget selection rather than global fallback selection.
 
+A consolidated report was generated from the committed dev/test policy CSVs:
+
+- `results/tables/qwen_gsm8k_final_policy_report.csv`
+- `results/reports/qwen_gsm8k_final_policy_report.md`
+- `results/figures/qwen_gsm8k_test20_policy_comparison.png`
+
 Generated artifacts:
 
 - `results/tables/qwen_gsm8k_official_train60_budget_grid.csv`
@@ -274,6 +280,9 @@ Generated artifacts:
 - `results/tables/qwen_gsm8k_official_train60_to_test20_safe_policy_selected.csv`
 - `results/tables/qwen_gsm8k_official_train60_dev20_to_test20_calibrated_policy_summary.csv`
 - `results/tables/qwen_gsm8k_official_train60_dev20_to_test20_calibrated_policy_selected.csv`
+- `results/tables/qwen_gsm8k_final_policy_report.csv`
+- `results/reports/qwen_gsm8k_final_policy_report.md`
+- `results/figures/qwen_gsm8k_test20_policy_comparison.png`
 
 ## Final Reporting Targets
 
