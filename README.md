@@ -2,6 +2,18 @@
 
 ThinkRouter is an adaptive thinking-budget router for reasoning LLMs. It treats the pair `(model, thinking_budget)` as the routing decision, then records quality, cost, and latency for verifiable reasoning tasks.
 
+## Key Results
+
+On the committed Qwen GSM8K held-out `test20` split, the dev-calibrated safe policy matched the high-budget `1024` baseline accuracy while lowering average estimated cost:
+
+| policy | accuracy | avg cost | p95 latency | cost vs budget 1024 |
+| --- | ---: | ---: | ---: | ---: |
+| fixed budget 1024 | 0.950 | 0.000542 | 23.390s | 100.0% |
+| dev-calibrated safe policy | 0.950 | 0.000344 | 16.721s | 63.5% |
+| oracle upper bound | 1.000 | 0.000288 | 10.325s | 53.2% |
+
+For a resume/interview-oriented overview, see `PROJECT_BRIEF.md`. The consolidated experiment report is in `results/reports/qwen_gsm8k_final_policy_report.md`.
+
 This repository currently implements the Day-1 MVP loop plus the first Week-2 trainable router, frozen-split experiment components, a JSONL benchmark interface, offline policy evaluation, learned policy replay, and real OpenAI-compatible model smoke-test tooling:
 
 1. load built-in GSM8K-style, MATH-style, and HumanEval-style seed samples,
