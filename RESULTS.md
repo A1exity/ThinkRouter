@@ -1,6 +1,6 @@
 # RESULTS
 
-No final multi-benchmark official report has been produced yet. The repository now includes deterministic mock-model pipeline checks plus provider-backed Qwen GSM8K train/dev experiments for budget and learned-policy analysis.
+No final multi-benchmark official report has been produced yet. The repository now includes deterministic mock-model pipeline checks, provider-backed Qwen GSM8K train/dev/test experiments, and an initial provider-backed Qwen MATH smoke test.
 
 ## Current Status
 
@@ -10,12 +10,14 @@ Implemented Day-1 and Week-2 pipeline components:
 - fixed budgets `0`, `256`, `1024`, `4096`,
 - mock and OpenAI-compatible model adapters,
 - GSM8K numeric exact-match evaluator,
+- MATH boxed-answer and final-expression evaluator,
 - exact-match evaluator for non-GSM8K seed tasks,
 - SQLite trace store,
 - Day-1 grid runner,
 - frozen train/dev/test grid runner,
 - benchmark JSONL export and input loader,
 - official GSM8K subset export to JSONL,
+- official MATH subset export to JSONL,
 - real OpenAI-compatible endpoint configuration preflight,
 - FastAPI endpoints,
 - Streamlit trace demo,
@@ -94,6 +96,23 @@ Because the early committed results use deterministic mock adapters, all mock ac
 
 The exported JSONL file and Hugging Face cache are local artifacts and are not committed. A 2-sample mock `run_grid --input data/splits/gsm8k.jsonl` smoke test passed, confirming the official GSM8K JSONL is compatible with the grid runner.
 
+## Official MATH Data Export
+
+`prepare_data --source math` was used to download `Maxwell-Jia/MATH` through the Hugging Face mirror and export a local JSONL subset:
+
+| file | total | train | dev | test |
+| --- | ---: | ---: | ---: | ---: |
+| `data/splits/math.jsonl` | 100 | 60 | 20 | 20 |
+
+The exporter extracts the final `\boxed{...}` answer from each official solution. The exported JSONL file and Hugging Face cache are local artifacts and are not committed. A 3-sample mock grid passed, confirming the official MATH JSONL is compatible with the grid runner and MATH evaluator.
+
+Generated mock artifacts:
+
+- `results/tables/math_mock_dev3_grid.csv`
+- `results/tables/math_mock_dev3_grid_regraded.csv`
+- `results/tables/math_mock_dev3_summary.csv`
+- `results/figures/math_mock_dev3_pareto.png`
+
 ## Qwen Real-Model Smoke Tests
 
 Small provider-backed smoke tests were run with `qwen3.5-flash-2026-02-23` through DashScope OpenAI-compatible mode. These are not benchmark results; they validate that the real model path works and that budget-level traces can be recorded.
@@ -139,6 +158,25 @@ Generated artifacts:
 - `results/tables/qwen_gsm8k_official_dev5.csv`
 - `results/tables/qwen_gsm8k_official_dev5_summary.csv`
 - `results/figures/qwen_gsm8k_official_dev5_pareto.png`
+
+## Official MATH Qwen Dev Smoke Test
+
+A small official MATH provider-backed run was executed on the exported `data/splits/math.jsonl` dev split using `qwen3.5-flash-2026-02-23`. This is a smoke test, not a benchmark result, because it covers only 5 examples and one real model.
+
+Original evaluator accuracy was 0.500 because several outputs contained the correct answer without a boxed or marked final answer. After improving the MATH final-expression extractor and regrading, all 10 rows were correct:
+
+| budget | regraded accuracy | avg cost | p95 latency | n |
+| ---: | ---: | ---: | ---: | ---: |
+| 0 | 1.000 | 0.000428 | 18.620s | 5 |
+| 256 | 1.000 | 0.000428 | 17.919s | 5 |
+
+Generated artifacts:
+
+- `results/tables/qwen_math_official_dev5.csv`
+- `results/tables/qwen_math_official_dev5_regraded.csv`
+- `results/tables/qwen_math_official_dev5_summary_regraded.csv`
+- `results/tables/qwen_math_official_dev5_failures_regraded.csv`
+- `results/figures/qwen_math_official_dev5_pareto_regraded.png`
 
 ## Official GSM8K Qwen Dev20 Budget Grid
 

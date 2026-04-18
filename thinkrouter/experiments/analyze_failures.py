@@ -8,7 +8,7 @@ from typing import Any
 
 import pandas as pd
 
-from thinkrouter.app.evaluators import normalize_numeric_answer
+from thinkrouter.app.evaluators import normalize_math_answer, normalize_numeric_answer
 
 
 def parse_metadata(value: object) -> dict[str, Any]:
@@ -29,7 +29,9 @@ def numeric_values(text: str) -> list[str]:
     return [value for value in normalized if value is not None]
 
 
-def classify_failure(output_text: str, expected_answer: object, extracted_answer: object) -> str:
+def classify_failure(output_text: str, expected_answer: object, extracted_answer: object, task_type: str = "gsm8k") -> str:
+    if task_type == "math":
+        return classify_math_failure(output_text, expected_answer, extracted_answer)
     expected = normalize_numeric_answer(None if pd.isna(expected_answer) else str(expected_answer))
     extracted = normalize_numeric_answer(None if pd.isna(extracted_answer) else str(extracted_answer))
     if extracted is None:
@@ -40,6 +42,21 @@ def classify_failure(output_text: str, expected_answer: object, extracted_answer
         return "not_failure"
     numbers = numeric_values(output_text)
     if expected in numbers:
+        return "answer_format_extraction_error"
+    return "wrong_answer"
+
+
+def classify_math_failure(output_text: str, expected_answer: object, extracted_answer: object) -> str:
+    expected = normalize_math_answer(None if pd.isna(expected_answer) else str(expected_answer))
+    extracted = normalize_math_answer(None if pd.isna(extracted_answer) else str(extracted_answer))
+    if expected is None:
+        return "missing_expected_answer"
+    if extracted is None:
+        return "no_final_answer"
+    if extracted == expected:
+        return "stale_or_normalization_mismatch"
+    output_normalized = normalize_math_answer(output_text) or ""
+    if expected in output_normalized:
         return "answer_format_extraction_error"
     return "wrong_answer"
 
@@ -76,7 +93,7 @@ def analyze_failures(csv_path: str) -> pd.DataFrame:
                 "selected_budget": int(row.get("selected_budget")),
                 "expected_answer": row.get("expected_answer"),
                 "extracted_answer": row.get("extracted_answer"),
-                "error_type": classify_failure(output_text, row.get("expected_answer"), row.get("extracted_answer")),
+                "error_type": classify_failure(output_text, row.get("expected_answer"), row.get("extracted_answer"), str(row.get("task_type", "gsm8k"))),
                 "correct_budgets_for_sample": ",".join(str(budget) for budget in budgets),
                 "any_other_budget_correct": any(budget != int(row.get("selected_budget")) for budget in budgets),
                 "total_tokens": int(row.get("total_tokens", 0)),

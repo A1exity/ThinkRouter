@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from thinkrouter.app.evaluators import GSM8KEvaluator, extract_numeric_answer, normalize_numeric_answer
+from thinkrouter.app.evaluators import GSM8KEvaluator, MATHEvaluator, extract_last_boxed, extract_math_output_answer, extract_numeric_answer, normalize_math_answer, normalize_numeric_answer
 
 
 def test_extract_numeric_answer_prefers_final_answer() -> None:
@@ -31,3 +31,21 @@ def test_gsm8k_evaluator_exact_match() -> None:
     result = GSM8KEvaluator().evaluate("Final answer: 19", "19")
     assert result.is_correct is True
     assert result.score == 1.0
+
+
+def test_math_evaluator_matches_boxed_answer() -> None:
+    result = MATHEvaluator().evaluate(r"We get \boxed{\frac{1}{2}}.", r"\frac{1}{2}")
+
+    assert result.is_correct is True
+    assert result.extracted_answer == r"\frac{1}{2}"
+
+
+def test_math_normalization_handles_latex_spacing_and_wrappers() -> None:
+    assert extract_last_boxed(r"First \boxed{1}, then \boxed{-\frac{1}{2}}") == r"-\frac{1}{2}"
+    assert normalize_math_answer(r"$ \left\{ x \right\} $") == "x"
+
+
+def test_extract_math_output_answer_falls_back_to_final_expression() -> None:
+    assert extract_math_output_answer(r"After solving, x=\frac{9}{7}") == r"\frac{9}{7}"
+    assert extract_math_output_answer("Equation: $2+1=3$.\n$x = \\dfrac{9}{7}$") == r"\dfrac{9}{7}"
+    assert extract_math_output_answer("The graph has 2 vertical asymptotes.") == "2"

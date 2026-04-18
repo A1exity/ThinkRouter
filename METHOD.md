@@ -42,7 +42,7 @@ External datasets should be converted to one JSON object per line:
 {"sample_id":"gsm8k_train_001","task_type":"gsm8k","split":"train","query":"...","expected_answer":"..."}
 ```
 
-`prepare_data.py` exports the built-in seed suite and a small official GSM8K subset to this format. For GSM8K it reads `openai/gsm8k`, extracts the final numeric answer after `####`, and creates a fixed 60 train / 20 dev / 20 test subset by default. `run_grid.py --input` consumes the same format, so MATH-500 and HumanEval loaders can be added without changing the model, evaluator, trace store, or router training layers.
+`prepare_data.py` exports the built-in seed suite, a small official GSM8K subset, and a small official MATH subset to this format. For GSM8K it reads `openai/gsm8k`, extracts the final numeric answer after `####`, and creates a fixed 60 train / 20 dev / 20 test subset by default. For MATH it reads `Maxwell-Jia/MATH`, extracts the final `\boxed{...}` answer from the solution, and uses the same default split sizes. `run_grid.py --input` consumes the same format, so additional benchmark loaders can be added without changing the model adapter, trace store, or router training layers.
 
 ## Model Adapters
 
@@ -121,4 +121,4 @@ The current online policy engine still uses simple accuracy, cost, and latency e
 
 ## Evaluation
 
-The implemented GSM8K evaluator extracts the final numeric answer, normalizes commas and trailing decimals, and uses exact match. Non-GSM8K seed tasks currently use exact-match final-answer evaluation. This follows the project's verifiable-first rule and avoids LLM-as-judge evaluation.
+The implemented GSM8K evaluator extracts the final numeric answer, normalizes commas and trailing decimals, and uses exact match. The MATH evaluator extracts boxed answers, answer markers, final equation lines such as `x = ...`, or final numeric/fraction expressions, then applies lightweight LaTeX normalization. Non-GSM8K/non-MATH seed tasks use exact-match final-answer evaluation. This follows the project's verifiable-first rule and avoids LLM-as-judge evaluation.

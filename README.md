@@ -139,6 +139,15 @@ python -m thinkrouter.experiments.prepare_data --source gsm8k --out data/splits/
 ```
 
 The GSM8K export reads from `openai/gsm8k`, extracts the final numeric answer, and writes the same JSONL schema used by `run_grid --input`.
+
+Export a small official MATH subset using Hugging Face. The default split is 60 train / 20 dev / 20 test:
+
+```bash
+python -m thinkrouter.experiments.prepare_data --source math --out data/splits/math.jsonl --hf-endpoint https://hf-mirror.com --summary
+```
+
+The MATH export reads from `Maxwell-Jia/MATH`, extracts the final `\boxed{...}` answer from each solution, and writes the standard benchmark JSONL schema.
+
 ## Run Frozen Split Grid
 
 The general grid runner supports local frozen seed splits for `gsm8k`, `math`, and `humaneval` tasks, or an external JSONL file via `--input`. The built-in samples are deterministic seed examples for pipeline validation; they are not a substitute for official benchmark results.
@@ -179,6 +188,14 @@ Small official GSM8K Qwen smoke test:
 python -m thinkrouter.experiments.run_grid --input data/splits/gsm8k.jsonl --task gsm8k --split dev --limit 5 --budgets 0,256 --models qwen3.5-flash-2026-02-23 --db results/traces/qwen_gsm8k_official_dev5.sqlite --out results/tables/qwen_gsm8k_official_dev5.csv
 python -m thinkrouter.experiments.eval_baselines results/tables/qwen_gsm8k_official_dev5.csv --out results/tables/qwen_gsm8k_official_dev5_summary.csv
 python -m thinkrouter.experiments.make_plots results/tables/qwen_gsm8k_official_dev5.csv --out results/figures/qwen_gsm8k_official_dev5_pareto.png
+```
+
+Small official MATH Qwen smoke test:
+
+```bash
+python -m thinkrouter.experiments.run_grid --input data/splits/math.jsonl --task math --split dev --limit 5 --budgets 0,256 --models qwen3.5-flash-2026-02-23 --db results/traces/qwen_math_official_dev5.sqlite --out results/tables/qwen_math_official_dev5.csv --resume
+python -m thinkrouter.experiments.regrade_traces results/tables/qwen_math_official_dev5.csv --out results/tables/qwen_math_official_dev5_regraded.csv
+python -m thinkrouter.experiments.eval_baselines results/tables/qwen_math_official_dev5_regraded.csv --out results/tables/qwen_math_official_dev5_summary_regraded.csv
 ```
 
 Official GSM8K dev20 Qwen budget grid:

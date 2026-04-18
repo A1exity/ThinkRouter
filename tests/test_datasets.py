@@ -49,6 +49,47 @@ def test_extract_gsm8k_answer_handles_official_format() -> None:
     assert extract_gsm8k_answer("Compute it. #### 12.0") == "12"
 
 
+def test_extract_math_answer_handles_boxed_solution() -> None:
+    from thinkrouter.experiments.prepare_data import extract_math_answer
+
+    assert extract_math_answer(r"We solve and get \boxed{0}.") == "0"
+    assert extract_math_answer(r"Thus the answer is \boxed{-\frac{1}{2}}.") == r"-\frac{1}{2}"
+
+
+def test_load_math_samples_uses_official_fields(monkeypatch) -> None:
+    from thinkrouter.experiments import prepare_data
+
+    class FakeSplit:
+        def __init__(self, rows):
+            self.rows = rows
+
+        def __len__(self):
+            return len(self.rows)
+
+        def __getitem__(self, index):
+            return self.rows[index]
+
+    def fake_load_dataset(name):
+        assert name == "Maxwell-Jia/MATH"
+        return {
+            "train": FakeSplit([{"problem": "Compute 1+1.", "solution": r"\boxed{2}"}]),
+            "test": FakeSplit(
+                [
+                    {"problem": "Compute 2+1.", "solution": r"\boxed{3}"},
+                    {"problem": "Compute 2+2.", "solution": r"\boxed{4}"},
+                ]
+            ),
+        }
+
+    monkeypatch.setattr(prepare_data, "load_dataset", fake_load_dataset, raising=False)
+    monkeypatch.setitem(__import__("sys").modules, "datasets", type("FakeDatasets", (), {"load_dataset": staticmethod(fake_load_dataset)}))
+
+    samples = prepare_data.load_math_samples(train_count=1, dev_count=1, test_count=1)
+
+    assert [sample.sample_id for sample in samples] == ["math_train_001", "math_dev_001", "math_test_001"]
+    assert [sample.expected_answer for sample in samples] == ["2", "3", "4"]
+
+
 def test_filter_samples_applies_split_and_limit() -> None:
     from thinkrouter.experiments.prepare_data import filter_samples
 

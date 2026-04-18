@@ -17,6 +17,12 @@ def test_classify_failure_detects_wrong_answer() -> None:
     assert classify_failure(output, "13", "12") == "wrong_answer"
 
 
+def test_classify_math_failure_detects_unmarked_correct_answer() -> None:
+    output = r"Solving gives x=\frac{9}{7}, so the requested value is \frac{9}{7}."
+
+    assert classify_failure(output, r"\frac{9}{7}", output, task_type="math") == "answer_format_extraction_error"
+
+
 def test_parse_metadata_handles_python_dict_string() -> None:
     metadata = parse_metadata("{'sample_id': 'gsm8k_dev_001', 'split': 'dev'}")
 

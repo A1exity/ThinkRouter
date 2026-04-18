@@ -1,0 +1,143 @@
+id,query,task_type,selected_model,selected_budget,output_text,score,is_correct,expected_answer,extracted_answer,prompt_tokens,completion_tokens,total_tokens,cost_usd,latency_s,created_at,metadata
+1,How many vertical asymptotes does the graph of $y=\frac{2}{x^2+x-6}$ have?,math,qwen3.5-flash-2026-02-23,0,The graph has 2 vertical asymptotes.,1.0,True,2,2,54,3089,3143,0.0009020409999999,19.514835399997537,2026-04-18 08:11:49.639209+00:00,"{'sample_id': 'math_dev_001', 'split': 'dev', 'experiment': 'jsonl_grid'}"
+2,How many vertical asymptotes does the graph of $y=\frac{2}{x^2+x-6}$ have?,math,qwen3.5-flash-2026-02-23,256,"To find the number of vertical asymptotes for the graph of the function $y=\frac{2}{x^2+x-6}$, we need to determine where the denominator is equal to zero while the numerator is not zero.
+
+1.  **Set the denominator to zero:**
+    $$x^2 + x - 6 = 0$$
+
+2.  **Factor the quadratic equation:**
+    We look for two numbers that multiply to $-6$ and add to $1$. These numbers are $3$ and $-2$.
+    $$(x + 3)(x - 2) = 0$$
+
+3.  **Solve for $x$:**
+    $$x = -3 \quad \text{or} \quad x = 2$$
+
+4.  **Check the numerator:**
+    The numerator is the constant $2$. Since $2 \neq 0$, the function is undefined at $x = -3$ and $x = 2$, and the limits approach infinity at these points. Therefore, vertical asymptotes exist at both values.
+
+There are 2 distinct values for which the denominator is zero and the numerator is non-zero.
+
+Final Answer: 2",1.0,True,2,2,51,1030,1081,0.000310247,6.892361399994115,2026-04-18 08:11:56.534105+00:00,"{'sample_id': 'math_dev_001', 'split': 'dev', 'experiment': 'jsonl_grid'}"
+3,What is the positive difference between $120\%$ of 30 and $130\%$ of 20?,math,qwen3.5-flash-2026-02-23,0,10,1.0,True,10,10,59,353,412,0.0001182439999999,2.367887399988831,2026-04-18 08:11:59.545772+00:00,"{'sample_id': 'math_dev_002', 'split': 'dev', 'experiment': 'jsonl_grid'}"
+4,What is the positive difference between $120\%$ of 30 and $130\%$ of 20?,math,qwen3.5-flash-2026-02-23,256,"First, calculate $120\%$ of 30:
+$$1.20 \times 30 = 36$$
+
+Next, calculate $130\%$ of 20:
+$$1.30 \times 20 = 26$$
+
+Finally, find the positive difference between these two results:
+$$36 - 26 = 10$$
+
+10",1.0,True,10,10,56,495,551,0.000158137,3.6212633999966783,2026-04-18 08:12:03.171189+00:00,"{'sample_id': 'math_dev_002', 'split': 'dev', 'experiment': 'jsonl_grid'}"
+5,Find $x$ such that $\lceil x \rceil + x = \dfrac{23}{7}$. Express $x$ as a common fraction.,math,qwen3.5-flash-2026-02-23,0,"Let $n = \lceil x \rceil$. By definition, $n$ is an integer such that $n-1 < x \le n$.
+The given equation is:
+$$ \lceil x \rceil + x = \dfrac{23}{7} $$
+Substituting $n$ for $\lceil x \rceil$, we get:
+$$ n + x = \dfrac{23}{7} \implies x = \dfrac{23}{7} - n $$
+Now substitute this expression for $x$ into the inequality $n-1 < x \le n$:
+$$ n-1 < \dfrac{23}{7} - n \le n $$
+We solve this compound inequality for the integer $n$.
+
+First, consider the right part:
+$$ \dfrac{23}{7} - n \le n $$
+$$ \dfrac{23}{7} \le 2n $$
+$$ n \ge \dfrac{23}{14} $$
+Since $\dfrac{23}{14} = 1 + \dfrac{9}{14} \approx 1.64$, we have $n \ge 2$ (since $n$ is an integer).
+
+Next, consider the left part:
+$$ n-1 < \dfrac{23}{7} - n $$
+$$ 2n < \dfrac{23}{7} + 1 $$
+$$ 2n < \dfrac{30}{7} $$
+$$ n < \dfrac{15}{7} $$
+Since $\dfrac{15}{7} = 2 + \dfrac{1}{7} \approx 2.14$, we have $n \le 2$ (since $n$ is an integer).
+
+Combining the results, the only integer satisfying both conditions is $n = 2$.
+Now, calculate $x$:
+$$ x = \dfrac{23}{7} - 2 = \dfrac{23}{7} - \dfrac{14}{7} = \dfrac{9}{7} $$
+Check the condition: $\lceil \frac{9}{7} \rceil = 2$.
+Equation: $2 + \frac{9}{7} = \frac{14}{7} + \frac{9}{7} = \frac{23}{7}$. This is correct.
+
+$x = \dfrac{9}{7}$",1.0,True,\frac{9}{7},\frac{9}{7},64,2252,2316,0.0006646919999999,15.041899499992724,2026-04-18 08:12:18.780052+00:00,"{'sample_id': 'math_dev_003', 'split': 'dev', 'experiment': 'jsonl_grid'}"
+6,Find $x$ such that $\lceil x \rceil + x = \dfrac{23}{7}$. Express $x$ as a common fraction.,math,qwen3.5-flash-2026-02-23,256,"Let $n = \lceil x \rceil$. By the definition of the ceiling function, $n$ is an integer such that $n-1 < x \le n$.
+
+We are given the equation:
+$$ \lceil x \rceil + x = \frac{23}{7} $$
+Substituting $n$ for $\lceil x \rceil$, we get:
+$$ n + x = \frac{23}{7} $$
+Solving for $x$, we have:
+$$ x = \frac{23}{7} - n $$
+
+Now, substitute this expression for $x$ back into the inequality $n-1 < x \le n$:
+$$ n - 1 < \frac{23}{7} - n \le n $$
+
+This compound inequality can be split into two separate inequalities to solve for the integer $n$.
+
+First part:
+$$ \frac{23}{7} - n \le n $$
+$$ \frac{23}{7} \le 2n $$
+$$ n \ge \frac{23}{14} $$
+Since $\frac{23}{14} = 1 \frac{9}{14} \approx 1.64$, we have $n \ge 1.64$. Since $n$ is an integer, $n \ge 2$.
+
+Second part:
+$$ n - 1 < \frac{23}{7} - n $$
+$$ 2n < \frac{23}{7} + 1 $$
+$$ 2n < \frac{23}{7} + \frac{7}{7} $$
+$$ 2n < \frac{30}{7} $$
+$$ n < \frac{15}{7} $$
+Since $\frac{15}{7} = 2 \frac{1}{7} \approx 2.14$, we have $n < 2.14$. Since $n$ is an integer, $n \le 2$.
+
+Combining the results from both parts, the only integer $n$ that satisfies $n \ge 1.64$ and $n < 2.14$ is $n = 2$.
+
+Now, substitute $n = 2$ back into the expression for $x$:
+$$ x = \frac{23}{7} - 2 $$
+$$ x = \frac{23}{7} - \frac{14}{7} $$
+$$ x = \frac{9}{7} $$
+
+To verify, calculate $\lceil \frac{9}{7} \rceil + \frac{9}{7}$. Since $\frac{9}{7} \approx 1.29$, $\lceil \frac{9}{7} \rceil = 2$.
+$$ 2 + \frac{9}{7} = \frac{14}{7} + \frac{9}{7} = \frac{23}{7} $$
+The solution is correct.
+
+$x = \dfrac{9}{7}$",1.0,True,\frac{9}{7},\frac{9}{7},61,2720,2781,0.000798147,19.150269599995227,2026-04-18 08:12:37.934976+00:00,"{'sample_id': 'math_dev_003', 'split': 'dev', 'experiment': 'jsonl_grid'}"
+7,Evaluate $i^5+i^{-25}+i^{45}$.,math,qwen3.5-flash-2026-02-23,0,$i$,1.0,True,i,i,46,848,894,0.000256578,6.855596599998535,2026-04-18 08:12:45.311072+00:00,"{'sample_id': 'math_dev_004', 'split': 'dev', 'experiment': 'jsonl_grid'}"
+8,Evaluate $i^5+i^{-25}+i^{45}$.,math,qwen3.5-flash-2026-02-23,256,"To evaluate the expression $i^5+i^{-25}+i^{45}$, we simplify each term using the cyclic property of the powers of the imaginary unit $i$, where $i^4 = 1$.
+
+1.  **Simplify $i^5$**:
+    Since $5 = 4(1) + 1$, we have:
+    $$i^5 = i^{4 \cdot 1 + 1} = (i^4)^1 \cdot i^1 = 1 \cdot i = i$$
+
+2.  **Simplify $i^{-25}$**:
+    We can rewrite the negative exponent as a reciprocal:
+    $$i^{-25} = \frac{1}{i^{25}}$$
+    Since $25 = 4(6) + 1$, $i^{25} = i^1 = i$. Thus:
+    $$i^{-25} = \frac{1}{i}$$
+    Multiplying the numerator and denominator by $i$ to rationalize:
+    $$\frac{1 \cdot i}{i \cdot i} = \frac{i}{-1} = -i$$
+    Alternatively, using modular arithmetic on the exponent: $-25 \equiv 3 \pmod 4$, so $i^{-25} = i^3 = -i$.
+
+3.  **Simplify $i^{45}$**:
+    Since $45 = 4(11) + 1$, we have:
+    $$i^{45} = i^{4 \cdot 11 + 1} = (i^4)^{11} \cdot i^1 = 1 \cdot i = i$$
+
+4.  **Calculate the sum**:
+    Substitute the simplified values back into the original expression:
+    $$i^5 + i^{-25} + i^{45} = i + (-i) + i$$
+    $$= i - i + i$$
+    $$= i$$
+
+**Final Answer:**
+$i$",1.0,True,i,i,43,1969,2012,0.000577444,12.99144250000245,2026-04-18 08:12:58.306429+00:00,"{'sample_id': 'math_dev_004', 'split': 'dev', 'experiment': 'jsonl_grid'}"
+9,"If $2^8=4^x$, what is the value of $x$?",math,qwen3.5-flash-2026-02-23,0,$x = 4$,1.0,True,4,4,48,641,689,0.0001977429999999,3.8367390999919735,2026-04-18 08:13:02.652153+00:00,"{'sample_id': 'math_dev_005', 'split': 'dev', 'experiment': 'jsonl_grid'}"
+10,"If $2^8=4^x$, what is the value of $x$?",math,qwen3.5-flash-2026-02-23,256,"To find the value of $x$, we need to express both sides of the equation with the same base.
+
+1.  **Identify the relationship between the bases:** The bases are 2 and 4. We know that $4 = 2^2$.
+2.  **Rewrite the equation:** Substitute $2^2$ for 4 in the term $4^x$.
+    $$2^8 = (2^2)^x$$
+3.  **Apply exponent rules:** When raising a power to a power, multiply the exponents ($ (a^m)^n = a^{m \cdot n} $).
+    $$2^8 = 2^{2x}$$
+4.  **Equate the exponents:** Since the bases are the same, the exponents must be equal.
+    $$8 = 2x$$
+5.  **Solve for $x$:** Divide both sides by 2.
+    $$x = \frac{8}{2}$$
+    $$x = 4$$
+
+**Answer:** 4",1.0,True,4,4,45,986,1031,0.0002958969999999,6.120602499999222,2026-04-18 08:13:08.777261+00:00,"{'sample_id': 'math_dev_005', 'split': 'dev', 'experiment': 'jsonl_grid'}"
