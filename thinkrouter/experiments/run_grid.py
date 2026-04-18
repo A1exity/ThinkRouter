@@ -71,6 +71,7 @@ def run_grid(
     limit: int | None = None,
     experiment: str | None = None,
     input_path: str | None = None,
+    resume: bool = False,
 ) -> list[TraceRecord]:
     load_dotenv()
     budgets = budgets or DEFAULT_BUDGETS
@@ -78,10 +79,20 @@ def run_grid(
     samples = load_grid_samples(input_path=input_path, task_type=task_type, split=split, limit=limit)
     configs = select_model_configs(model_ids)
     store = TraceStore(db_path)
+    completed = completed_trace_keys(store) if resume else set()
     traces: list[TraceRecord] = []
     for sample in samples:
-        traces.extend(_run_sample_grid(sample, configs, budgets, store, experiment))
-    return traces
+        traces.extend(_run_sample_grid(sample, configs, budgets, store, experiment, completed))
+    return list(store.iter_traces()) if resume else traces
+
+
+def completed_trace_keys(store: TraceStore) -> set[tuple[str, str, int]]:
+    keys: set[tuple[str, str, int]] = set()
+    for trace in store.iter_traces():
+        sample_id = str(trace.metadata.get("sample_id", ""))
+        if sample_id:
+            keys.add((sample_id, trace.selected_model, int(trace.selected_budget)))
+    return keys
 
 
 def _run_sample_grid(
@@ -90,12 +101,16 @@ def _run_sample_grid(
     budgets: list[int],
     store: TraceStore,
     experiment: str,
+    completed: set[tuple[str, str, int]] | None = None,
 ) -> list[TraceRecord]:
     traces: list[TraceRecord] = []
     evaluator = get_evaluator(sample.task_type)
+    completed = completed or set()
     for config in configs:
         adapter = build_adapter(config)
         for budget in budgets:
+            if (sample.sample_id, config.model_id, int(budget)) in completed:
+                continue
             request = ModelRequest(
                 query=sample.query,
                 task_type=sample.task_type,  # type: ignore[arg-type]
@@ -150,6 +165,7 @@ def main() -> None:
     parser.add_argument("--budgets", default="0,256,1024", help="Comma-separated budget levels.")
     parser.add_argument("--models", default=None, help="Comma-separated model ids. Defaults to configured cheap and strong models.")
     parser.add_argument("--limit", type=int, default=None, help="Optional sample limit after task/split filtering.")
+    parser.add_argument("--resume", action="store_true", help="Skip sample/model/budget traces already present in --db and export all rows from that DB.")
     parser.add_argument("--summary", action="store_true", help="Print sample counts and exit.")
     args = parser.parse_args()
 
@@ -165,6 +181,7 @@ def main() -> None:
         model_ids=parse_csv_strings(args.models),
         limit=args.limit,
         input_path=args.input,
+        resume=args.resume,
     )
     df = traces_to_dataframe(traces)
     out_path = Path(args.out)

@@ -79,3 +79,31 @@ def test_run_grid_uses_jsonl_input(tmp_path, monkeypatch) -> None:
     assert len(traces) == 1
     assert traces[0].metadata["sample_id"] == "jsonl_1"
     assert traces[0].metadata["experiment"] == "jsonl_grid"
+
+
+def test_run_grid_resume_skips_existing_trace_keys(tmp_path, monkeypatch) -> None:
+    monkeypatch.setenv("THINKROUTER_CHEAP_MODEL", "mock-cheap")
+    monkeypatch.setenv("THINKROUTER_STRONG_MODEL", "mock-strong")
+    db_path = tmp_path / "grid.sqlite"
+
+    first = run_grid(
+        db_path=str(db_path),
+        task_type="gsm8k",
+        split="dev",
+        budgets=[0],
+        model_ids=["mock-cheap"],
+        limit=1,
+    )
+    resumed = run_grid(
+        db_path=str(db_path),
+        task_type="gsm8k",
+        split="dev",
+        budgets=[0, 256],
+        model_ids=["mock-cheap"],
+        limit=1,
+        resume=True,
+    )
+
+    assert len(first) == 1
+    assert len(resumed) == 2
+    assert sorted(trace.selected_budget for trace in resumed) == [0, 256]

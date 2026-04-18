@@ -2,7 +2,7 @@
 
 ThinkRouter is an adaptive thinking-budget router for reasoning LLMs. It treats the pair `(model, thinking_budget)` as the routing decision, then records quality, cost, and latency for verifiable reasoning tasks.
 
-This repository currently implements the Day-1 MVP loop plus the first Week-2 trainable router, frozen-split experiment components, a JSONL benchmark interface, offline policy evaluation, and real OpenAI-compatible model smoke-test tooling:
+This repository currently implements the Day-1 MVP loop plus the first Week-2 trainable router, frozen-split experiment components, a JSONL benchmark interface, offline policy evaluation, learned policy replay, and real OpenAI-compatible model smoke-test tooling:
 
 1. load built-in GSM8K-style, MATH-style, and HumanEval-style seed samples,
 2. run model configs across fixed budgets,
@@ -13,7 +13,8 @@ This repository currently implements the Day-1 MVP loop plus the first Week-2 tr
 7. train lightweight difficulty and budget models from train traces,
 8. validate or call a real OpenAI-compatible model endpoint,
 9. compare fixed-budget, oracle, and aggregate-utility policies from completed grids,
-10. inspect or run examples through Streamlit or FastAPI.
+10. train a learned policy router on one split and replay it on another split,
+11. inspect or run examples through Streamlit or FastAPI.
 
 ## Setup
 
@@ -158,7 +159,7 @@ Useful options:
 - `--budgets 0,256,1024,4096`
 - `--models mock-cheap,mock-strong`
 - `--limit N`
-
+- `--resume` to skip sample/model/budget traces already present in `--db` and export all rows from that database
 
 Small official GSM8K Qwen smoke test:
 
@@ -176,6 +177,13 @@ python -m thinkrouter.experiments.eval_baselines results/tables/qwen_gsm8k_offic
 python -m thinkrouter.experiments.make_plots results/tables/qwen_gsm8k_official_dev20_budget_grid.csv --out results/figures/qwen_gsm8k_official_dev20_budget_pareto.png
 ```
 
+Official GSM8K train60 Qwen budget grid with resume support:
+
+```bash
+python -m thinkrouter.experiments.run_grid --input data/splits/gsm8k.jsonl --task gsm8k --split train --budgets 0,256,1024 --models qwen3.5-flash-2026-02-23 --db results/traces/qwen_gsm8k_official_train60_budget_grid.sqlite --out results/tables/qwen_gsm8k_official_train60_budget_grid.csv --resume
+python -m thinkrouter.experiments.regrade_traces results/tables/qwen_gsm8k_official_train60_budget_grid.csv --out results/tables/qwen_gsm8k_official_train60_budget_grid_regraded.csv
+python -m thinkrouter.experiments.evaluate_policy results/tables/qwen_gsm8k_official_train60_budget_grid_regraded.csv --out results/tables/qwen_gsm8k_official_train60_policy_summary.csv --stats-out results/tables/qwen_gsm8k_official_train60_policy_stats.csv
+```
 
 Regrade an existing grid with the current evaluator:
 
@@ -187,6 +195,13 @@ Evaluate offline routing policies from an existing grid:
 
 ```bash
 python -m thinkrouter.experiments.evaluate_policy results/tables/qwen_gsm8k_official_dev20_budget_grid_regraded.csv --out results/tables/qwen_gsm8k_official_dev20_policy_summary.csv --stats-out results/tables/qwen_gsm8k_official_dev20_policy_stats.csv
+```
+
+Train and replay a learned policy router:
+
+```bash
+python -m thinkrouter.experiments.train_learned_policy results/tables/qwen_gsm8k_official_train60_budget_grid_regraded.csv --out results/models/qwen_gsm8k_official_train60_learned_policy.joblib
+python -m thinkrouter.experiments.evaluate_learned_policy results/tables/qwen_gsm8k_official_dev20_budget_grid_regraded.csv --model results/models/qwen_gsm8k_official_train60_learned_policy.joblib --out results/tables/qwen_gsm8k_official_train60_to_dev20_learned_policy_summary.csv --selected-out results/tables/qwen_gsm8k_official_train60_to_dev20_learned_policy_selected.csv
 ```
 
 Failure analysis for a grid CSV:

@@ -1,6 +1,6 @@
 # RESULTS
 
-No final official benchmark results have been produced yet. Most committed results are deterministic mock-model smoke tests for validating the experiment pipeline. A small provider-backed Qwen smoke result has now been recorded separately.
+No final multi-benchmark official report has been produced yet. The repository now includes deterministic mock-model pipeline checks plus provider-backed Qwen GSM8K train/dev experiments for budget and learned-policy analysis.
 
 ## Current Status
 
@@ -21,6 +21,8 @@ Implemented Day-1 and Week-2 pipeline components:
 - Streamlit trace demo,
 - baseline summary and Pareto plotting scripts,
 - failure analysis and trace regrading scripts,
+- offline fixed-budget, oracle, and aggregate-utility policy evaluation,
+- learned policy router training and cross-split replay,
 - sklearn difficulty estimator training,
 - sklearn budget predictor training,
 - optional router loading from joblib model paths.
@@ -192,6 +194,50 @@ Generated artifacts:
 - `results/figures/qwen_gsm8k_official_dev20_budget_pareto_regraded.png`
 - `results/tables/qwen_gsm8k_official_dev20_policy_summary.csv`
 - `results/tables/qwen_gsm8k_official_dev20_policy_stats.csv`
+
+## Official GSM8K Qwen Train60 Learned Policy
+
+The 60-example train split was run with the same Qwen model and budgets. The first network attempt was interrupted after 26 traces; `run_grid --resume` then skipped existing `(sample_id, model, budget)` combinations and completed the 180-row grid.
+
+Regraded train60 budget summary:
+
+| budget | regraded accuracy | avg cost | p95 latency | n |
+| ---: | ---: | ---: | ---: | ---: |
+| 0 | 0.983 | 0.000266 | 10.907s | 60 |
+| 256 | 0.983 | 0.000352 | 20.436s | 60 |
+| 1024 | 0.917 | 0.000495 | 36.716s | 60 |
+
+Train60 offline policy summary:
+
+| policy | accuracy | avg cost | total cost | avg latency | p95 latency | n |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| fixed_budget_0 | 0.983 | 0.000266 | 0.015967 | 6.703s | 10.907s | 60 |
+| fixed_budget_256 | 0.983 | 0.000352 | 0.021121 | 8.493s | 20.436s | 60 |
+| fixed_budget_1024 | 0.917 | 0.000495 | 0.029706 | 12.852s | 36.716s | 60 |
+| oracle_lowest_cost_correct | 0.983 | 0.000239 | 0.014354 | 5.785s | 10.788s | 60 |
+| aggregate_utility_budget_0 | 0.983 | 0.000266 | 0.015967 | 6.703s | 10.907s | 60 |
+
+The learned policy router was trained on train60 labels derived from per-sample utility. Label counts were `0: 41`, `256: 17`, `1024: 2`. Replaying this trained router on the separate dev20 grid produced:
+
+| policy | train split | eval split | accuracy | avg cost | total cost | avg latency | p95 latency | n |
+| --- | --- | --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| learned_policy | train60 | dev20 | 0.950 | 0.000373 | 0.007465 | 8.377s | 14.455s | 20 |
+
+The learned router predicted budget `0` for 10 dev samples, `256` for 7, and `1024` for 3. It matched the best fixed-budget accuracy on dev20, but did not beat fixed budget `0` or `256` on cost/latency. The useful conclusion is that the learned-router evaluation loop is now real and cross-split, while this first feature set and small training split are not yet strong enough to outperform simple fixed-budget baselines.
+
+Generated artifacts:
+
+- `results/tables/qwen_gsm8k_official_train60_budget_grid.csv`
+- `results/tables/qwen_gsm8k_official_train60_budget_summary.csv`
+- `results/tables/qwen_gsm8k_official_train60_budget_grid_regraded.csv`
+- `results/tables/qwen_gsm8k_official_train60_budget_summary_regraded.csv`
+- `results/tables/qwen_gsm8k_official_train60_policy_summary.csv`
+- `results/tables/qwen_gsm8k_official_train60_policy_stats.csv`
+- `results/tables/qwen_gsm8k_official_train60_failures_regraded.csv`
+- `results/figures/qwen_gsm8k_official_train60_budget_pareto_regraded.png`
+- `results/models/qwen_gsm8k_official_train60_learned_policy.joblib`
+- `results/tables/qwen_gsm8k_official_train60_to_dev20_learned_policy_summary.csv`
+- `results/tables/qwen_gsm8k_official_train60_to_dev20_learned_policy_selected.csv`
 
 ## Final Reporting Targets
 

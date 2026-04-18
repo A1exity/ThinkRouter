@@ -1,0 +1,109 @@
+sample_id,split,task_type,selected_model,selected_budget,expected_answer,extracted_answer,error_type,correct_budgets_for_sample,any_other_budget_correct,total_tokens,cost_usd,latency_s,query,output_preview,output_text
+gsm8k_train_025,train,gsm8k,qwen3.5-flash-2026-02-23,1024,62,1,answer_format_extraction_error,"0,256",True,854,0.0002450979999999,5.405923900005291,"Mary does her grocery shopping on Saturday. She does her shopping only at a specific store where she is allowed a credit of $100, which must be paid in full before her next shopping trip. That week she spent the full credit limit and paid $15 of it on Tuesday and $23 of it on Thursday. How much credit will Mary need to pay before her next shopping trip?","Here is the step-by-step calculation to find the answer:  1.  **Total Credit Used:** Mary spent the full credit limit, which is **$100**. 2.  **Total Amount Paid:** She paid $15 on Tuesday and $23 on Thursday.     *   $15 + $23 = **$38** 3.","Here is the step-by-step calculation to find the answer:
+
+1.  **Total Credit Used:** Mary spent the full credit limit, which is **$100**.
+2.  **Total Amount Paid:** She paid $15 on Tuesday and $23 on Thursday.
+    *   $15 + $23 = **$38**
+3.  **Remaining Balance:** To find out how much is left to pay, subtract the amount paid from the total credit used.
+    *   $100 - $38 = **$62**
+
+Mary will need to pay **$62** before her next shopping trip."
+gsm8k_train_027,train,gsm8k,qwen3.5-flash-2026-02-23,1024,400,1,answer_format_extraction_error,"0,256",True,3976,0.001141112,36.6004033999925,"Jack is stranded on a desert island. He wants some salt to season his fish. He collects 2 liters of seawater in an old bucket. If the water is 20% salt, how many ml of salt will Jack get when all the water evaporates?",Here is the step-by-step reasoning to determine the answer:  **1. Analyze the Input Data** *   **Total Volume:** Jack has 2 liters of seawater. *   **Concentration:** The problem states the water is 20% salt. *   **Target Unit:** The questi,"Here is the step-by-step reasoning to determine the answer:
+
+**1. Analyze the Input Data**
+*   **Total Volume:** Jack has 2 liters of seawater.
+*   **Concentration:** The problem states the water is 20% salt.
+*   **Target Unit:** The question asks for the result in milliliters (ml).
+
+**2. Unit Conversion**
+First, we need to convert the total volume from liters to milliliters to match the requested unit.
+*   1 Liter = 1,000 Milliliters.
+*   2 Liters = $2 \times 1,000 = 2,000$ ml.
+
+**3. Perform the Calculation**
+Next, we calculate the volume of salt based on the percentage provided.
+*   Calculation: $2,000 \text{ ml} \times 20\%$
+*   $2,000 \times 0.20 = 400$ ml.
+
+**4. Reality Check & Verification**
+*   **Mathematical Check:** $20\%$ of $2,000$ is indeed $400$.
+*   **Physical Context:** While the math is straightforward, it is worth noting that typical seawater is only about 3.5% salt. A 20% salt concentration is extremely high (similar to a saturated brine), but since the prompt explicitly sets the condition ""If the water is 20% salt,"" we must use that figure for the calculation.
+*   **Unit Validity:** While salt is a solid, measuring its volume in milliliters (after evaporation) is a standard way to express the quantity in this type of word problem.
+
+**Answer:**
+Jack will get **400 ml** of salt."
+gsm8k_train_042,train,gsm8k,qwen3.5-flash-2026-02-23,1024,500,1,answer_format_extraction_error,"0,256",True,1054,0.000302498,6.535945900002844,Rachel and Sara want to attend a beauty and modeling contest. They both want to buy new pairs of shoes and dresses. Sara buys a pair of shoes which costs $50 and a dress which costs $200. How much should Rachel budget if she wants to spend twice as much as what Sara spent on the pair of shoes and dress?,Here is the step-by-step breakdown to find the answer:  1.  **Calculate Sara's total spending:**     *   Cost of shoes: $50     *   Cost of dress: $200     *   Total: $50 + $200 = **$250**  2.  **Calculate Rachel's budget:**     *   Rachel ,"Here is the step-by-step breakdown to find the answer:
+
+1.  **Calculate Sara's total spending:**
+    *   Cost of shoes: $50
+    *   Cost of dress: $200
+    *   Total: $50 + $200 = **$250**
+
+2.  **Calculate Rachel's budget:**
+    *   Rachel wants to spend twice as much as Sara.
+    *   Calculation: $250 × 2 = **$500**
+
+Rachel should budget **$500**."
+gsm8k_train_059,train,gsm8k,qwen3.5-flash-2026-02-23,1024,320,60,answer_format_extraction_error,"0,256",True,1797,0.000515739,12.345255099993665,"A Statistics student wants to find out the average daily allowance of the middle school students. According to his survey, 2/3 of the students receive an average of $6 allowance per day while the rest gets an average of $4 a day. If he surveyed 60 students, what is the total amount of money those 60 students get in a day?","Here is the step-by-step reasoning to solve the problem:  **1. Determine the number of students in each group:** *   **Total students surveyed:** 60 *   **Group 1 (2/3 of students):** To find the number of students, calculate $\frac{2}{3}$ ","Here is the step-by-step reasoning to solve the problem:
+
+**1. Determine the number of students in each group:**
+*   **Total students surveyed:** 60
+*   **Group 1 (2/3 of students):** To find the number of students, calculate $\frac{2}{3}$ of 60.
+    $$60 \div 3 = 20$$
+    $$20 \times 2 = 40 \text{ students}$$
+*   **Group 2 (The rest):** Subtract Group 1 from the total.
+    $$60 - 40 = 20 \text{ students}$$
+
+**2. Calculate the total money for each group:**
+*   **Group 1 Allowance:** These 40 students receive an average of $\$6$ per day.
+    $$40 \text{ students} \times \$6/\text{day} = \$240$$
+*   **Group 2 Allowance:** These 20 students receive an average of $\$4$ per day.
+    $$20 \text{ students} \times \$4/\text{day} = \$80$$
+
+**3. Calculate the grand total:**
+*   Add the total allowances from both groups together.
+    $$\$240 + \$80 = \$320$$
+
+**Answer:**
+The total amount of money those 60 students get in a day is **$320**."
+gsm8k_train_060,train,gsm8k,qwen3.5-flash-2026-02-23,0,120,85,wrong_answer,,False,8144,0.002337328,65.61252519999107,"Every hour Joanne has to collect the coins out of the fountain inside the mall. During the first hour, she collected 15 coins. For the next two hours, she collected 35 coins from the fountain. In the fourth hour, she collected 50 coins from the fountain but she gave 15 of them to her coworker so she could buy a soda. How many coins did she have after the fourth hour?",Joanne had 85 coins.  **Calculation:** *   First hour: 15 coins *   Next two hours: 35 coins *   Fourth hour: 50 coins collected - 15 coins given = 35 coins *   Total: 15 + 35 + 35 = 85 coins,"Joanne had 85 coins.
+
+**Calculation:**
+*   First hour: 15 coins
+*   Next two hours: 35 coins
+*   Fourth hour: 50 coins collected - 15 coins given = 35 coins
+*   Total: 15 + 35 + 35 = 85 coins"
+gsm8k_train_060,train,gsm8k,qwen3.5-flash-2026-02-23,256,120,85,wrong_answer,,False,8015,0.002300305,53.83459359999688,"Every hour Joanne has to collect the coins out of the fountain inside the mall. During the first hour, she collected 15 coins. For the next two hours, she collected 35 coins from the fountain. In the fourth hour, she collected 50 coins from the fountain but she gave 15 of them to her coworker so she could buy a soda. How many coins did she have after the fourth hour?",Joanne collected coins in three distinct periods: 1.  **First hour:** 15 coins. 2.  **Next two hours:** 35 coins (total for the period). 3.  **Fourth hour:** 50 coins.  Total collected = $15 + 35 + 50 = 100$ coins. She gave away 15 coins. T,"Joanne collected coins in three distinct periods:
+1.  **First hour:** 15 coins.
+2.  **Next two hours:** 35 coins (total for the period).
+3.  **Fourth hour:** 50 coins.
+
+Total collected = $15 + 35 + 50 = 100$ coins.
+She gave away 15 coins.
+Total remaining = $100 - 15 = 85$ coins.
+
+**85**"
+gsm8k_train_060,train,gsm8k,qwen3.5-flash-2026-02-23,1024,120,85,wrong_answer,,False,5915,0.0016976049999999,44.14619379999931,"Every hour Joanne has to collect the coins out of the fountain inside the mall. During the first hour, she collected 15 coins. For the next two hours, she collected 35 coins from the fountain. In the fourth hour, she collected 50 coins from the fountain but she gave 15 of them to her coworker so she could buy a soda. How many coins did she have after the fourth hour?","To determine how many coins Joanne has after the fourth hour, we need to track the number of coins she collects and loses hour by hour.  **Step 1: Analyze the first hour.** Joanne collected **15** coins. *Current Total: 15*  **Step 2: Analy","To determine how many coins Joanne has after the fourth hour, we need to track the number of coins she collects and loses hour by hour.
+
+**Step 1: Analyze the first hour.**
+Joanne collected **15** coins.
+*Current Total: 15*
+
+**Step 2: Analyze the next two hours (Hour 2 and Hour 3).**
+The problem states: ""For the next two hours, she collected 35 coins from the fountain.""
+Grammatically, this indicates a total of 35 coins collected over the course of those two hours combined, rather than 35 coins per hour.
+*Coins added: 35*
+*Current Total: 15 + 35 = 50*
+
+**Step 3: Analyze the fourth hour.**
+Joanne collected **50** coins.
+However, she gave **15** of them to her coworker.
+*Coins added: 50 - 15 = 35*
+*Current Total: 50 (from previous hours) + 35 (net from 4th hour)*
+
+**Step 4: Calculate the final sum.**
+$$15 \text{ (Hour 1)} + 35 \text{ (Hours 2 \& 3)} + 50 \text{ (Hour 4 Collection)} - 15 \text{ (Given Away)}$$
+$$= 15 + 35 + 35$$
+$$= 85$$
+
+Joanne has **85** coins after the fourth hour."

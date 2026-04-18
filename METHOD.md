@@ -91,6 +91,18 @@ THINKROUTER_BUDGET_MODEL_PATH=results/models/budget.joblib
 
 When loaded, the budget prediction is used as a soft hint inside the joint utility policy. It does not hard-force the selected budget.
 
+## Learned Policy Replay
+
+`train_learned_policy.py` trains a deployable budget selector from completed train-split grids. For each `(sample_id, model)` group, it computes the utility of every completed budget trace:
+
+```text
+U = alpha * is_correct - beta * cost - gamma * latency
+```
+
+The target label is the budget with the highest utility. The model only receives query-side features, task type, and selected model id; it does not see the model output or correctness at inference time.
+
+`evaluate_learned_policy.py` replays the trained selector on a separate grid CSV by predicting a budget for each evaluation sample, selecting the matching trace, and aggregating accuracy, cost, and latency. This is an offline replay estimate: it is deployable in structure, but it can only evaluate candidate budgets that were already run in the grid.
+
 ## Routing Policy
 
 The router estimates difficulty, optionally predicts a budget hint for each candidate model, evaluates utility for each model-budget pair, and selects the best option:
@@ -99,7 +111,7 @@ The router estimates difficulty, optionally predicts a budget hint for each cand
 U = alpha * estimated_accuracy - beta * estimated_cost - gamma * estimated_latency - hint_penalty
 ```
 
-The current accuracy, cost, and latency estimates are still simple policy estimates. The next implementation step is to replace them with train-split aggregate statistics from real benchmark traces.
+The current online policy engine still uses simple accuracy, cost, and latency estimates. The offline learned-policy replay now provides the experimental path for comparing learned routing against fixed-budget, aggregate-utility, and oracle baselines before wiring the learned selector into online routing.
 
 ## Evaluation
 
