@@ -16,4 +16,6 @@ def test_mock_adapter_returns_expected_answer() -> None:
         )
     )
     assert "Final answer: 4" in response.output_text
+    assert response.parsed_output == "4"
+    assert response.provider_meta["budget_id"] == "budget-0"
     assert response.total_tokens > 0

@@ -50,9 +50,13 @@ def test_evaluate_policies_summarizes_fixed_oracle_and_utility(tmp_path) -> None
     summary, stats = evaluate_policies(str(csv_path))
 
     policies = set(summary["policy"])
+    assert "fixed_model_budget_0" in policies
+    assert "fixed_model_budget_1024" in policies
     assert "fixed_budget_0" in policies
     assert "fixed_budget_1024" in policies
     assert "oracle_lowest_cost_correct" in policies
+    assert "model_only_best_model" in policies
+    assert "budget_only_best_0" in policies
     assert "aggregate_utility_budget_0" in policies
     assert summary.loc[summary["policy"] == "fixed_budget_0", "accuracy"].iloc[0] == 1.0
     assert summary.loc[summary["policy"] == "fixed_budget_1024", "accuracy"].iloc[0] == 0.0

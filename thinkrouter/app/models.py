@@ -5,7 +5,7 @@ import time
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 
-from thinkrouter.app.budgets import budget_instruction, validate_budget
+from thinkrouter.app.budgets import budget_instruction, budget_to_dict, validate_budget
 from thinkrouter.app.schemas import ModelRequest, ModelResponse
 
 
@@ -34,7 +34,8 @@ class BaseModelAdapter(ABC):
 class MockAdapter(BaseModelAdapter):
     def generate(self, request: ModelRequest) -> ModelResponse:
         start = time.perf_counter()
-        validate_budget(request.budget)
+        budget_config = request.resolved_budget_config
+        validate_budget(budget_config.legacy_budget)
         answer = request.metadata.get("expected_answer")
         if not answer:
             answer = _simple_math_answer(request.query) or "I do not know."
@@ -43,11 +44,14 @@ class MockAdapter(BaseModelAdapter):
         completion_tokens = max(1, len(output.split()))
         return ModelResponse(
             output_text=output,
+            parsed_output=answer,
             prompt_tokens=prompt_tokens,
             completion_tokens=completion_tokens,
             total_tokens=prompt_tokens + completion_tokens,
             latency_s=time.perf_counter() - start,
-            raw_response={"backend": "mock"},
+            finish_reason="stop",
+            provider_meta={"backend": "mock", "budget_id": budget_config.budget_id},
+            raw_response={"backend": "mock", "budget": budget_to_dict(budget_config)},
         )
 
 
@@ -65,13 +69,15 @@ class OpenAICompatibleAdapter(BaseModelAdapter):
 
     def generate(self, request: ModelRequest) -> ModelResponse:
         start = time.perf_counter()
-        instruction = budget_instruction(request.budget)
+        budget_config = request.resolved_budget_config
+        instruction = budget_instruction(budget_config)
         response = self.client.chat.completions.create(
             model=self.model_name,
             messages=[
                 {"role": "system", "content": instruction},
                 {"role": "user", "content": request.query},
             ],
+            max_completion_tokens=budget_config.max_output_tokens,
             temperature=0,
         )
         latency_s = time.perf_counter() - start
@@ -86,7 +92,9 @@ class OpenAICompatibleAdapter(BaseModelAdapter):
             completion_tokens=completion_tokens,
             total_tokens=total_tokens,
             latency_s=latency_s,
-            raw_response={"id": response.id, "model": response.model},
+            finish_reason=response.choices[0].finish_reason,
+            provider_meta={"id": response.id, "model": response.model, "budget_id": budget_config.budget_id},
+            raw_response={"id": response.id, "model": response.model, "budget": budget_to_dict(budget_config)},
         )
 
 

@@ -31,6 +31,7 @@ def test_gsm8k_evaluator_exact_match() -> None:
     result = GSM8KEvaluator().evaluate("Final answer: 19", "19")
     assert result.is_correct is True
     assert result.score == 1.0
+    assert result.error_type is None
 
 
 def test_math_evaluator_matches_boxed_answer() -> None:
@@ -38,6 +39,13 @@ def test_math_evaluator_matches_boxed_answer() -> None:
 
     assert result.is_correct is True
     assert result.extracted_answer == r"\frac{1}{2}"
+
+
+def test_gsm8k_evaluator_reports_parse_error_when_no_numeric_answer() -> None:
+    result = GSM8KEvaluator().evaluate("I cannot solve this.", "19")
+
+    assert result.is_correct is False
+    assert result.error_type == "parse_error"
 
 
 def test_math_normalization_handles_latex_spacing_and_wrappers() -> None:

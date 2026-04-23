@@ -6,7 +6,7 @@ from pathlib import Path
 from dotenv import load_dotenv
 from fastapi import FastAPI
 
-from thinkrouter.app.budgets import validate_budget
+from thinkrouter.app.budgets import budget_to_dict, compile_budget_config, validate_budget
 from thinkrouter.app.evaluators import get_evaluator
 from thinkrouter.app.models import build_adapter, default_model_configs
 from thinkrouter.app.router import JointPolicyEngine
@@ -45,6 +45,7 @@ def run_query(request: RunRequest) -> RunResponse:
         model_id = route.model_id
         budget = route.budget
     validate_budget(budget)
+    budget_config = compile_budget_config(budget)
     if model_id not in configs:
         configs[model_id] = configs[next(iter(configs))].__class__(model_id=model_id)
     config = configs[model_id]
@@ -54,26 +55,41 @@ def run_query(request: RunRequest) -> RunResponse:
         task_type=request.task_type,
         model_id=model_id,
         budget=budget,
+        budget_config=budget_config,
+        candidate_set_signature="|".join(sorted(request.candidate_models or list(configs.keys()))),
         metadata={"expected_answer": request.expected_answer},
     )
     model_response = adapter.generate(model_request)
     evaluation = get_evaluator(request.task_type).evaluate(model_response.output_text, request.expected_answer)
     trace = TraceRecord(
+        query_id=None,
+        benchmark=request.task_type,
         query=request.query,
+        query_text=request.query,
         task_type=request.task_type,
         selected_model=model_id,
         selected_budget=budget,
+        selected_budget_id=budget_config.budget_id,
+        budget_config=budget_to_dict(budget_config),
         output_text=model_response.output_text,
+        parsed_output=evaluation.parsed_output or model_response.parsed_output,
         score=evaluation.score,
         is_correct=evaluation.is_correct,
         expected_answer=evaluation.expected_answer,
         extracted_answer=evaluation.extracted_answer,
+        judge_metadata=evaluation.judge_metadata,
         prompt_tokens=model_response.prompt_tokens,
         completion_tokens=model_response.completion_tokens,
         total_tokens=model_response.total_tokens,
         cost_usd=adapter.estimate_cost(model_response.total_tokens),
         latency_s=model_response.latency_s,
-        metadata={"route": model_to_dict(route) if route else None},
+        error_type=evaluation.error_type or model_response.error_type,
+        route_reason=route.explanation if route else None,
+        candidate_set_signature=model_request.candidate_set_signature,
+        prompt_template_version=budget_config.prompt_template_version,
+        provider_response_meta=model_response.provider_meta,
+        route_confidence=route.estimated_accuracy if route else None,
+        metadata={"route": model_to_dict(route) if route else None, "router_name": request.router_name},
     )
     trace = store.insert_trace(trace)
     return RunResponse(route=route, model_response=model_response, evaluation=evaluation, trace=trace)

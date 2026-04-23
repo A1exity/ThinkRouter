@@ -18,11 +18,19 @@ class GSM8KEvaluator(BaseEvaluator):
         extracted = extract_numeric_answer(output_text)
         expected = normalize_numeric_answer(expected_answer)
         is_correct = bool(extracted is not None and expected is not None and extracted == expected)
+        error_type = None
+        if extracted is None:
+            error_type = "parse_error"
+        elif not is_correct:
+            error_type = "wrong_answer"
         return EvalResult(
             score=1.0 if is_correct else 0.0,
             is_correct=is_correct,
+            parsed_output=extracted,
             extracted_answer=extracted,
             expected_answer=expected,
+            error_type=error_type,
+            judge_metadata={"task_type": "gsm8k", "comparison": "numeric_exact_match"},
         )
 
 
@@ -31,11 +39,19 @@ class ExactMatchEvaluator(BaseEvaluator):
         extracted = extract_final_answer(output_text)
         expected = normalize_text(expected_answer)
         is_correct = bool(extracted and expected and normalize_text(extracted) == expected)
+        error_type = None
+        if not extracted:
+            error_type = "empty_output"
+        elif not is_correct:
+            error_type = "wrong_answer"
         return EvalResult(
             score=1.0 if is_correct else 0.0,
             is_correct=is_correct,
+            parsed_output=extracted,
             extracted_answer=extracted,
             expected_answer=expected,
+            error_type=error_type,
+            judge_metadata={"task_type": "exact_match", "comparison": "normalized_text_exact_match"},
         )
 
 
@@ -44,11 +60,19 @@ class MATHEvaluator(BaseEvaluator):
         extracted = normalize_math_answer(extract_math_output_answer(output_text))
         expected = normalize_math_answer(expected_answer)
         is_correct = bool(extracted and expected and math_answers_equal(extracted, expected))
+        error_type = None
+        if extracted is None:
+            error_type = "parse_error"
+        elif not is_correct:
+            error_type = "wrong_answer"
         return EvalResult(
             score=1.0 if is_correct else 0.0,
             is_correct=is_correct,
+            parsed_output=extracted,
             extracted_answer=extracted,
             expected_answer=expected,
+            error_type=error_type,
+            judge_metadata={"task_type": "math", "comparison": "normalized_math_match"},
         )
 
 

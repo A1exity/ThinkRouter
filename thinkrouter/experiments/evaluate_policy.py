@@ -47,6 +47,10 @@ def summarize_selection(name: str, selected: pd.DataFrame) -> dict[str, Any]:
     }
 
 
+def fixed_model_budget_policy(df: pd.DataFrame, model_id: str, budget: int) -> pd.DataFrame:
+    return df[(df["selected_model"].astype(str) == str(model_id)) & (df["selected_budget"].astype(int) == int(budget))].copy()
+
+
 def fixed_budget_policy(df: pd.DataFrame, budget: int) -> pd.DataFrame:
     return df[df["selected_budget"].astype(int) == budget].copy()
 
@@ -75,13 +79,44 @@ def aggregate_utility_policy(df: pd.DataFrame, weights: UtilityWeights) -> tuple
     return selected, stats
 
 
+def best_model_only_policy(df: pd.DataFrame, weights: UtilityWeights) -> tuple[pd.DataFrame, dict[str, Any]]:
+    stats = df.groupby("selected_model", dropna=False).agg(
+        accuracy=("is_correct", "mean"),
+        avg_cost=("cost_usd", "mean"),
+        avg_latency=("latency_s", "mean"),
+    ).reset_index()
+    stats["utility"] = [utility(row, weights) for _, row in stats.iterrows()]
+    best = stats.sort_values(["utility", "accuracy", "avg_cost"], ascending=[False, False, True]).iloc[0]
+    selected = df[df["selected_model"].astype(str) == str(best["selected_model"])].copy()
+    return selected, {"selected_model": str(best["selected_model"]), "utility": float(best["utility"])}
+
+
+def best_budget_only_policy(df: pd.DataFrame, weights: UtilityWeights) -> tuple[pd.DataFrame, dict[str, Any]]:
+    stats = df.groupby("selected_budget", dropna=False).agg(
+        accuracy=("is_correct", "mean"),
+        avg_cost=("cost_usd", "mean"),
+        avg_latency=("latency_s", "mean"),
+    ).reset_index()
+    stats["utility"] = [utility(row, weights) for _, row in stats.iterrows()]
+    best = stats.sort_values(["utility", "accuracy", "avg_cost"], ascending=[False, False, True]).iloc[0]
+    selected = df[df["selected_budget"].astype(int) == int(best["selected_budget"])].copy()
+    return selected, {"selected_budget": int(best["selected_budget"]), "utility": float(best["utility"])}
+
+
 def evaluate_policies(csv_path: str, weights: UtilityWeights | None = None) -> tuple[pd.DataFrame, pd.DataFrame]:
     weights = weights or UtilityWeights()
     df = add_sample_id(pd.read_csv(csv_path))
     rows: list[dict[str, Any]] = []
+    for model_id in sorted(df["selected_model"].astype(str).unique()):
+        for budget in sorted(df.loc[df["selected_model"].astype(str) == model_id, "selected_budget"].astype(int).unique()):
+            rows.append(summarize_selection(f"fixed_{model_id}_budget_{budget}", fixed_model_budget_policy(df, model_id, budget)))
     for budget in sorted(df["selected_budget"].astype(int).unique()):
         rows.append(summarize_selection(f"fixed_budget_{budget}", fixed_budget_policy(df, budget)))
     rows.append(summarize_selection("oracle_lowest_cost_correct", oracle_lowest_cost_correct(df)))
+    model_only_selected, model_only_meta = best_model_only_policy(df, weights)
+    rows.append(summarize_selection(f"model_only_best_{model_only_meta['selected_model']}", model_only_selected))
+    budget_only_selected, budget_only_meta = best_budget_only_policy(df, weights)
+    rows.append(summarize_selection(f"budget_only_best_{budget_only_meta['selected_budget']}", budget_only_selected))
     aggregate_selected, aggregate_stats = aggregate_utility_policy(df, weights)
     budget = int(aggregate_selected["selected_budget"].iloc[0]) if not aggregate_selected.empty else -1
     rows.append(summarize_selection(f"aggregate_utility_budget_{budget}", aggregate_selected))

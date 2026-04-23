@@ -6,6 +6,7 @@ from pathlib import Path
 import pandas as pd
 from dotenv import load_dotenv
 
+from thinkrouter.app.budgets import budget_to_dict, compile_budget_config
 from thinkrouter.app.evaluators import get_evaluator
 from thinkrouter.app.models import ModelConfig, build_adapter, default_model_configs
 from thinkrouter.app.schemas import ModelRequest, TraceRecord, model_to_dict
@@ -89,7 +90,7 @@ def run_grid(
 def completed_trace_keys(store: TraceStore) -> set[tuple[str, str, int]]:
     keys: set[tuple[str, str, int]] = set()
     for trace in store.iter_traces():
-        sample_id = str(trace.metadata.get("sample_id", ""))
+        sample_id = str(trace.query_id or trace.metadata.get("sample_id", ""))
         if sample_id:
             keys.add((sample_id, trace.selected_model, int(trace.selected_budget)))
     return keys
@@ -111,30 +112,44 @@ def _run_sample_grid(
         for budget in budgets:
             if (sample.sample_id, config.model_id, int(budget)) in completed:
                 continue
+            budget_config = compile_budget_config(int(budget))
             request = ModelRequest(
                 query=sample.query,
                 task_type=sample.task_type,  # type: ignore[arg-type]
                 model_id=config.model_id,
-                budget=budget,
+                budget=int(budget),
+                budget_config=budget_config,
+                candidate_set_signature=_candidate_set_signature(configs, budgets),
                 metadata={"expected_answer": sample.expected_answer, "sample_id": sample.sample_id, "split": sample.split},
             )
             response = adapter.generate(request)
             evaluation = evaluator.evaluate(response.output_text, sample.expected_answer)
             trace = TraceRecord(
+                query_id=sample.sample_id,
+                benchmark=sample.task_type,
                 query=sample.query,
+                query_text=sample.query,
                 task_type=sample.task_type,  # type: ignore[arg-type]
                 selected_model=config.model_id,
-                selected_budget=budget,
+                selected_budget=int(budget),
+                selected_budget_id=budget_config.budget_id,
+                budget_config=budget_to_dict(budget_config),
                 output_text=response.output_text,
+                parsed_output=evaluation.parsed_output or response.parsed_output,
                 score=evaluation.score,
                 is_correct=evaluation.is_correct,
                 expected_answer=evaluation.expected_answer,
                 extracted_answer=evaluation.extracted_answer,
+                judge_metadata=evaluation.judge_metadata,
                 prompt_tokens=response.prompt_tokens,
                 completion_tokens=response.completion_tokens,
                 total_tokens=response.total_tokens,
                 cost_usd=adapter.estimate_cost(response.total_tokens),
                 latency_s=response.latency_s,
+                error_type=evaluation.error_type or response.error_type,
+                candidate_set_signature=request.candidate_set_signature,
+                prompt_template_version=budget_config.prompt_template_version,
+                provider_response_meta=response.provider_meta,
                 metadata={"sample_id": sample.sample_id, "split": sample.split, "experiment": experiment},
             )
             traces.append(store.insert_trace(trace))
@@ -143,6 +158,12 @@ def _run_sample_grid(
 
 def traces_to_dataframe(traces: list[TraceRecord]) -> pd.DataFrame:
     return pd.DataFrame([model_to_dict(trace) for trace in traces])
+
+
+def _candidate_set_signature(configs: list[ModelConfig], budgets: list[int]) -> str:
+    model_ids = ",".join(config.model_id for config in configs)
+    budget_ids = ",".join(str(int(budget)) for budget in budgets)
+    return f"models={model_ids}|budgets={budget_ids}"
 
 
 def _print_summary(input_path: str | None) -> None:

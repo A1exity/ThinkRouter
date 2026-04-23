@@ -6,6 +6,7 @@ from pathlib import Path
 import pandas as pd
 from dotenv import load_dotenv
 
+from thinkrouter.app.budgets import budget_to_dict, compile_budget_config
 from thinkrouter.app.evaluators import get_evaluator
 from thinkrouter.app.models import build_adapter, default_model_configs
 from thinkrouter.app.schemas import ModelRequest, TraceRecord, model_to_dict
@@ -29,30 +30,44 @@ def run_day1_grid(db_path: str, limit: int = 20, budgets: list[int] | None = Non
         for config in selected_configs:
             adapter = build_adapter(config)
             for budget in budgets:
+                budget_config = compile_budget_config(int(budget))
                 request = ModelRequest(
                     query=sample.query,
                     task_type="gsm8k",
                     model_id=config.model_id,
-                    budget=budget,
+                    budget=int(budget),
+                    budget_config=budget_config,
+                    candidate_set_signature=f"models={','.join(item.model_id for item in selected_configs)}|budgets={','.join(str(int(item)) for item in budgets)}",
                     metadata={"expected_answer": sample.expected_answer, "sample_id": sample.sample_id},
                 )
                 response = adapter.generate(request)
                 evaluation = get_evaluator("gsm8k").evaluate(response.output_text, sample.expected_answer)
                 trace = TraceRecord(
+                    query_id=sample.sample_id,
+                    benchmark="gsm8k",
                     query=sample.query,
+                    query_text=sample.query,
                     task_type="gsm8k",
                     selected_model=config.model_id,
-                    selected_budget=budget,
+                    selected_budget=int(budget),
+                    selected_budget_id=budget_config.budget_id,
+                    budget_config=budget_to_dict(budget_config),
                     output_text=response.output_text,
+                    parsed_output=evaluation.parsed_output or response.parsed_output,
                     score=evaluation.score,
                     is_correct=evaluation.is_correct,
                     expected_answer=evaluation.expected_answer,
                     extracted_answer=evaluation.extracted_answer,
+                    judge_metadata=evaluation.judge_metadata,
                     prompt_tokens=response.prompt_tokens,
                     completion_tokens=response.completion_tokens,
                     total_tokens=response.total_tokens,
                     cost_usd=adapter.estimate_cost(response.total_tokens),
                     latency_s=response.latency_s,
+                    error_type=evaluation.error_type or response.error_type,
+                    candidate_set_signature=request.candidate_set_signature,
+                    prompt_template_version=budget_config.prompt_template_version,
+                    provider_response_meta=response.provider_meta,
                     metadata={"sample_id": sample.sample_id, "experiment": "day1_grid"},
                 )
                 traces.append(store.insert_trace(trace))
