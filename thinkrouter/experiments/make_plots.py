@@ -4,25 +4,37 @@ import argparse
 from pathlib import Path
 
 import matplotlib.pyplot as plt
-import pandas as pd
+
+from thinkrouter.experiments.eval_baselines import summarize_baselines
+
+
+FAMILY_STYLES = {
+    "fixed_model_budget": {"color": "#94A3B8", "marker": "o", "size": 45},
+    "model_only": {"color": "#2563EB", "marker": "X", "size": 110},
+    "budget_only": {"color": "#059669", "marker": "^", "size": 110},
+    "joint_aggregate_utility": {"color": "#DC2626", "marker": "*", "size": 180},
+}
 
 
 def make_pareto_plot(csv_path: str, out_path: str) -> None:
-    df = pd.read_csv(csv_path)
-    if df.empty:
+    summary = summarize_baselines(csv_path)
+    if summary.empty:
         raise ValueError("Input CSV is empty.")
-    summary = df.groupby(["selected_model", "selected_budget"], dropna=False).agg(
-        accuracy=("is_correct", "mean"),
-        avg_cost=("cost_usd", "mean"),
-    ).reset_index()
     fig, ax = plt.subplots(figsize=(7, 5))
-    ax.scatter(summary["avg_cost"], summary["accuracy"])
-    for row in summary.itertuples(index=False):
-        ax.annotate(f"{row.selected_model}/{row.selected_budget}", (row.avg_cost, row.accuracy), fontsize=8)
+    for family, group in summary.groupby("policy_family", dropna=False):
+        style = FAMILY_STYLES.get(str(family), {"color": "#111827", "marker": "o", "size": 60})
+        ax.scatter(group["avg_cost"], group["accuracy"], c=style["color"], marker=style["marker"], s=style["size"], label=str(family))
+        for row in group.itertuples(index=False):
+            if str(family) == "fixed_model_budget":
+                label = f"{row.selected_model}/{int(row.selected_budget)}"
+            else:
+                label = str(row.policy)
+            ax.annotate(label, (row.avg_cost, row.accuracy), fontsize=8)
     ax.set_xlabel("Average cost per query (USD)")
     ax.set_ylabel("Accuracy")
     ax.set_title("ThinkRouter Cost-Accuracy Pareto")
     ax.grid(True, alpha=0.3)
+    ax.legend(loc="best", fontsize=8)
     out = Path(out_path)
     out.parent.mkdir(parents=True, exist_ok=True)
     fig.tight_layout()

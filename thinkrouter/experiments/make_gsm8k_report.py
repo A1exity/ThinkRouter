@@ -18,6 +18,26 @@ REPORT_INPUTS = [
 ]
 
 
+def classify_policy_family(policy: str) -> str:
+    if policy.startswith("fixed_budget_"):
+        return "fixed_budget"
+    if policy.startswith("fixed_model_budget_"):
+        return "fixed_model_budget"
+    if policy.startswith("model_only_"):
+        return "model_only"
+    if policy.startswith("budget_only_"):
+        return "budget_only"
+    if policy.startswith("aggregate_utility_"):
+        return "joint_aggregate_utility"
+    if policy.startswith("safe_learned_policy"):
+        return "safe_learned"
+    if policy.startswith("learned_policy"):
+        return "learned"
+    if policy == "oracle_lowest_cost_correct":
+        return "oracle"
+    return "other"
+
+
 def load_policy_rows(paths: list[tuple[str, str, str]]) -> pd.DataFrame:
     rows: list[pd.DataFrame] = []
     for split, source, path in paths:
@@ -37,6 +57,7 @@ def load_policy_rows(paths: list[tuple[str, str, str]]) -> pd.DataFrame:
 
 def add_relative_metrics(df: pd.DataFrame) -> pd.DataFrame:
     out = df.copy()
+    out["policy_family"] = out["policy"].astype(str).map(classify_policy_family)
     out["cost_vs_fixed_1024"] = pd.NA
     out["accuracy_delta_vs_fixed_1024"] = pd.NA
     for split, group in out.groupby("split"):
@@ -56,6 +77,7 @@ def write_markdown_report(df: pd.DataFrame, out_path: str) -> None:
     columns = [
         "split",
         "source",
+        "policy_family",
         "policy",
         "accuracy",
         "avg_cost",
@@ -91,9 +113,12 @@ def plot_test_policy_comparison(df: pd.DataFrame, out_path: str) -> None:
         "fixed_budget_0",
         "fixed_budget_256",
         "fixed_budget_1024",
+        "budget_only_best_0",
+        "model_only_best_mock-cheap",
         "learned_policy",
         "safe_learned_policy_fallback_budget_0",
         "safe_learned_policy_fallback_budget_256",
+        "aggregate_utility_mock-cheap_0",
         "oracle_lowest_cost_correct",
     ]
     test["policy_order"] = test["policy"].apply(lambda value: order.index(value) if value in order else len(order))

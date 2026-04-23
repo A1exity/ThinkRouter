@@ -13,6 +13,26 @@ REPORT_INPUTS = [
 ]
 
 
+def classify_policy_family(policy: str) -> str:
+    if policy.startswith("fixed_budget_"):
+        return "fixed_budget"
+    if policy.startswith("fixed_model_budget_"):
+        return "fixed_model_budget"
+    if policy.startswith("model_only_"):
+        return "model_only"
+    if policy.startswith("budget_only_"):
+        return "budget_only"
+    if policy.startswith("aggregate_utility_"):
+        return "joint_aggregate_utility"
+    if policy.startswith("safe_learned_policy"):
+        return "safe_learned"
+    if policy.startswith("learned_policy"):
+        return "learned"
+    if policy == "oracle_lowest_cost_correct":
+        return "oracle"
+    return "other"
+
+
 def load_rows() -> pd.DataFrame:
     rows: list[pd.DataFrame] = []
     for benchmark, split, path in REPORT_INPUTS:
@@ -30,6 +50,7 @@ def load_rows() -> pd.DataFrame:
 
 def add_relative_cost(df: pd.DataFrame) -> pd.DataFrame:
     out = df.copy()
+    out["policy_family"] = out["policy"].astype(str).map(classify_policy_family)
     out["cost_vs_fixed_1024"] = pd.NA
     for (benchmark, split), group in out.groupby(["benchmark", "split"]):
         baseline = group[group["policy"] == "fixed_budget_1024"]
@@ -44,7 +65,7 @@ def add_relative_cost(df: pd.DataFrame) -> pd.DataFrame:
 def write_markdown(df: pd.DataFrame, out_path: str) -> None:
     out = Path(out_path)
     out.parent.mkdir(parents=True, exist_ok=True)
-    table = df[["benchmark", "split", "policy", "accuracy", "avg_cost", "p95_latency", "cost_vs_fixed_1024", "n"]].copy()
+    table = df[["benchmark", "split", "policy_family", "policy", "accuracy", "avg_cost", "p95_latency", "cost_vs_fixed_1024", "n"]].copy()
     for col in ["accuracy", "avg_cost", "p95_latency", "cost_vs_fixed_1024"]:
         table[col] = pd.to_numeric(table[col], errors="coerce").round(6)
     lines = [

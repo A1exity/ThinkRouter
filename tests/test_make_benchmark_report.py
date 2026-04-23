@@ -38,5 +38,6 @@ def test_build_multi_benchmark_report(tmp_path, monkeypatch) -> None:
 
     report = make_benchmark_report.build_report(str(tmp_path / "report.csv"), str(tmp_path / "report.md"))
 
+    assert "policy_family" in report.columns
     assert "cost_vs_fixed_1024" in report.columns
     assert report.loc[report["policy"] == "fixed_budget_256", "cost_vs_fixed_1024"].iloc[0] == 0.5

@@ -44,5 +44,6 @@ def test_build_report_writes_summary_markdown_and_figure(tmp_path, monkeypatch) 
     assert summary_out.exists()
     assert markdown_out.exists()
     assert figure_out.exists()
+    assert "policy_family" in report.columns
     assert "cost_vs_fixed_1024" in report.columns
     assert report.loc[report["policy"] == "safe_learned_policy_fallback_budget_256", "cost_vs_fixed_1024"].iloc[0] == 0.5
