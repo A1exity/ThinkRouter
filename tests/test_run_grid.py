@@ -35,6 +35,7 @@ def test_run_grid_runs_task_split_mock_grid(tmp_path, monkeypatch) -> None:
     assert {trace.task_type for trace in traces} == {"math"}
     assert {trace.selected_budget for trace in traces} == {0, 256}
     assert all(trace.metadata["split"] == "dev" for trace in traces)
+    assert all(trace.selected_model_provider in {"mock", "openai-compatible"} for trace in traces)
 
 
 def test_run_grid_limit_applies_to_samples(tmp_path, monkeypatch) -> None:

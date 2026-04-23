@@ -50,13 +50,14 @@ def run_query(request: RunRequest) -> RunResponse:
         configs[model_id] = configs[next(iter(configs))].__class__(model_id=model_id)
     config = configs[model_id]
     adapter = build_adapter(config)
+    candidate_models = request.candidate_models or list(configs.keys())
     model_request = ModelRequest(
         query=request.query,
         task_type=request.task_type,
         model_id=model_id,
         budget=budget,
         budget_config=budget_config,
-        candidate_set_signature="|".join(sorted(request.candidate_models or list(configs.keys()))),
+        candidate_set_signature="|".join(sorted(candidate_models)),
         metadata={"expected_answer": request.expected_answer},
     )
     model_response = adapter.generate(model_request)
@@ -68,6 +69,9 @@ def run_query(request: RunRequest) -> RunResponse:
         query_text=request.query,
         task_type=request.task_type,
         selected_model=model_id,
+        selected_model_provider=config.provider,
+        selected_model_tier=config.tier,
+        selected_model_alias=config.alias,
         selected_budget=budget,
         selected_budget_id=budget_config.budget_id,
         budget_config=budget_to_dict(budget_config),
@@ -89,7 +93,13 @@ def run_query(request: RunRequest) -> RunResponse:
         prompt_template_version=budget_config.prompt_template_version,
         provider_response_meta=model_response.provider_meta,
         route_confidence=route.estimated_accuracy if route else None,
-        metadata={"route": model_to_dict(route) if route else None, "router_name": request.router_name},
+        metadata={
+            "route": model_to_dict(route) if route else None,
+            "router_name": request.router_name,
+            "selected_model_provider": config.provider,
+            "selected_model_tier": config.tier,
+            "selected_model_alias": config.alias,
+        },
     )
     trace = store.insert_trace(trace)
     return RunResponse(route=route, model_response=model_response, evaluation=evaluation, trace=trace)
@@ -106,6 +116,7 @@ def config() -> dict[str, object]:
     return {
         "db_path": str(Path(get_db_path())),
         "models": {key: value.__dict__ for key, value in configs.items()},
+        "model_pool": list(configs.keys()),
         "budgets": [0, 256, 1024, 4096],
     }
 

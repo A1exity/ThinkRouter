@@ -49,6 +49,9 @@ def run_day1_grid(db_path: str, limit: int = 20, budgets: list[int] | None = Non
                     query_text=sample.query,
                     task_type="gsm8k",
                     selected_model=config.model_id,
+                    selected_model_provider=config.provider,
+                    selected_model_tier=config.tier,
+                    selected_model_alias=config.alias,
                     selected_budget=int(budget),
                     selected_budget_id=budget_config.budget_id,
                     budget_config=budget_to_dict(budget_config),
@@ -68,7 +71,13 @@ def run_day1_grid(db_path: str, limit: int = 20, budgets: list[int] | None = Non
                     candidate_set_signature=request.candidate_set_signature,
                     prompt_template_version=budget_config.prompt_template_version,
                     provider_response_meta=response.provider_meta,
-                    metadata={"sample_id": sample.sample_id, "experiment": "day1_grid"},
+                    metadata={
+                        "sample_id": sample.sample_id,
+                        "experiment": "day1_grid",
+                        "selected_model_provider": config.provider,
+                        "selected_model_tier": config.tier,
+                        "selected_model_alias": config.alias,
+                    },
                 )
                 traces.append(store.insert_trace(trace))
     return traces

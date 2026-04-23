@@ -68,6 +68,9 @@ class TraceRecord(BaseModel):
     query_text: str | None = None
     task_type: TaskType
     selected_model: str
+    selected_model_provider: str | None = None
+    selected_model_tier: str | None = None
+    selected_model_alias: str | None = None
     selected_budget: int
     selected_budget_id: str | None = None
     budget_config: dict[str, Any] = Field(default_factory=dict)
@@ -106,6 +109,12 @@ class TraceRecord(BaseModel):
             self.budget_config = compile_budget_config(self.selected_budget).model_dump()
         if self.prompt_template_version is None:
             self.prompt_template_version = str(self.budget_config.get("prompt_template_version", "v2"))
+        if self.selected_model_provider is None:
+            self.selected_model_provider = str(self.provider_response_meta.get("provider") or self.metadata.get("selected_model_provider") or "")
+        if self.selected_model_tier is None:
+            self.selected_model_tier = str(self.provider_response_meta.get("tier") or self.metadata.get("selected_model_tier") or "")
+        if self.selected_model_alias is None:
+            self.selected_model_alias = str(self.metadata.get("selected_model_alias") or "")
 
 
 class RunRequest(BaseModel):

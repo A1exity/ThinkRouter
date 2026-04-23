@@ -22,6 +22,19 @@ st.caption("Adaptive thinking-budget routing for verifiable reasoning tasks")
 configs = default_model_configs()
 model_ids = list(configs.keys())
 samples = load_day1_samples()
+config_rows = pd.DataFrame(
+    [
+        {
+            "model_id": config.model_id,
+            "provider": config.provider,
+            "tier": config.tier,
+            "alias": config.alias,
+            "backend": config.backend,
+            "cost_per_1k_tokens": config.cost_per_1k_tokens,
+        }
+        for config in configs.values()
+    ]
+)
 
 with st.sidebar:
     st.header("Run")
@@ -60,13 +73,30 @@ if st.button("Run query", type="primary"):
     metric_cols[3].metric("Latency", f"{response.trace.latency_s:.2f}s")
 
 st.divider()
+st.subheader("Model Pool")
+st.dataframe(config_rows, use_container_width=True)
+
+st.divider()
 st.subheader("Recent traces")
 try:
     traces = TraceStore(db_path).list_traces(limit=100)
     if traces:
         df = pd.DataFrame([model_to_dict(trace) for trace in traces])
         st.dataframe(
-            df[["id", "task_type", "selected_model", "selected_budget", "is_correct", "cost_usd", "latency_s", "query"]],
+            df[
+                [
+                    "id",
+                    "task_type",
+                    "selected_model",
+                    "selected_model_provider",
+                    "selected_model_tier",
+                    "selected_budget",
+                    "is_correct",
+                    "cost_usd",
+                    "latency_s",
+                    "query",
+                ]
+            ],
             use_container_width=True,
         )
     else:

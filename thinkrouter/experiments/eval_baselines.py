@@ -33,6 +33,15 @@ def summarize_baselines(csv_path: str, weights: UtilityWeights | None = None) ->
                 "policy": f"fixed_model_budget_{row.selected_model}_{int(row.selected_budget)}",
                 "policy_family": "fixed_model_budget",
                 "selected_model": row.selected_model,
+                "selected_model_provider": df.loc[df["selected_model"].astype(str) == str(row.selected_model), "selected_model_provider"].dropna().astype(str).iloc[0]
+                if "selected_model_provider" in df.columns and not df.loc[df["selected_model"].astype(str) == str(row.selected_model), "selected_model_provider"].dropna().empty
+                else pd.NA,
+                "selected_model_tier": df.loc[df["selected_model"].astype(str) == str(row.selected_model), "selected_model_tier"].dropna().astype(str).iloc[0]
+                if "selected_model_tier" in df.columns and not df.loc[df["selected_model"].astype(str) == str(row.selected_model), "selected_model_tier"].dropna().empty
+                else pd.NA,
+                "selected_model_alias": df.loc[df["selected_model"].astype(str) == str(row.selected_model), "selected_model_alias"].dropna().astype(str).iloc[0]
+                if "selected_model_alias" in df.columns and not df.loc[df["selected_model"].astype(str) == str(row.selected_model), "selected_model_alias"].dropna().empty
+                else pd.NA,
                 "selected_budget": int(row.selected_budget),
                 "accuracy": float(row.accuracy),
                 "avg_cost": float(row.avg_cost),
@@ -49,6 +58,9 @@ def summarize_baselines(csv_path: str, weights: UtilityWeights | None = None) ->
             **summarize_selection(f"model_only_best_{model_only_meta['selected_model']}", model_only_selected),
             "policy_family": "model_only",
             "selected_model": model_only_meta["selected_model"],
+            "selected_model_provider": _first_non_null(model_only_selected, "selected_model_provider"),
+            "selected_model_tier": _first_non_null(model_only_selected, "selected_model_tier"),
+            "selected_model_alias": _first_non_null(model_only_selected, "selected_model_alias"),
             "selected_budget": pd.NA,
         }
     )
@@ -59,6 +71,9 @@ def summarize_baselines(csv_path: str, weights: UtilityWeights | None = None) ->
             **summarize_selection(f"budget_only_best_{budget_only_meta['selected_budget']}", budget_only_selected),
             "policy_family": "budget_only",
             "selected_model": pd.NA,
+            "selected_model_provider": pd.NA,
+            "selected_model_tier": pd.NA,
+            "selected_model_alias": pd.NA,
             "selected_budget": int(budget_only_meta["selected_budget"]),
         }
     )
@@ -71,12 +86,24 @@ def summarize_baselines(csv_path: str, weights: UtilityWeights | None = None) ->
             **summarize_selection(f"aggregate_utility_{aggregate_model}_{aggregate_budget}", aggregate_selected),
             "policy_family": "joint_aggregate_utility",
             "selected_model": aggregate_model,
+            "selected_model_provider": _first_non_null(aggregate_selected, "selected_model_provider"),
+            "selected_model_tier": _first_non_null(aggregate_selected, "selected_model_tier"),
+            "selected_model_alias": _first_non_null(aggregate_selected, "selected_model_alias"),
             "selected_budget": aggregate_budget,
         }
     )
 
     summary = pd.DataFrame(rows)
     return summary.sort_values(["policy_family", "accuracy", "avg_cost"], ascending=[True, False, True]).reset_index(drop=True)
+
+
+def _first_non_null(df: pd.DataFrame, column: str) -> object:
+    if column not in df.columns:
+        return pd.NA
+    values = df[column].dropna()
+    if values.empty:
+        return pd.NA
+    return values.astype(str).iloc[0]
 
 
 def main() -> None:

@@ -26,7 +26,8 @@ def make_pareto_plot(csv_path: str, out_path: str) -> None:
         ax.scatter(group["avg_cost"], group["accuracy"], c=style["color"], marker=style["marker"], s=style["size"], label=str(family))
         for row in group.itertuples(index=False):
             if str(family) == "fixed_model_budget":
-                label = f"{row.selected_model}/{int(row.selected_budget)}"
+                tier = "" if not getattr(row, "selected_model_tier", None) or str(getattr(row, "selected_model_tier")) == "nan" else f"[{row.selected_model_tier}]"
+                label = f"{row.selected_model}{tier}/{int(row.selected_budget)}"
             else:
                 label = str(row.policy)
             ax.annotate(label, (row.avg_cost, row.accuracy), fontsize=8)

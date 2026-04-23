@@ -12,6 +12,9 @@ def test_trace_store_insert_and_list(tmp_path) -> None:
         query="What is 1 + 1?",
         task_type="gsm8k",
         selected_model="mock-cheap",
+        selected_model_provider="mock",
+        selected_model_tier="cheap",
+        selected_model_alias="mock-cheap",
         selected_budget=0,
         output_text="Final answer: 2",
         parsed_output="2",
@@ -28,5 +31,7 @@ def test_trace_store_insert_and_list(tmp_path) -> None:
     assert len(traces) == 1
     assert traces[0].is_correct is True
     assert traces[0].query_id == "sample-1"
+    assert traces[0].selected_model_provider == "mock"
+    assert traces[0].selected_model_tier == "cheap"
     assert traces[0].selected_budget_id == "budget-0"
     assert traces[0].budget_config["legacy_budget"] == 0

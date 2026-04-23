@@ -139,6 +139,9 @@ def _run_sample_grid(
                 query_text=sample.query,
                 task_type=sample.task_type,  # type: ignore[arg-type]
                 selected_model=config.model_id,
+                selected_model_provider=config.provider,
+                selected_model_tier=config.tier,
+                selected_model_alias=config.alias,
                 selected_budget=int(budget),
                 selected_budget_id=budget_config.budget_id,
                 budget_config=budget_to_dict(budget_config),
@@ -158,7 +161,14 @@ def _run_sample_grid(
                 candidate_set_signature=request.candidate_set_signature,
                 prompt_template_version=budget_config.prompt_template_version,
                 provider_response_meta=response.provider_meta,
-                metadata={"sample_id": sample.sample_id, "split": sample.split, "experiment": experiment},
+                metadata={
+                    "sample_id": sample.sample_id,
+                    "split": sample.split,
+                    "experiment": experiment,
+                    "selected_model_provider": config.provider,
+                    "selected_model_tier": config.tier,
+                    "selected_model_alias": config.alias,
+                },
             )
             traces.append(store.insert_trace(trace))
     return traces

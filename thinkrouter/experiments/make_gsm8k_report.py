@@ -79,6 +79,9 @@ def write_markdown_report(df: pd.DataFrame, out_path: str) -> None:
         "source",
         "policy_family",
         "policy",
+        "selected_model_provider",
+        "selected_model_tier",
+        "selected_model_alias",
         "accuracy",
         "avg_cost",
         "p95_latency",
@@ -86,7 +89,7 @@ def write_markdown_report(df: pd.DataFrame, out_path: str) -> None:
         "accuracy_delta_vs_fixed_1024",
         "n",
     ]
-    table = df[columns].copy()
+    table = df[[column for column in columns if column in df.columns]].copy()
     for col in ["accuracy", "avg_cost", "p95_latency", "cost_vs_fixed_1024", "accuracy_delta_vs_fixed_1024"]:
         table[col] = pd.to_numeric(table[col], errors="coerce").round(6)
     lines = [

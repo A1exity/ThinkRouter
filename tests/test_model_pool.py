@@ -35,3 +35,17 @@ def test_resolve_model_name_supports_qwen_alias_without_pool(monkeypatch) -> Non
     assert config.model_id == "qwen3-plus"
     assert config.tier == "mid"
     assert config.provider == "qwen"
+
+
+def test_resolve_model_name_uses_official_snapshot_defaults(monkeypatch) -> None:
+    monkeypatch.delenv("THINKROUTER_QWEN_FLASH_MODEL", raising=False)
+    monkeypatch.delenv("THINKROUTER_QWEN_PLUS_MODEL", raising=False)
+    monkeypatch.delenv("THINKROUTER_QWEN_MAX_MODEL", raising=False)
+
+    flash = resolve_model_name("qwen-flash")
+    plus = resolve_model_name("qwen-plus")
+    max_model = resolve_model_name("qwen-max")
+
+    assert flash.model_id == "qwen3.5-flash-2026-02-23"
+    assert plus.model_id == "qwen3.5-plus-2026-02-15"
+    assert max_model.model_id == "qwen3-max-2026-01-23"

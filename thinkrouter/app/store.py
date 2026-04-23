@@ -19,6 +19,9 @@ CREATE TABLE IF NOT EXISTS traces (
     query_text TEXT,
     task_type TEXT NOT NULL,
     selected_model TEXT NOT NULL,
+    selected_model_provider TEXT,
+    selected_model_tier TEXT,
+    selected_model_alias TEXT,
     selected_budget INTEGER NOT NULL,
     selected_budget_id TEXT,
     budget_config TEXT NOT NULL DEFAULT '{}',
@@ -53,6 +56,9 @@ REQUIRED_COLUMNS: dict[str, str] = {
     "query_id": "TEXT",
     "benchmark": "TEXT",
     "query_text": "TEXT",
+    "selected_model_provider": "TEXT",
+    "selected_model_tier": "TEXT",
+    "selected_model_alias": "TEXT",
     "selected_budget_id": "TEXT",
     "budget_config": "TEXT NOT NULL DEFAULT '{}'",
     "parsed_output": "TEXT",
@@ -95,11 +101,11 @@ class TraceStore:
                 """
                 INSERT INTO traces (
                     schema_version, query_id, benchmark, query, query_text, task_type, selected_model, selected_budget,
-                    selected_budget_id, budget_config, output_text, parsed_output, score, is_correct, expected_answer,
+                    selected_model_provider, selected_model_tier, selected_model_alias, selected_budget_id, budget_config, output_text, parsed_output, score, is_correct, expected_answer,
                     extracted_answer, judge_metadata, prompt_tokens, completion_tokens, total_tokens, cost_usd, latency_s,
                     error_type, router_features, route_reason, candidate_set_signature, prompt_template_version,
                     provider_response_meta, route_confidence, fallback_triggered, fallback_reason, created_at, metadata
-                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 """,
                 (
                     record.schema_version,
@@ -110,6 +116,9 @@ class TraceStore:
                     record.task_type,
                     record.selected_model,
                     record.selected_budget,
+                    record.selected_model_provider,
+                    record.selected_model_tier,
+                    record.selected_model_alias,
                     record.selected_budget_id or budget_config.get("budget_id"),
                     json.dumps(budget_config),
                     record.output_text,

@@ -14,9 +14,9 @@ QWEN_ALIAS_META: dict[str, tuple[str, str, str, str]] = {
     "qwen-max": ("THINKROUTER_QWEN_MAX_MODEL", "THINKROUTER_QWEN_MAX_COST_PER_1K", "strong", "openai-compatible"),
 }
 QWEN_DEFAULT_MODEL_IDS = {
-    "qwen-flash": "qwen-flash",
-    "qwen-plus": "qwen-plus",
-    "qwen-max": "qwen-max",
+    "qwen-flash": "qwen3.5-flash-2026-02-23",
+    "qwen-plus": "qwen3.5-plus-2026-02-15",
+    "qwen-max": "qwen3-max-2026-01-23",
 }
 QWEN_DEFAULT_COSTS = {
     "qwen-flash": "0.0003",

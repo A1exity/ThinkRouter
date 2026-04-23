@@ -65,7 +65,21 @@ def add_relative_cost(df: pd.DataFrame) -> pd.DataFrame:
 def write_markdown(df: pd.DataFrame, out_path: str) -> None:
     out = Path(out_path)
     out.parent.mkdir(parents=True, exist_ok=True)
-    table = df[["benchmark", "split", "policy_family", "policy", "accuracy", "avg_cost", "p95_latency", "cost_vs_fixed_1024", "n"]].copy()
+    available_columns = [
+        "benchmark",
+        "split",
+        "policy_family",
+        "policy",
+        "selected_model_provider",
+        "selected_model_tier",
+        "selected_model_alias",
+        "accuracy",
+        "avg_cost",
+        "p95_latency",
+        "cost_vs_fixed_1024",
+        "n",
+    ]
+    table = df[[column for column in available_columns if column in df.columns]].copy()
     for col in ["accuracy", "avg_cost", "p95_latency", "cost_vs_fixed_1024"]:
         table[col] = pd.to_numeric(table[col], errors="coerce").round(6)
     lines = [

@@ -124,9 +124,11 @@ Qwen pool support:
 ```text
 THINKROUTER_MODEL_POOL=qwen-flash,qwen-plus,qwen-max
 THINKROUTER_QWEN_FLASH_MODEL=qwen3.5-flash-2026-02-23
-THINKROUTER_QWEN_PLUS_MODEL=qwen3.5-plus-2026-02-23
-THINKROUTER_QWEN_MAX_MODEL=qwen3.5-max-2026-02-23
+THINKROUTER_QWEN_PLUS_MODEL=qwen3.5-plus-2026-02-15
+THINKROUTER_QWEN_MAX_MODEL=qwen3-max-2026-01-23
 ```
+
+These snapshot suffixes are not uniform. As of April 24, 2026, DashScope lists `qwen3.5-flash-2026-02-23`, `qwen3.5-plus-2026-02-15`, and `qwen3-max-2026-01-23`.
 
 If `THINKROUTER_MODEL_POOL` is unset, the project keeps the legacy `THINKROUTER_CHEAP_MODEL` / `THINKROUTER_MID_MODEL` / `THINKROUTER_STRONG_MODEL` behavior.
 
