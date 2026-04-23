@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
 
 @dataclass(frozen=True)
@@ -10,6 +10,7 @@ class BenchmarkSample:
     query: str
     expected_answer: str
     split: str = "train"
+    metadata: dict[str, str] = field(default_factory=dict)
 
 
 DAY1_GSM8K_SAMPLES: list[BenchmarkSample] = [
@@ -49,14 +50,102 @@ MATH_SEED_SAMPLES: list[BenchmarkSample] = [
 ]
 
 HUMANEVAL_SEED_SAMPLES: list[BenchmarkSample] = [
-    BenchmarkSample("humaneval_seed_001", "humaneval", "Write a Python function add(a, b) that returns the sum of a and b. Final answer should be: pass", "pass", "train"),
-    BenchmarkSample("humaneval_seed_002", "humaneval", "Write a Python function is_even(n) that returns True if n is even. Final answer should be: pass", "pass", "train"),
-    BenchmarkSample("humaneval_seed_003", "humaneval", "Write a Python function first_item(xs) that returns the first item of a list. Final answer should be: pass", "pass", "train"),
-    BenchmarkSample("humaneval_seed_004", "humaneval", "Write a Python function square(n) that returns n multiplied by itself. Final answer should be: pass", "pass", "train"),
-    BenchmarkSample("humaneval_seed_005", "humaneval", "Write a Python function max_of_two(a, b) that returns the larger value. Final answer should be: pass", "pass", "dev"),
-    BenchmarkSample("humaneval_seed_006", "humaneval", "Write a Python function reverse_string(s) that returns s reversed. Final answer should be: pass", "pass", "dev"),
-    BenchmarkSample("humaneval_seed_007", "humaneval", "Write a Python function count_vowels(s) that counts lowercase vowels. Final answer should be: pass", "pass", "test"),
-    BenchmarkSample("humaneval_seed_008", "humaneval", "Write a Python function factorial(n) for nonnegative n. Final answer should be: pass", "pass", "test"),
+    BenchmarkSample(
+        "humaneval_seed_001",
+        "humaneval",
+        "Write a Python function add(a, b) that returns the sum of a and b.",
+        "pass",
+        "train",
+        metadata={
+            "entry_point": "add",
+            "canonical_solution": "def add(a, b):\n    return a + b\n",
+            "test_code": "assert add(1, 2) == 3\nassert add(-1, 4) == 3\n",
+        },
+    ),
+    BenchmarkSample(
+        "humaneval_seed_002",
+        "humaneval",
+        "Write a Python function is_even(n) that returns True if n is even.",
+        "pass",
+        "train",
+        metadata={
+            "entry_point": "is_even",
+            "canonical_solution": "def is_even(n):\n    return n % 2 == 0\n",
+            "test_code": "assert is_even(2) is True\nassert is_even(3) is False\n",
+        },
+    ),
+    BenchmarkSample(
+        "humaneval_seed_003",
+        "humaneval",
+        "Write a Python function first_item(xs) that returns the first item of a list.",
+        "pass",
+        "train",
+        metadata={
+            "entry_point": "first_item",
+            "canonical_solution": "def first_item(xs):\n    return xs[0]\n",
+            "test_code": "assert first_item([3, 4, 5]) == 3\nassert first_item(['a', 'b']) == 'a'\n",
+        },
+    ),
+    BenchmarkSample(
+        "humaneval_seed_004",
+        "humaneval",
+        "Write a Python function square(n) that returns n multiplied by itself.",
+        "pass",
+        "train",
+        metadata={
+            "entry_point": "square",
+            "canonical_solution": "def square(n):\n    return n * n\n",
+            "test_code": "assert square(5) == 25\nassert square(-3) == 9\n",
+        },
+    ),
+    BenchmarkSample(
+        "humaneval_seed_005",
+        "humaneval",
+        "Write a Python function max_of_two(a, b) that returns the larger value.",
+        "pass",
+        "dev",
+        metadata={
+            "entry_point": "max_of_two",
+            "canonical_solution": "def max_of_two(a, b):\n    return a if a >= b else b\n",
+            "test_code": "assert max_of_two(3, 5) == 5\nassert max_of_two(8, 1) == 8\n",
+        },
+    ),
+    BenchmarkSample(
+        "humaneval_seed_006",
+        "humaneval",
+        "Write a Python function reverse_string(s) that returns s reversed.",
+        "pass",
+        "dev",
+        metadata={
+            "entry_point": "reverse_string",
+            "canonical_solution": "def reverse_string(s):\n    return s[::-1]\n",
+            "test_code": "assert reverse_string('abc') == 'cba'\nassert reverse_string('') == ''\n",
+        },
+    ),
+    BenchmarkSample(
+        "humaneval_seed_007",
+        "humaneval",
+        "Write a Python function count_vowels(s) that counts lowercase vowels.",
+        "pass",
+        "test",
+        metadata={
+            "entry_point": "count_vowels",
+            "canonical_solution": "def count_vowels(s):\n    return sum(ch in 'aeiou' for ch in s)\n",
+            "test_code": "assert count_vowels('banana') == 3\nassert count_vowels('rhythm') == 0\n",
+        },
+    ),
+    BenchmarkSample(
+        "humaneval_seed_008",
+        "humaneval",
+        "Write a Python function factorial(n) for nonnegative n.",
+        "pass",
+        "test",
+        metadata={
+            "entry_point": "factorial",
+            "canonical_solution": "def factorial(n):\n    result = 1\n    for value in range(2, n + 1):\n        result *= value\n    return result\n",
+            "test_code": "assert factorial(0) == 1\nassert factorial(5) == 120\n",
+        },
+    ),
 ]
 
 FROZEN_SEED_SAMPLES: list[BenchmarkSample] = DAY1_GSM8K_SAMPLES + MATH_SEED_SAMPLES + HUMANEVAL_SEED_SAMPLES

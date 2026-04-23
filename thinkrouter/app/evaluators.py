@@ -3,18 +3,19 @@ from __future__ import annotations
 import re
 from abc import ABC, abstractmethod
 from fractions import Fraction
+from typing import Any
 
 from thinkrouter.app.schemas import EvalResult
 
 
 class BaseEvaluator(ABC):
     @abstractmethod
-    def evaluate(self, output_text: str, expected_answer: str | None) -> EvalResult:
+    def evaluate(self, output_text: str, expected_answer: str | None, metadata: dict[str, Any] | None = None) -> EvalResult:
         raise NotImplementedError
 
 
 class GSM8KEvaluator(BaseEvaluator):
-    def evaluate(self, output_text: str, expected_answer: str | None) -> EvalResult:
+    def evaluate(self, output_text: str, expected_answer: str | None, metadata: dict[str, Any] | None = None) -> EvalResult:
         extracted = extract_numeric_answer(output_text)
         expected = normalize_numeric_answer(expected_answer)
         is_correct = bool(extracted is not None and expected is not None and extracted == expected)
@@ -35,7 +36,7 @@ class GSM8KEvaluator(BaseEvaluator):
 
 
 class ExactMatchEvaluator(BaseEvaluator):
-    def evaluate(self, output_text: str, expected_answer: str | None) -> EvalResult:
+    def evaluate(self, output_text: str, expected_answer: str | None, metadata: dict[str, Any] | None = None) -> EvalResult:
         extracted = extract_final_answer(output_text)
         expected = normalize_text(expected_answer)
         is_correct = bool(extracted and expected and normalize_text(extracted) == expected)
@@ -56,7 +57,7 @@ class ExactMatchEvaluator(BaseEvaluator):
 
 
 class MATHEvaluator(BaseEvaluator):
-    def evaluate(self, output_text: str, expected_answer: str | None) -> EvalResult:
+    def evaluate(self, output_text: str, expected_answer: str | None, metadata: dict[str, Any] | None = None) -> EvalResult:
         extracted = normalize_math_answer(extract_math_output_answer(output_text))
         expected = normalize_math_answer(expected_answer)
         is_correct = bool(extracted and expected and math_answers_equal(extracted, expected))
@@ -76,12 +77,87 @@ class MATHEvaluator(BaseEvaluator):
         )
 
 
+class CodeEvaluator(BaseEvaluator):
+    def evaluate(self, output_text: str, expected_answer: str | None, metadata: dict[str, Any] | None = None) -> EvalResult:
+        metadata = metadata or {}
+        extracted = extract_code_block(output_text)
+        test_code = str(metadata.get("test_code") or "")
+        entry_point = str(metadata.get("entry_point") or "")
+        if not extracted:
+            return EvalResult(
+                score=0.0,
+                is_correct=False,
+                parsed_output=None,
+                extracted_answer=None,
+                expected_answer=expected_answer,
+                error_type="parse_error",
+                judge_metadata={"task_type": "humaneval", "entry_point": entry_point},
+            )
+        if not test_code:
+            return EvalResult(
+                score=0.0,
+                is_correct=False,
+                parsed_output=extracted,
+                extracted_answer=extracted,
+                expected_answer=expected_answer,
+                error_type="execution_error",
+                judge_metadata={"task_type": "humaneval", "entry_point": entry_point, "reason": "missing_test_code"},
+            )
+        namespace: dict[str, Any] = {}
+        try:
+            exec(extracted, namespace, namespace)
+            exec(test_code, namespace, namespace)
+        except AssertionError:
+            return EvalResult(
+                score=0.0,
+                is_correct=False,
+                parsed_output=extracted,
+                extracted_answer=extracted,
+                expected_answer=expected_answer,
+                error_type="wrong_answer",
+                judge_metadata={"task_type": "humaneval", "entry_point": entry_point, "tests_passed": False},
+            )
+        except Exception as exc:
+            return EvalResult(
+                score=0.0,
+                is_correct=False,
+                parsed_output=extracted,
+                extracted_answer=extracted,
+                expected_answer=expected_answer,
+                error_type="execution_error",
+                judge_metadata={"task_type": "humaneval", "entry_point": entry_point, "exception": type(exc).__name__},
+            )
+        return EvalResult(
+            score=1.0,
+            is_correct=True,
+            parsed_output=extracted,
+            extracted_answer=extracted,
+            expected_answer=expected_answer,
+            error_type=None,
+            judge_metadata={"task_type": "humaneval", "entry_point": entry_point, "tests_passed": True},
+        )
+
+
 def get_evaluator(task_type: str) -> BaseEvaluator:
     if task_type == "gsm8k":
         return GSM8KEvaluator()
     if task_type == "math":
         return MATHEvaluator()
+    if task_type == "humaneval":
+        return CodeEvaluator()
     return ExactMatchEvaluator()
+
+
+def extract_code_block(text: str) -> str | None:
+    fenced = re.findall(r"```(?:python)?\s*(.*?)```", text, flags=re.DOTALL | re.IGNORECASE)
+    if fenced:
+        candidate = fenced[-1].strip()
+        return candidate or None
+    function_match = re.search(r"(def\s+[a-zA-Z_]\w*\s*\(.*)", text, flags=re.DOTALL)
+    if function_match:
+        candidate = function_match.group(1).strip()
+        return candidate or None
+    return None
 
 
 def extract_final_answer(text: str) -> str | None:

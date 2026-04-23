@@ -102,3 +102,23 @@ def test_filter_samples_applies_split_and_limit() -> None:
     filtered = filter_samples(samples, split="dev", limit=1)
 
     assert filtered == [samples[1]]
+
+
+def test_write_and_load_samples_jsonl_preserves_optional_metadata(tmp_path) -> None:
+    path = tmp_path / "humaneval.jsonl"
+    samples = [
+        BenchmarkSample(
+            "code_1",
+            "humaneval",
+            "Write add.",
+            "pass",
+            "test",
+            metadata={"entry_point": "add", "test_code": "assert add(1, 2) == 3"},
+        )
+    ]
+
+    write_samples_jsonl(samples, path)
+    loaded = load_samples_jsonl(path, task_type="humaneval", split="test")
+
+    assert loaded[0].metadata["entry_point"] == "add"
+    assert "assert add" in loaded[0].metadata["test_code"]

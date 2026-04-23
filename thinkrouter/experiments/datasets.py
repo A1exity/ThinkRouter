@@ -10,13 +10,16 @@ REQUIRED_JSONL_FIELDS = {"sample_id", "task_type", "query", "expected_answer", "
 
 
 def sample_to_json(sample: BenchmarkSample) -> dict[str, str]:
-    return {
+    payload: dict[str, Any] = {
         "sample_id": sample.sample_id,
         "task_type": sample.task_type,
         "query": sample.query,
         "expected_answer": sample.expected_answer,
         "split": sample.split,
     }
+    if sample.metadata:
+        payload["metadata"] = sample.metadata
+    return payload
 
 
 def sample_from_json(row: dict[str, Any], line_number: int | None = None) -> BenchmarkSample:
@@ -30,6 +33,7 @@ def sample_from_json(row: dict[str, Any], line_number: int | None = None) -> Ben
         query=str(row["query"]),
         expected_answer=str(row["expected_answer"]),
         split=str(row["split"]),
+        metadata={str(key): str(value) for key, value in dict(row.get("metadata") or {}).items()},
     )
     validate_sample(sample, line_number=line_number)
     return sample

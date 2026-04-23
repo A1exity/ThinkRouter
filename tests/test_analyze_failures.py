@@ -30,6 +30,10 @@ def test_parse_metadata_handles_python_dict_string() -> None:
     assert metadata["split"] == "dev"
 
 
+def test_classify_code_failure_detects_parse_error() -> None:
+    assert classify_failure("no code here", None, None, task_type="humaneval") == "parse_error"
+
+
 def test_analyze_failures_includes_cross_budget_correctness(tmp_path) -> None:
     csv_path = tmp_path / "grid.csv"
     rows = [

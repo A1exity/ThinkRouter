@@ -120,10 +120,15 @@ def _run_sample_grid(
                 budget=int(budget),
                 budget_config=budget_config,
                 candidate_set_signature=_candidate_set_signature(configs, budgets),
-                metadata={"expected_answer": sample.expected_answer, "sample_id": sample.sample_id, "split": sample.split},
+                metadata={
+                    "expected_answer": sample.expected_answer,
+                    "sample_id": sample.sample_id,
+                    "split": sample.split,
+                    **sample.metadata,
+                },
             )
             response = adapter.generate(request)
-            evaluation = evaluator.evaluate(response.output_text, sample.expected_answer)
+            evaluation = evaluator.evaluate(response.output_text, sample.expected_answer, request.metadata)
             trace = TraceRecord(
                 query_id=sample.sample_id,
                 benchmark=sample.task_type,

@@ -60,7 +60,7 @@ def run_query(request: RunRequest) -> RunResponse:
         metadata={"expected_answer": request.expected_answer},
     )
     model_response = adapter.generate(model_request)
-    evaluation = get_evaluator(request.task_type).evaluate(model_response.output_text, request.expected_answer)
+    evaluation = get_evaluator(request.task_type).evaluate(model_response.output_text, request.expected_answer, model_request.metadata)
     trace = TraceRecord(
         query_id=None,
         benchmark=request.task_type,

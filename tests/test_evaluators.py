@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from thinkrouter.app.evaluators import GSM8KEvaluator, MATHEvaluator, extract_last_boxed, extract_math_output_answer, math_answers_equal, normalize_math_answer, extract_numeric_answer, normalize_numeric_answer
+from thinkrouter.app.evaluators import CodeEvaluator, GSM8KEvaluator, MATHEvaluator, extract_code_block, extract_last_boxed, extract_math_output_answer, math_answers_equal, normalize_math_answer, extract_numeric_answer, normalize_numeric_answer
 
 
 def test_extract_numeric_answer_prefers_final_answer() -> None:
@@ -63,3 +63,29 @@ def test_math_answers_equal_handles_simple_numeric_equivalence() -> None:
     assert math_answers_equal(r"\frac{11}{2}", "5.5")
     assert normalize_math_answer(r"\frac{8}{2}=4") == "4"
     assert normalize_math_answer(r"7\%") == "7"
+
+
+def test_code_evaluator_executes_python_solution() -> None:
+    result = CodeEvaluator().evaluate(
+        "```python\ndef add(a, b):\n    return a + b\n```",
+        "pass",
+        {"entry_point": "add", "test_code": "assert add(1, 2) == 3\nassert add(-1, 4) == 3\n"},
+    )
+
+    assert result.is_correct is True
+    assert result.error_type is None
+
+
+def test_code_evaluator_reports_execution_error_for_invalid_code() -> None:
+    result = CodeEvaluator().evaluate(
+        "```python\ndef add(a, b)\n    return a + b\n```",
+        "pass",
+        {"entry_point": "add", "test_code": "assert add(1, 2) == 3\n"},
+    )
+
+    assert result.is_correct is False
+    assert result.error_type == "execution_error"
+
+
+def test_extract_code_block_prefers_fenced_python() -> None:
+    assert extract_code_block("Text\n```python\ndef square(x):\n    return x * x\n```") == "def square(x):\n    return x * x"

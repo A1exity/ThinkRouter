@@ -38,10 +38,10 @@ def run_day1_grid(db_path: str, limit: int = 20, budgets: list[int] | None = Non
                     budget=int(budget),
                     budget_config=budget_config,
                     candidate_set_signature=f"models={','.join(item.model_id for item in selected_configs)}|budgets={','.join(str(int(item)) for item in budgets)}",
-                    metadata={"expected_answer": sample.expected_answer, "sample_id": sample.sample_id},
+                    metadata={"expected_answer": sample.expected_answer, "sample_id": sample.sample_id, **sample.metadata},
                 )
                 response = adapter.generate(request)
-                evaluation = get_evaluator("gsm8k").evaluate(response.output_text, sample.expected_answer)
+                evaluation = get_evaluator("gsm8k").evaluate(response.output_text, sample.expected_answer, request.metadata)
                 trace = TraceRecord(
                     query_id=sample.sample_id,
                     benchmark="gsm8k",

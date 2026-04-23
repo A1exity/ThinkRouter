@@ -32,6 +32,8 @@ def numeric_values(text: str) -> list[str]:
 def classify_failure(output_text: str, expected_answer: object, extracted_answer: object, task_type: str = "gsm8k") -> str:
     if task_type == "math":
         return classify_math_failure(output_text, expected_answer, extracted_answer)
+    if task_type == "humaneval":
+        return classify_code_failure(output_text, extracted_answer)
     expected = normalize_numeric_answer(None if pd.isna(expected_answer) else str(expected_answer))
     extracted = normalize_numeric_answer(None if pd.isna(extracted_answer) else str(extracted_answer))
     if extracted is None:
@@ -58,6 +60,18 @@ def classify_math_failure(output_text: str, expected_answer: object, extracted_a
     output_normalized = normalize_math_answer(output_text) or ""
     if expected in output_normalized:
         return "answer_format_extraction_error"
+    return "wrong_answer"
+
+
+def classify_code_failure(output_text: str, extracted_answer: object) -> str:
+    extracted = "" if pd.isna(extracted_answer) else str(extracted_answer)
+    if not extracted.strip():
+        return "parse_error"
+    normalized = output_text.lower()
+    if "traceback" in normalized or "syntaxerror" in normalized:
+        return "execution_error"
+    if "def " not in extracted:
+        return "malformed_answer"
     return "wrong_answer"
 
 
