@@ -21,7 +21,7 @@ def run_day1_grid(db_path: str, limit: int = 20, budgets: list[int] | None = Non
     load_dotenv()
     budgets = budgets or DEFAULT_BUDGETS
     configs = default_model_configs()
-    selected_configs = list(configs.values())[:2]
+    selected_configs = list(configs.values())[:3]
     if len(selected_configs) == 1:
         selected_configs.append(selected_configs[0])
     store = TraceStore(db_path)

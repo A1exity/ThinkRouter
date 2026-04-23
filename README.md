@@ -7,6 +7,7 @@ ThinkRouter treats `(model, thinking_budget)` as the routing decision. It record
 ## Highlights
 
 - OpenAI-compatible model adapter with mock-model fallback for zero-cost local testing.
+- Ordered model-pool config with legacy tier vars and built-in Qwen `flash -> plus -> max` aliases.
 - Resumable benchmark grid runner for interrupted API experiments.
 - Official GSM8K and MATH JSONL export pipelines.
 - Deterministic GSM8K and MATH evaluators with regrading support.
@@ -47,7 +48,8 @@ Core files:
 
 | path | purpose |
 | --- | --- |
-| `thinkrouter/app/models.py` | mock and OpenAI-compatible model adapters |
+| `thinkrouter/adapters/` | mock/OpenAI-compatible adapters and model-pool config parsing |
+| `thinkrouter/app/models.py` | compatibility exports for adapter/model config entrypoints |
 | `thinkrouter/app/evaluators.py` | GSM8K, MATH, and exact-match evaluators |
 | `thinkrouter/app/store.py` | SQLite trace persistence |
 | `thinkrouter/app/router.py` | query features and online routing policy |
@@ -110,13 +112,25 @@ Important environment variables:
 | --- | --- |
 | `THINKROUTER_OPENAI_BASE_URL` | OpenAI-compatible `/v1` endpoint |
 | `THINKROUTER_OPENAI_API_KEY` | provider API key |
+| `THINKROUTER_MODEL_POOL` | ordered candidate models, for example `qwen-flash,qwen-plus,qwen-max` |
 | `THINKROUTER_STRONG_MODEL` | real model id, for example `qwen3.5-flash-2026-02-23` |
 | `THINKROUTER_STRONG_COST_PER_1K` | estimated cost per 1K tokens |
 | `THINKROUTER_DB_PATH` | default SQLite trace database path |
 | `THINKROUTER_DIFFICULTY_MODEL_PATH` | optional sklearn difficulty model |
 | `THINKROUTER_BUDGET_MODEL_PATH` | optional sklearn budget model |
 
-Validate real endpoint configuration without making a network call:
+Qwen pool support:
+
+```text
+THINKROUTER_MODEL_POOL=qwen-flash,qwen-plus,qwen-max
+THINKROUTER_QWEN_FLASH_MODEL=qwen3.5-flash-2026-02-23
+THINKROUTER_QWEN_PLUS_MODEL=qwen3.5-plus-2026-02-23
+THINKROUTER_QWEN_MAX_MODEL=qwen3.5-max-2026-02-23
+```
+
+If `THINKROUTER_MODEL_POOL` is unset, the project keeps the legacy `THINKROUTER_CHEAP_MODEL` / `THINKROUTER_MID_MODEL` / `THINKROUTER_STRONG_MODEL` behavior.
+
+Validate the strongest configured model in the pool without making a network call:
 
 ```bash
 python -m thinkrouter.experiments.smoke_real_model --model qwen3.5-flash-2026-02-23

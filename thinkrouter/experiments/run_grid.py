@@ -8,7 +8,7 @@ from dotenv import load_dotenv
 
 from thinkrouter.app.budgets import budget_to_dict, compile_budget_config
 from thinkrouter.app.evaluators import get_evaluator
-from thinkrouter.app.models import ModelConfig, build_adapter, default_model_configs
+from thinkrouter.app.models import ModelConfig, build_adapter, default_model_configs, resolve_model_name
 from thinkrouter.app.schemas import ModelRequest, TraceRecord, model_to_dict
 from thinkrouter.app.store import TraceStore
 from thinkrouter.experiments.datasets import load_samples_jsonl, summarize_samples
@@ -38,15 +38,18 @@ def select_model_configs(model_ids: list[str] | None = None) -> list[ModelConfig
         if model_id in configs:
             selected.append(configs[model_id])
             continue
-        backend = "mock" if model_id.startswith("mock") else fallback.backend
+        resolved = resolve_model_name(model_id)
         selected.append(
             ModelConfig(
-                model_id=model_id,
-                backend=backend,
-                model_name=model_id,
-                base_url=fallback.base_url,
-                api_key=fallback.api_key,
-                cost_per_1k_tokens=fallback.cost_per_1k_tokens,
+                model_id=resolved.model_id,
+                backend=resolved.backend or fallback.backend,
+                model_name=resolved.model_name or resolved.model_id,
+                base_url=resolved.base_url or fallback.base_url,
+                api_key=resolved.api_key or fallback.api_key,
+                cost_per_1k_tokens=resolved.cost_per_1k_tokens,
+                provider=resolved.provider,
+                tier=resolved.tier,
+                alias=resolved.alias,
             )
         )
     return selected

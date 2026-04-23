@@ -12,7 +12,7 @@ DEFAULT_EXPECTED = "7"
 
 def main() -> None:
     parser = argparse.ArgumentParser(description="Check or run a real OpenAI-compatible model smoke test.")
-    parser.add_argument("--model", default=None, help="Non-mock model id. Defaults to THINKROUTER_STRONG_MODEL.")
+    parser.add_argument("--model", default=None, help="Non-mock model id. Defaults to the strongest configured model in THINKROUTER_MODEL_POOL.")
     parser.add_argument("--query", default=DEFAULT_QUERY, help="Prompt to send when --run is set.")
     parser.add_argument("--expected-answer", default=DEFAULT_EXPECTED, help="Expected answer for evaluator reporting.")
     parser.add_argument("--task", default="gsm8k", choices=["gsm8k", "math", "humaneval", "custom"], help="Task type for evaluation.")

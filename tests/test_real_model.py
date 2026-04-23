@@ -39,3 +39,17 @@ def test_real_model_config_model_argument_overrides_env(monkeypatch) -> None:
 
     assert check.ok
     assert check.model_id == "provider-model"
+
+
+def test_real_model_config_uses_strongest_model_from_pool(monkeypatch) -> None:
+    monkeypatch.setenv("THINKROUTER_OPENAI_BASE_URL", "https://example.test/v1")
+    monkeypatch.setenv("THINKROUTER_OPENAI_API_KEY", "test-key")
+    monkeypatch.setenv("THINKROUTER_MODEL_POOL", "qwen-flash,qwen-plus,qwen-max")
+    monkeypatch.setenv("THINKROUTER_QWEN_FLASH_MODEL", "qwen3-flash")
+    monkeypatch.setenv("THINKROUTER_QWEN_PLUS_MODEL", "qwen3-plus")
+    monkeypatch.setenv("THINKROUTER_QWEN_MAX_MODEL", "qwen3-max")
+
+    check = check_openai_compatible_config()
+
+    assert check.ok
+    assert check.model_id == "qwen3-max"

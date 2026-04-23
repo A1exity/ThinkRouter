@@ -5,7 +5,7 @@ from dataclasses import dataclass
 
 from dotenv import load_dotenv
 
-from thinkrouter.app.models import ModelConfig, build_adapter
+from thinkrouter.app.models import ModelConfig, build_adapter, default_primary_model_id
 from thinkrouter.app.schemas import ModelRequest, ModelResponse
 
 PLACEHOLDER_API_KEYS = {"", "replace-me", "changeme", "your-api-key"}
@@ -22,12 +22,12 @@ class EndpointCheck:
 
 def check_openai_compatible_config(model_id: str | None = None) -> EndpointCheck:
     load_dotenv()
-    selected_model = model_id or os.getenv("THINKROUTER_STRONG_MODEL", "")
+    selected_model = model_id or default_primary_model_id()
     base_url = os.getenv("THINKROUTER_OPENAI_BASE_URL")
     api_key = os.getenv("THINKROUTER_OPENAI_API_KEY", "")
     missing: list[str] = []
     if not selected_model or selected_model.startswith("mock"):
-        missing.append("THINKROUTER_STRONG_MODEL or --model must be a non-mock model id")
+        missing.append("THINKROUTER_MODEL_POOL / THINKROUTER_STRONG_MODEL / --model must provide a non-mock model id")
     if not base_url:
         missing.append("THINKROUTER_OPENAI_BASE_URL")
     if api_key.strip().lower() in PLACEHOLDER_API_KEYS:
