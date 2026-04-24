@@ -219,6 +219,12 @@ python -m thinkrouter.experiments.train_phase2_router results/tables/qwen35_pool
 python -m thinkrouter.experiments.train_phase2_router results/tables/qwen35_pool_gsm8k_dev5_grid.csv --router mlp_factorized --out results/models/qwen35_pool_gsm8k_dev5_factorized.joblib
 ```
 
+Or run the full Phase 2 train + replay bundle in one step:
+
+```bash
+python -m thinkrouter.experiments.run_phase2_eval results/tables/qwen35_pool_gsm8k_dev10_grid.csv --out-prefix results/qwen35_pool_gsm8k_dev10
+```
+
 Replay a Phase 2 router on the same grid:
 
 ```bash

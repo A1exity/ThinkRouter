@@ -14,6 +14,10 @@ FAMILY_STYLES = {
     "budget_only": {"color": "#059669", "marker": "^", "size": 110},
     "joint_aggregate_utility": {"color": "#DC2626", "marker": "*", "size": 180},
     "joint_safe_fallback": {"color": "#D97706", "marker": "P", "size": 150},
+    "phase2_threshold": {"color": "#0F766E", "marker": "s", "size": 120},
+    "phase2_logreg_joint": {"color": "#7C3AED", "marker": "D", "size": 130},
+    "phase2_mlp_factorized": {"color": "#C2410C", "marker": "h", "size": 140},
+    "phase2_uncertainty_aware": {"color": "#111827", "marker": "X", "size": 150},
 }
 
 

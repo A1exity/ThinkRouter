@@ -454,6 +454,44 @@ Produced files:
 - `results/tables/qwen35_pool_gsm8k_dev5_baseline_phase2_summary.csv`
 - `results/figures/qwen35_pool_gsm8k_dev5_phase2_pareto.png`
 
+## Phase 2 Qwen 3.5 Pool GSM8K Dev10 Slice
+
+A larger real Phase 2 slice was then executed on the official GSM8K `dev` split with `limit=10`, the full Qwen `flash / plus / max` pool, and budgets `0 / 256 / 1024`. This produced `90` real traces in `results/tables/qwen35_pool_gsm8k_dev10_grid.csv` with overall candidate-trace accuracy `0.978`.
+
+The new `run_phase2_eval` orchestration script was used to train and replay all four Phase 2 routers on that completed grid:
+
+- `threshold`
+- `logreg_joint`
+- `mlp_factorized`
+- `uncertainty_aware`
+
+Replay summary:
+
+| policy | accuracy | avg cost | avg latency | avg route confidence | fallback rate |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| `phase2_threshold` | 1.000 | 0.000234 | 6.135s | 0.6750 | 0.0 |
+| `phase2_logreg_joint` | 1.000 | 0.000234 | 6.135s | 0.9116 | 0.0 |
+| `phase2_mlp_factorized` | 1.000 | 0.000234 | 6.135s | 0.9478 | 0.0 |
+| `phase2_uncertainty_aware` | 1.000 | 0.000234 | 6.135s | 0.9478 | 0.1 |
+
+On this dev10 slice, all four Phase 2 routers selected the cheap flash tier and matched the best observed accuracy while staying far below the `qwen-max` aggregate-utility point on cost. The uncertainty-aware router triggered fallback on one of the ten samples, confirming that the fallback path remains active on a larger real slice and not only on the earlier dev5 smoke evaluation.
+
+Produced files:
+
+- `results/tables/qwen35_pool_gsm8k_dev10_grid.csv`
+- `results/qwen35_pool_gsm8k_dev10_logreg_joint.joblib`
+- `results/qwen35_pool_gsm8k_dev10_mlp_factorized.joblib`
+- `results/qwen35_pool_gsm8k_dev10_threshold_summary.csv`
+- `results/qwen35_pool_gsm8k_dev10_threshold_selected.csv`
+- `results/qwen35_pool_gsm8k_dev10_logreg_joint_summary.csv`
+- `results/qwen35_pool_gsm8k_dev10_logreg_joint_selected.csv`
+- `results/qwen35_pool_gsm8k_dev10_mlp_factorized_summary.csv`
+- `results/qwen35_pool_gsm8k_dev10_mlp_factorized_selected.csv`
+- `results/qwen35_pool_gsm8k_dev10_uncertainty_aware_summary.csv`
+- `results/qwen35_pool_gsm8k_dev10_uncertainty_aware_selected.csv`
+- `results/qwen35_pool_gsm8k_dev10_baseline_phase2_summary.csv`
+- `results/qwen35_pool_gsm8k_dev10_phase2_pareto.png`
+
 ## Final Reporting Targets
 
 The final report should include:
