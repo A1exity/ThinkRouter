@@ -13,6 +13,7 @@ FAMILY_STYLES = {
     "model_only": {"color": "#2563EB", "marker": "X", "size": 110},
     "budget_only": {"color": "#059669", "marker": "^", "size": 110},
     "joint_aggregate_utility": {"color": "#DC2626", "marker": "*", "size": 180},
+    "joint_safe_fallback": {"color": "#D97706", "marker": "P", "size": 150},
 }
 
 

@@ -392,6 +392,38 @@ Generated artifacts:
 - `results/reports/qwen_gsm8k_final_policy_report.md`
 - `results/figures/qwen_gsm8k_test20_policy_comparison.png`
 
+## Qwen 3.5 Pool Phase 1 Completion Slice
+
+Phase 1 was closed out with a real three-tier Qwen pool on DashScope:
+
+- `qwen3.5-flash-2026-02-23`
+- `qwen3.5-plus-2026-02-15`
+- `qwen3-max-2026-01-23`
+
+Two final small real-benchmark slices were added to verify the multi-model system path end to end:
+
+1. GSM8K `dev5` with `flash / plus / max` and budgets `0 / 256 / 1024`
+2. HumanEval seed `dev2` with `flash / plus / max` at budget `256`
+
+The GSM8K slice completed all `45` traces and all runs were correct. The strongest utility winner on this small slice was `qwen3-max-2026-01-23` at budget `0`, while the cheapest always-correct point was still the flash tier at budget `0`.
+
+The HumanEval slice completed `6` traces and all were incorrect, which is still useful for Phase 1 because it validates the real code-generation evaluation path, failure taxonomy, and multi-model trace/report flow. On this small code slice, `qwen3-max-2026-01-23` was the least costly failed option and the flash `budget 0` configuration was intentionally not used because it produced pathological runtimes on the seed tasks.
+
+Added artifacts:
+
+- `results/tables/qwen35_pool_gsm8k_dev5_grid.csv`
+- `results/tables/qwen35_pool_gsm8k_dev5_baseline_summary.csv`
+- `results/tables/qwen35_pool_gsm8k_dev5_policy_summary.csv`
+- `results/tables/qwen35_pool_gsm8k_dev5_policy_stats.csv`
+- `results/tables/qwen35_pool_gsm8k_dev5_failures.csv`
+- `results/figures/qwen35_pool_gsm8k_dev5_pareto.png`
+- `results/tables/qwen35_pool_humaneval_dev2_budget256_grid.csv`
+- `results/tables/qwen35_pool_humaneval_dev2_budget256_baseline_summary.csv`
+- `results/tables/qwen35_pool_humaneval_dev2_budget256_policy_summary.csv`
+- `results/tables/qwen35_pool_humaneval_dev2_budget256_policy_stats.csv`
+- `results/tables/qwen35_pool_humaneval_dev2_budget256_failures.csv`
+- `results/figures/qwen35_pool_humaneval_dev2_budget256_pareto.png`
+
 ## Final Reporting Targets
 
 The final report should include:

@@ -108,6 +108,9 @@ def _resolve_named_model(name: str) -> ModelConfig:
             tier=tier,
             alias=name,
         )
+    explicit_qwen = _resolve_explicit_qwen_model(name)
+    if explicit_qwen is not None:
+        return explicit_qwen
     backend = "mock" if name.startswith("mock") else os.getenv("THINKROUTER_DEFAULT_BACKEND", "openai-compatible")
     inferred_tier = _infer_tier_from_name(name)
     default_cost = "0.0" if backend == "mock" else "0.0006"
@@ -122,6 +125,27 @@ def _resolve_named_model(name: str) -> ModelConfig:
         tier=inferred_tier,
         alias=name,
     )
+
+
+def _resolve_explicit_qwen_model(name: str) -> ModelConfig | None:
+    normalized = name.strip()
+    for alias, (model_env, cost_env, tier, backend) in QWEN_ALIAS_META.items():
+        configured_model_id = os.getenv(model_env, QWEN_DEFAULT_MODEL_IDS[alias]).strip() or QWEN_DEFAULT_MODEL_IDS[alias]
+        if normalized != configured_model_id:
+            continue
+        effective_backend = "mock" if configured_model_id.startswith("mock") else backend
+        return ModelConfig(
+            model_id=configured_model_id,
+            backend=effective_backend,
+            model_name=configured_model_id,
+            base_url=os.getenv("THINKROUTER_OPENAI_BASE_URL") or None,
+            api_key=os.getenv("THINKROUTER_OPENAI_API_KEY") or None,
+            cost_per_1k_tokens=float(os.getenv(cost_env, QWEN_DEFAULT_COSTS[alias])),
+            provider="qwen",
+            tier=tier,
+            alias=alias,
+        )
+    return None
 
 
 def _infer_tier_from_name(name: str) -> str | None:

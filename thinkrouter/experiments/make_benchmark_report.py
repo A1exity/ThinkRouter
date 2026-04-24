@@ -22,6 +22,8 @@ def classify_policy_family(policy: str) -> str:
         return "model_only"
     if policy.startswith("budget_only_"):
         return "budget_only"
+    if policy.startswith("aggregate_utility_safe_fallback_"):
+        return "joint_safe_fallback"
     if policy.startswith("aggregate_utility_"):
         return "joint_aggregate_utility"
     if policy.startswith("safe_learned_policy"):

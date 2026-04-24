@@ -103,6 +103,36 @@ def best_budget_only_policy(df: pd.DataFrame, weights: UtilityWeights) -> tuple[
     return selected, {"selected_budget": int(best["selected_budget"]), "utility": float(best["utility"])}
 
 
+def safe_fallback_policy(
+    df: pd.DataFrame,
+    primary_selected: pd.DataFrame,
+    fallback_budget: int,
+    recoverable_error_types: set[str] | None = None,
+) -> pd.DataFrame:
+    recoverable_error_types = recoverable_error_types or {
+        "parse_error",
+        "execution_error",
+        "timeout",
+        "empty_output",
+        "malformed_answer",
+    }
+    prepared = add_sample_id(df)
+    selected_rows: list[pd.Series] = []
+    for _, row in primary_selected.iterrows():
+        sample_id = str(row.get("sample_id"))
+        selected = row.copy()
+        error_type = str(row.get("error_type") or "")
+        if error_type in recoverable_error_types:
+            group = prepared[prepared["sample_id"].astype(str) == sample_id].copy()
+            fallback = group[group["selected_budget"].astype(int) == int(fallback_budget)]
+            if not fallback.empty:
+                selected = fallback.sort_values(["cost_usd", "latency_s", "selected_model"], ascending=[True, True, True]).iloc[0].copy()
+                selected["fallback_triggered"] = True
+                selected["fallback_reason"] = f"recoverable_error:{error_type}"
+        selected_rows.append(selected)
+    return pd.DataFrame(selected_rows)
+
+
 def evaluate_policies(csv_path: str, weights: UtilityWeights | None = None) -> tuple[pd.DataFrame, pd.DataFrame]:
     weights = weights or UtilityWeights()
     df = add_sample_id(pd.read_csv(csv_path))
@@ -120,6 +150,13 @@ def evaluate_policies(csv_path: str, weights: UtilityWeights | None = None) -> t
     aggregate_selected, aggregate_stats = aggregate_utility_policy(df, weights)
     budget = int(aggregate_selected["selected_budget"].iloc[0]) if not aggregate_selected.empty else -1
     rows.append(summarize_selection(f"aggregate_utility_budget_{budget}", aggregate_selected))
+    safe_selected = safe_fallback_policy(df, aggregate_selected, int(budget_only_meta["selected_budget"]))
+    rows.append(
+        summarize_selection(
+            f"aggregate_utility_safe_fallback_budget_{budget_only_meta['selected_budget']}",
+            safe_selected,
+        )
+    )
     return pd.DataFrame(rows), aggregate_stats
 
 

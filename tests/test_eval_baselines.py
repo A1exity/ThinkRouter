@@ -62,3 +62,4 @@ def test_summarize_baselines_includes_policy_families(tmp_path) -> None:
     assert "model_only_best_strong" in set(summary["policy"])
     assert "budget_only_best_1024" in set(summary["policy"])
     assert "joint_aggregate_utility" in set(summary["policy_family"])
+    assert "joint_safe_fallback" in set(summary["policy_family"])

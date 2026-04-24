@@ -21,7 +21,9 @@ def test_frozen_sample_summary_contains_seed_splits() -> None:
 
 
 def test_run_grid_runs_task_split_mock_grid(tmp_path, monkeypatch) -> None:
+    monkeypatch.setenv("THINKROUTER_MODEL_POOL", "")
     monkeypatch.setenv("THINKROUTER_CHEAP_MODEL", "mock-cheap")
+    monkeypatch.setenv("THINKROUTER_MID_MODEL", "")
     monkeypatch.setenv("THINKROUTER_STRONG_MODEL", "mock-strong")
 
     traces = run_grid(
@@ -39,7 +41,9 @@ def test_run_grid_runs_task_split_mock_grid(tmp_path, monkeypatch) -> None:
 
 
 def test_run_grid_limit_applies_to_samples(tmp_path, monkeypatch) -> None:
+    monkeypatch.setenv("THINKROUTER_MODEL_POOL", "")
     monkeypatch.setenv("THINKROUTER_CHEAP_MODEL", "mock-cheap")
+    monkeypatch.setenv("THINKROUTER_MID_MODEL", "")
     monkeypatch.setenv("THINKROUTER_STRONG_MODEL", "mock-strong")
 
     traces = run_grid(
@@ -57,7 +61,9 @@ def test_run_grid_uses_jsonl_input(tmp_path, monkeypatch) -> None:
     from thinkrouter.experiments.datasets import write_samples_jsonl
     from thinkrouter.experiments.sample_data import BenchmarkSample
 
+    monkeypatch.setenv("THINKROUTER_MODEL_POOL", "")
     monkeypatch.setenv("THINKROUTER_CHEAP_MODEL", "mock-cheap")
+    monkeypatch.setenv("THINKROUTER_MID_MODEL", "")
     monkeypatch.setenv("THINKROUTER_STRONG_MODEL", "mock-strong")
     input_path = tmp_path / "samples.jsonl"
     write_samples_jsonl(
@@ -83,7 +89,9 @@ def test_run_grid_uses_jsonl_input(tmp_path, monkeypatch) -> None:
 
 
 def test_run_grid_resume_skips_existing_trace_keys(tmp_path, monkeypatch) -> None:
+    monkeypatch.setenv("THINKROUTER_MODEL_POOL", "")
     monkeypatch.setenv("THINKROUTER_CHEAP_MODEL", "mock-cheap")
+    monkeypatch.setenv("THINKROUTER_MID_MODEL", "")
     monkeypatch.setenv("THINKROUTER_STRONG_MODEL", "mock-strong")
     db_path = tmp_path / "grid.sqlite"
 
@@ -111,7 +119,9 @@ def test_run_grid_resume_skips_existing_trace_keys(tmp_path, monkeypatch) -> Non
 
 
 def test_run_grid_executes_humaneval_seed_samples_with_mock_code(tmp_path, monkeypatch) -> None:
+    monkeypatch.setenv("THINKROUTER_MODEL_POOL", "")
     monkeypatch.setenv("THINKROUTER_CHEAP_MODEL", "mock-cheap")
+    monkeypatch.setenv("THINKROUTER_MID_MODEL", "")
     monkeypatch.setenv("THINKROUTER_STRONG_MODEL", "mock-strong")
 
     traces = run_grid(

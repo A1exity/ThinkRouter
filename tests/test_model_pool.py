@@ -49,3 +49,13 @@ def test_resolve_model_name_uses_official_snapshot_defaults(monkeypatch) -> None
     assert flash.model_id == "qwen3.5-flash-2026-02-23"
     assert plus.model_id == "qwen3.5-plus-2026-02-15"
     assert max_model.model_id == "qwen3-max-2026-01-23"
+
+
+def test_resolve_model_name_preserves_qwen_cost_for_explicit_snapshot(monkeypatch) -> None:
+    monkeypatch.setenv("THINKROUTER_QWEN_FLASH_COST_PER_1K", "0.123")
+
+    config = resolve_model_name("qwen3.5-flash-2026-02-23")
+
+    assert config.alias == "qwen-flash"
+    assert config.provider == "qwen"
+    assert config.cost_per_1k_tokens == 0.123

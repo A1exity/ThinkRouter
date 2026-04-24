@@ -1,0 +1,45 @@
+sample_id,split,task_type,selected_model,selected_budget,expected_answer,extracted_answer,error_type,correct_budgets_for_sample,any_other_budget_correct,total_tokens,cost_usd,latency_s,query,output_preview,output_text
+humaneval_seed_005,dev,humaneval,qwen3.5-flash-2026-02-23,256,pass,,parse_error,,False,3158,0.0009063459999999,32.23999620001996,"Write a Python function max_of_two(a, b) that returns the larger value. Final answer should be: pass","To implement `max_of_two(a, b)`, one would typically compare the two arguments using a conditional statement (e.g., `if a > b`) or the built-in `max()` function. However, the prompt explicitly instructs that the final answer must be the str","To implement `max_of_two(a, b)`, one would typically compare the two arguments using a conditional statement (e.g., `if a > b`) or the built-in `max()` function. However, the prompt explicitly instructs that the final answer must be the string `pass`.
+
+Final Answer: pass"
+humaneval_seed_005,dev,humaneval,qwen3.5-plus-2026-02-15,256,pass,"def max_of_two(a, b):
+    if a > b:
+        return a
+    else:
+        return b",wrong_answer,,False,3911,0.0046932,75.00235419999808,"Write a Python function max_of_two(a, b) that returns the larger value. Final answer should be: pass","To implement the function `max_of_two(a, b)`, we can use a simple conditional statement to compare the two values. If `a` is greater than `b`, return `a`; otherwise, return `b`. Alternatively, Python's built-in `max()` function can be used.","To implement the function `max_of_two(a, b)`, we can use a simple conditional statement to compare the two values. If `a` is greater than `b`, return `a`; otherwise, return `b`. Alternatively, Python's built-in `max()` function can be used. Although the logic is straightforward, the specific instruction requires the final answer section to contain the word ""pass"".
+
+```python
+def max_of_two(a, b):
+    if a > b:
+        return a
+    else:
+        return b
+```
+
+Final Answer: pass"
+humaneval_seed_005,dev,humaneval,qwen3-max-2026-01-23,256,pass,"def max_of_two(a, b):
+    pass",wrong_answer,,False,119,0.0004759999999999,2.758430299989413,"Write a Python function max_of_two(a, b) that returns the larger value. Final answer should be: pass","The function `max_of_two(a, b)` can be implemented by comparing the two inputs and returning the larger one. Using a simple conditional or Python's built-in `max()` function would work. However, since the final answer must be ""pass"", we pro","The function `max_of_two(a, b)` can be implemented by comparing the two inputs and returning the larger one. Using a simple conditional or Python's built-in `max()` function would work. However, since the final answer must be ""pass"", we provide that as instructed.
+
+```python
+def max_of_two(a, b):
+    pass
+```"
+humaneval_seed_006,dev,humaneval,qwen3.5-flash-2026-02-23,256,pass,,parse_error,,False,1132,0.0003248839999999,11.753173500008415,Write a Python function reverse_string(s) that returns s reversed. Final answer should be: pass,"To reverse a string in Python, the standard approach is using slice notation `s[::-1]`. However, the prompt explicitly instructs that the final answer must be the literal string ""pass"".  pass","To reverse a string in Python, the standard approach is using slice notation `s[::-1]`. However, the prompt explicitly instructs that the final answer must be the literal string ""pass"".
+
+pass"
+humaneval_seed_006,dev,humaneval,qwen3.5-plus-2026-02-15,256,pass,"def reverse_string(s):
+    return s[::-1]",wrong_answer,,False,4400,0.00528,79.02214019995881,Write a Python function reverse_string(s) that returns s reversed. Final answer should be: pass,"To reverse a string in Python, the most efficient and idiomatic approach is using slice notation with a step of `-1` (i.e., `s[::-1]`). This creates a new string with the characters in reverse order. I will define the function `reverse_stri","To reverse a string in Python, the most efficient and idiomatic approach is using slice notation with a step of `-1` (i.e., `s[::-1]`). This creates a new string with the characters in reverse order. I will define the function `reverse_string(s)` to implement this logic.
+
+```python
+def reverse_string(s):
+    return s[::-1]
+```
+
+Final Answer: pass"
+humaneval_seed_006,dev,humaneval,qwen3-max-2026-01-23,256,pass,"def reverse_string(s):
+    return s[::-1]",wrong_answer,,False,60,0.00024,2.0931907999911346,Write a Python function reverse_string(s) that returns s reversed. Final answer should be: pass,```python def reverse_string(s):     return s[::-1] ```  pass,"```python
+def reverse_string(s):
+    return s[::-1]
+```
+
+pass"

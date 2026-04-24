@@ -5,7 +5,7 @@ from pathlib import Path
 
 import pandas as pd
 
-from thinkrouter.experiments.evaluate_policy import UtilityWeights, add_sample_id, aggregate_utility_policy, best_budget_only_policy, best_model_only_policy, summarize_selection
+from thinkrouter.experiments.evaluate_policy import UtilityWeights, add_sample_id, aggregate_utility_policy, best_budget_only_policy, best_model_only_policy, safe_fallback_policy, summarize_selection
 
 
 def summarize_baselines(csv_path: str, weights: UtilityWeights | None = None) -> pd.DataFrame:
@@ -89,6 +89,21 @@ def summarize_baselines(csv_path: str, weights: UtilityWeights | None = None) ->
             "selected_model_provider": _first_non_null(aggregate_selected, "selected_model_provider"),
             "selected_model_tier": _first_non_null(aggregate_selected, "selected_model_tier"),
             "selected_model_alias": _first_non_null(aggregate_selected, "selected_model_alias"),
+            "selected_budget": aggregate_budget,
+        }
+    )
+    safe_selected = safe_fallback_policy(df, aggregate_selected, int(budget_only_meta["selected_budget"]))
+    rows.append(
+        {
+            **summarize_selection(
+                f"aggregate_utility_safe_fallback_{aggregate_model}_{aggregate_budget}_to_{budget_only_meta['selected_budget']}",
+                safe_selected,
+            ),
+            "policy_family": "joint_safe_fallback",
+            "selected_model": aggregate_model,
+            "selected_model_provider": _first_non_null(safe_selected, "selected_model_provider"),
+            "selected_model_tier": _first_non_null(safe_selected, "selected_model_tier"),
+            "selected_model_alias": _first_non_null(safe_selected, "selected_model_alias"),
             "selected_budget": aggregate_budget,
         }
     )

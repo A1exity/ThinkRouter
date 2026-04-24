@@ -58,6 +58,7 @@ def test_evaluate_policies_summarizes_fixed_oracle_and_utility(tmp_path) -> None
     assert "model_only_best_model" in policies
     assert "budget_only_best_0" in policies
     assert "aggregate_utility_budget_0" in policies
+    assert "aggregate_utility_safe_fallback_budget_0" in policies
     assert summary.loc[summary["policy"] == "fixed_budget_0", "accuracy"].iloc[0] == 1.0
     assert summary.loc[summary["policy"] == "fixed_budget_1024", "accuracy"].iloc[0] == 0.0
     assert stats["utility"].notna().all()
