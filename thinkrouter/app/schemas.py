@@ -57,6 +57,10 @@ class RouteDecision(BaseModel):
     estimated_cost: float
     estimated_latency: float
     explanation: str
+    route_confidence: float | None = None
+    router_name: str | None = None
+    fallback_triggered: bool = False
+    fallback_reason: str | None = None
 
 
 class TraceRecord(BaseModel):

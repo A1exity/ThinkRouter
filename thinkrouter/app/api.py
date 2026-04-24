@@ -9,7 +9,7 @@ from fastapi import FastAPI
 from thinkrouter.app.budgets import budget_to_dict, compile_budget_config, validate_budget
 from thinkrouter.app.evaluators import get_evaluator
 from thinkrouter.app.models import build_adapter, default_model_configs
-from thinkrouter.app.router import JointPolicyEngine
+from thinkrouter.app.router import JointPolicyEngine, available_router_names, build_runtime_router
 from thinkrouter.app.schemas import ModelRequest, RunRequest, RunResponse, TraceRecord, model_to_dict
 from thinkrouter.app.store import TraceStore
 
@@ -41,7 +41,11 @@ def run_query(request: RunRequest) -> RunResponse:
     model_id = request.model_id
     budget = request.budget
     if request.use_router:
-        route = policy.route(request.query, request.task_type)
+        if request.router_name:
+            router = build_runtime_router(list(configs.values()), request.router_name)
+            route = router.route(request.query, request.task_type)
+        else:
+            route = policy.route(request.query, request.task_type)
         model_id = route.model_id
         budget = route.budget
     validate_budget(budget)
@@ -92,10 +96,12 @@ def run_query(request: RunRequest) -> RunResponse:
         candidate_set_signature=model_request.candidate_set_signature,
         prompt_template_version=budget_config.prompt_template_version,
         provider_response_meta=model_response.provider_meta,
-        route_confidence=route.estimated_accuracy if route else None,
+        route_confidence=route.route_confidence if route else None,
+        fallback_triggered=route.fallback_triggered if route else False,
+        fallback_reason=route.fallback_reason if route else None,
         metadata={
             "route": model_to_dict(route) if route else None,
-            "router_name": request.router_name,
+            "router_name": request.router_name or (route.router_name if route else None),
             "selected_model_provider": config.provider,
             "selected_model_tier": config.tier,
             "selected_model_alias": config.alias,
@@ -118,5 +124,6 @@ def config() -> dict[str, object]:
         "models": {key: value.__dict__ for key, value in configs.items()},
         "model_pool": list(configs.keys()),
         "budgets": [0, 256, 1024, 4096],
+        "routers": available_router_names(),
     }
 

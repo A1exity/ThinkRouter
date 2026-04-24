@@ -12,6 +12,7 @@ ThinkRouter treats `(model, thinking_budget)` as the routing decision. It record
 - Official GSM8K and MATH JSONL export pipelines.
 - Deterministic GSM8K and MATH evaluators with regrading support.
 - Offline policy replay for fixed budget, oracle, aggregate utility, raw learned, safe fallback, and dev-calibrated policies.
+- Phase 2 router stack with surface/semantic/cheap-probe features plus `threshold`, `logreg_joint`, `mlp_factorized`, and `uncertainty_aware` routers.
 - Consolidated report generation for GSM8K and multi-benchmark results.
 
 ## Key Results
@@ -49,6 +50,9 @@ Core files:
 | path | purpose |
 | --- | --- |
 | `thinkrouter/adapters/` | mock/OpenAI-compatible adapters and model-pool config parsing |
+| `thinkrouter/features/` | Phase 2 feature pipeline: surface, semantic-hash, and cheap-probe extractors |
+| `thinkrouter/routers/` | threshold, joint-logreg, factorized MLP, and uncertainty-aware routers |
+| `thinkrouter/training/` | utility objective plus trace-to-training-set conversion |
 | `thinkrouter/app/models.py` | compatibility exports for adapter/model config entrypoints |
 | `thinkrouter/app/evaluators.py` | GSM8K, MATH, and exact-match evaluators |
 | `thinkrouter/app/store.py` | SQLite trace persistence |
@@ -206,6 +210,29 @@ python -m thinkrouter.experiments.evaluate_learned_policy results/tables/qwen_gs
 
 The default learned-policy evaluator uses safe fallback. Add `--unsafe` to replay raw classifier predictions.
 
+## Phase 2 Router Workflow
+
+Train a utility-aware Phase 2 router from a completed grid:
+
+```bash
+python -m thinkrouter.experiments.train_phase2_router results/tables/qwen35_pool_gsm8k_dev5_grid.csv --router logreg_joint --out results/models/qwen35_pool_gsm8k_dev5_logreg.joblib
+python -m thinkrouter.experiments.train_phase2_router results/tables/qwen35_pool_gsm8k_dev5_grid.csv --router mlp_factorized --out results/models/qwen35_pool_gsm8k_dev5_factorized.joblib
+```
+
+Replay a Phase 2 router on the same grid:
+
+```bash
+python -m thinkrouter.experiments.evaluate_phase2_router results/tables/qwen35_pool_gsm8k_dev5_grid.csv --router threshold --out results/tables/qwen35_pool_gsm8k_dev5_threshold_summary.csv
+python -m thinkrouter.experiments.evaluate_phase2_router results/tables/qwen35_pool_gsm8k_dev5_grid.csv --router uncertainty_aware --model results/models/qwen35_pool_gsm8k_dev5_factorized.joblib --out results/tables/qwen35_pool_gsm8k_dev5_uncertainty_summary.csv --selected-out results/tables/qwen35_pool_gsm8k_dev5_uncertainty_selected.csv
+```
+
+Current Phase 2 router names are:
+
+- `threshold`
+- `logreg_joint`
+- `mlp_factorized`
+- `uncertainty_aware`
+
 ## API and Demo
 
 Run FastAPI:
@@ -217,8 +244,8 @@ uvicorn thinkrouter.app.api:app --reload
 Useful endpoints:
 
 - `GET /health`
-- `GET /config`
-- `POST /run`
+- `GET /config` returns the configured model pool and available router names
+- `POST /run` accepts `use_router`, `router_name`, `candidate_models`, and `candidate_budgets`
 - `GET /traces`
 
 Run Streamlit:

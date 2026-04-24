@@ -10,6 +10,8 @@ import pandas as pd
 
 from thinkrouter.app.budgets import BUDGET_LEVELS
 from thinkrouter.app.schemas import DifficultyLabel, RouteDecision, TaskType
+from thinkrouter.features import extract_query_features, make_feature_frame
+from thinkrouter.routers import RouterWeights, available_routers, build_router
 
 
 @dataclass(frozen=True)
@@ -28,44 +30,6 @@ class DifficultyEstimator(Protocol):
 class BudgetPredictor(Protocol):
     def predict(self, query: str, task_type: str, model_id: str, difficulty: DifficultyLabel) -> int:
         ...
-
-
-def extract_query_features(query: str, task_type: str = "custom") -> dict[str, float | str]:
-    text = query.lower()
-    words = query.split()
-    char_count = len(query)
-    word_count = len(words)
-    digit_count = sum(ch.isdigit() for ch in query)
-    math_symbol_count = sum(ch in "+-*/=^" for ch in query)
-    punctuation_count = sum(ch in ",.;:!?()[]{}" for ch in query)
-    code_marker_count = sum(marker in text for marker in ["def ", "class ", "return", "assert", "```", "import "])
-    digit_density = digit_count / max(char_count, 1)
-    avg_word_length = sum(len(word) for word in words) / max(word_count, 1)
-    return {
-        "query": query,
-        "task_type": task_type,
-        "char_count": float(char_count),
-        "word_count": float(word_count),
-        "digit_count": float(digit_count),
-        "digit_density": float(digit_density),
-        "math_symbol_count": float(math_symbol_count),
-        "punctuation_count": float(punctuation_count),
-        "code_marker_count": float(code_marker_count),
-        "avg_word_length": float(avg_word_length),
-    }
-
-
-def make_feature_frame(rows: list[dict[str, object]]) -> pd.DataFrame:
-    feature_rows: list[dict[str, object]] = []
-    for row in rows:
-        query = str(row.get("query", ""))
-        task_type = str(row.get("task_type", "custom"))
-        features = extract_query_features(query, task_type)
-        for key, value in row.items():
-            if key not in features:
-                features[key] = value
-        feature_rows.append(features)
-    return pd.DataFrame(feature_rows)
 
 
 class HeuristicDifficultyEstimator:
@@ -204,3 +168,11 @@ class JointPolicyEngine:
 
     def _estimate_latency(self, model_index: int, budget: int) -> float:
         return 0.4 + model_index * 0.8 + budget / 1500
+
+
+def build_runtime_router(model_configs, router_name: str | None = None):
+    return build_router(router_name, list(model_configs), RouterWeights())
+
+
+def available_router_names() -> list[str]:
+    return available_routers()
