@@ -9,10 +9,11 @@ from dotenv import load_dotenv
 from thinkrouter.app.budgets import budget_to_dict, compile_budget_config
 from thinkrouter.app.evaluators import get_evaluator
 from thinkrouter.app.models import ModelConfig, build_adapter, default_model_configs, resolve_model_name
-from thinkrouter.app.schemas import ModelRequest, TraceRecord, model_to_dict
+from thinkrouter.app.schemas import EvalResult, ModelRequest, ModelResponse, TraceRecord, model_to_dict
 from thinkrouter.app.store import TraceStore
 from thinkrouter.experiments.datasets import load_samples_jsonl, summarize_samples
 from thinkrouter.experiments.sample_data import BenchmarkSample, load_frozen_samples, summarize_frozen_samples
+from thinkrouter.runtime import generate_with_runtime
 
 DEFAULT_BUDGETS = [0, 256, 1024]
 
@@ -130,8 +131,33 @@ def _run_sample_grid(
                     **sample.metadata,
                 },
             )
-            response = adapter.generate(request)
-            evaluation = evaluator.evaluate(response.output_text, sample.expected_answer, request.metadata)
+            response, runtime_meta = generate_with_runtime(adapter, request)
+            if response is None:
+                response = ModelResponse(
+                    output_text="",
+                    parsed_output=None,
+                    finish_reason="error",
+                    error_type=str(runtime_meta["error_type"]),
+                    provider_meta={
+                        "provider": config.provider,
+                        "tier": config.tier,
+                        "budget_id": budget_config.budget_id,
+                        "cache_hit": runtime_meta["cache_hit"],
+                        "error_message": runtime_meta["error_message"],
+                    },
+                    raw_response={"error_message": runtime_meta["error_message"], "budget": budget_to_dict(budget_config)},
+                )
+                evaluation = EvalResult(
+                    score=0.0,
+                    is_correct=False,
+                    parsed_output=None,
+                    extracted_answer=None,
+                    expected_answer=sample.expected_answer,
+                    error_type=str(runtime_meta["error_type"]),
+                    judge_metadata={"runtime_error": runtime_meta["error_message"]},
+                )
+            else:
+                evaluation = evaluator.evaluate(response.output_text, sample.expected_answer, request.metadata)
             trace = TraceRecord(
                 query_id=sample.sample_id,
                 benchmark=sample.task_type,
@@ -165,6 +191,7 @@ def _run_sample_grid(
                     "sample_id": sample.sample_id,
                     "split": sample.split,
                     "experiment": experiment,
+                    "cache_hit": runtime_meta["cache_hit"],
                     "selected_model_provider": config.provider,
                     "selected_model_tier": config.tier,
                     "selected_model_alias": config.alias,

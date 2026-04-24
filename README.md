@@ -123,6 +123,8 @@ Important environment variables:
 | `THINKROUTER_DB_PATH` | default SQLite trace database path |
 | `THINKROUTER_PROVIDER_MAX_RETRIES` | provider retry count for timeout/connection/rate-limit errors |
 | `THINKROUTER_PROVIDER_RETRY_BACKOFF_S` | base retry backoff in seconds |
+| `THINKROUTER_CACHE_PATH` | SQLite request cache path shared by API and experiment runs |
+| `THINKROUTER_DISABLE_CACHE` | disable request cache when set to `1`/`true` |
 | `THINKROUTER_DIFFICULTY_MODEL_PATH` | optional sklearn difficulty model |
 | `THINKROUTER_BUDGET_MODEL_PATH` | optional sklearn budget model |
 
@@ -284,6 +286,12 @@ streamlit run thinkrouter/ui/streamlit_app.py
 
 The Streamlit demo now exposes the Phase 2 router names, plus route confidence and fallback status for each run.
 It also includes a dashboard tab, a route inspector tab, and a failure browser tab for completed grid CSV files.
+
+Runtime behavior:
+
+- API calls and experiment runs share a SQLite request cache unless `THINKROUTER_DISABLE_CACHE=1`.
+- `run_grid` now records failed traces with `error_type` instead of aborting the whole experiment on a single provider error.
+- Provider-backed adapters retry timeout, connection, rate-limit, and internal-server errors before failing.
 
 ## Repository Notes
 

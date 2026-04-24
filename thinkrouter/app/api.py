@@ -10,8 +10,9 @@ from thinkrouter.app.budgets import budget_to_dict, compile_budget_config, valid
 from thinkrouter.app.evaluators import get_evaluator
 from thinkrouter.app.models import build_adapter, default_model_configs
 from thinkrouter.app.router import JointPolicyEngine, available_router_names, build_runtime_router
-from thinkrouter.app.schemas import ModelRequest, RunRequest, RunResponse, TraceRecord, model_to_dict
+from thinkrouter.app.schemas import EvalResult, ModelRequest, ModelResponse, RunRequest, RunResponse, TraceRecord, model_to_dict
 from thinkrouter.app.store import TraceStore
+from thinkrouter.runtime import generate_with_runtime
 
 load_dotenv()
 
@@ -64,8 +65,33 @@ def run_query(request: RunRequest) -> RunResponse:
         candidate_set_signature="|".join(sorted(candidate_models)),
         metadata={"expected_answer": request.expected_answer},
     )
-    model_response = adapter.generate(model_request)
-    evaluation = get_evaluator(request.task_type).evaluate(model_response.output_text, request.expected_answer, model_request.metadata)
+    model_response, runtime_meta = generate_with_runtime(adapter, model_request)
+    if model_response is None:
+        model_response = ModelResponse(
+            output_text="",
+            parsed_output=None,
+            finish_reason="error",
+            error_type=str(runtime_meta["error_type"]),
+            provider_meta={
+                "provider": config.provider,
+                "tier": config.tier,
+                "budget_id": budget_config.budget_id,
+                "cache_hit": runtime_meta["cache_hit"],
+                "error_message": runtime_meta["error_message"],
+            },
+            raw_response={"error_message": runtime_meta["error_message"], "budget": budget_to_dict(budget_config)},
+        )
+        evaluation = EvalResult(
+            score=0.0,
+            is_correct=False,
+            parsed_output=None,
+            extracted_answer=None,
+            expected_answer=request.expected_answer,
+            error_type=str(runtime_meta["error_type"]),
+            judge_metadata={"runtime_error": runtime_meta["error_message"]},
+        )
+    else:
+        evaluation = get_evaluator(request.task_type).evaluate(model_response.output_text, request.expected_answer, model_request.metadata)
     trace = TraceRecord(
         query_id=None,
         benchmark=request.task_type,
@@ -102,6 +128,7 @@ def run_query(request: RunRequest) -> RunResponse:
         metadata={
             "route": model_to_dict(route) if route else None,
             "router_name": request.router_name or (route.router_name if route else None),
+            "cache_hit": runtime_meta["cache_hit"],
             "selected_model_provider": config.provider,
             "selected_model_tier": config.tier,
             "selected_model_alias": config.alias,
