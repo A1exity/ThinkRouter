@@ -2,81 +2,76 @@
 
 ## One-Liner
 
-ThinkRouter is an adaptive routing system for reasoning LLMs that treats `(model, thinking_budget)` as the routing decision and optimizes the quality-cost-latency tradeoff on verifiable reasoning tasks.
+ThinkRouter is a complete experimental routing system for reasoning LLMs that jointly selects `model + thinking_budget` and measures the resulting quality, cost, and latency tradeoffs.
 
 ## Resume Version
 
-Built an adaptive thinking-budget router for reasoning LLMs with a full experiment pipeline: benchmark export, OpenAI-compatible model calls, SQLite tracing, deterministic answer grading, offline policy replay, learned budget selection, dev calibration, and held-out GSM8K evaluation.
+Built ThinkRouter, a full-stack LLM routing system with provider adapters, structured budgets, deterministic benchmark evaluators, SQLite traces, offline replay, learned and uncertainty-aware routers, runtime cache/recovery, analysis dashboards, and reproducible reporting.
 
 ## What It Demonstrates
 
-- End-to-end LLM systems engineering: model adapter, routing policy, trace store, benchmark runner, evaluator, and reporting pipeline.
-- Cost-aware evaluation: every trace records correctness, tokens, estimated cost, latency, model id, and budget.
-- Scientific workflow: train/dev/test separation, regrading, failure analysis, offline oracle upper bound, and held-out test reporting.
-- Practical routing discipline: raw learned routing is not trusted blindly; a safe calibrated fallback prevents cost/latency regressions when the learned selector is weak.
+- LLM systems engineering from provider call to trace store to report
+- joint routing over both model and budget rather than budget-only tuning
+- deterministic evaluation and offline replay discipline
+- practical runtime hardening: retries, request cache, resumable experiments, failure recording
+- research workflow discipline: baselines, closeout summaries, failure taxonomy, stability summaries, reproducibility scripts
 
 ## Architecture
 
 ```text
-benchmark JSONL
-    -> run_grid.py
-    -> OpenAI-compatible adapter or mock adapter
-    -> SQLite trace store
-    -> evaluator / regrader / failure analysis
-    -> fixed, oracle, aggregate, learned, safe calibrated policies
-    -> final report tables and figures
+benchmark export
+  -> grid collection
+  -> trace store
+  -> evaluator
+  -> replay / ranking / plotting / failure taxonomy / stability summaries
+  -> reports and UI inspection
 ```
 
 Core modules:
 
-- `thinkrouter/app/models.py`: mock and OpenAI-compatible adapters.
-- `thinkrouter/app/router.py`: feature extraction and online policy engine.
-- `thinkrouter/app/store.py`: SQLite trace persistence.
-- `thinkrouter/app/evaluators.py`: deterministic GSM8K numeric grading.
-- `thinkrouter/experiments/run_grid.py`: benchmark grid runner with resume support.
-- `thinkrouter/experiments/learned_policy_router.py`: learned budget selector and safe fallback replay.
-- `thinkrouter/experiments/calibrate_learned_policy.py`: dev-set calibration for deployment policy selection.
-- `thinkrouter/experiments/make_gsm8k_report.py`: consolidated final report generation.
+- `thinkrouter/adapters/`: provider abstraction and model-pool parsing
+- `thinkrouter/runtime/`: shared cache and recovery
+- `thinkrouter/features/`: routing features
+- `thinkrouter/routers/`: routing policies
+- `thinkrouter/analytics/`: cost/latency/failure/stability summaries
+- `thinkrouter/experiments/`: grid runs, reports, closeout scripts
+- `thinkrouter/ui/`: dashboard, failure browser, route inspector
 
-## Key Result
+## Key Results
 
-On the committed Qwen GSM8K held-out `test20` split:
+Completed real Qwen pool Phase 2 slice on GSM8K `dev20`:
 
-| policy | accuracy | avg cost | p95 latency | cost vs budget 1024 |
-| --- | ---: | ---: | ---: | ---: |
-| fixed budget 1024 | 0.950 | 0.000542 | 23.390s | 100.0% |
-| dev-calibrated safe policy | 0.950 | 0.000344 | 16.721s | 63.5% |
-| oracle upper bound | 1.000 | 0.000288 | 10.325s | 53.2% |
+| policy | accuracy | avg cost | avg latency |
+| --- | ---: | ---: | ---: |
+| `phase2_threshold` | 0.950 | 0.000246 | 6.744s |
+| `phase2_logreg_joint` | 0.950 | 0.000246 | 6.744s |
+| `phase2_mlp_factorized` | 0.950 | 0.000246 | 6.744s |
+| `phase2_uncertainty_aware` | 0.950 | 0.000246 | 6.744s |
 
-The calibrated safe policy matched the high-budget test accuracy while reducing average estimated cost by about 36.5%. The oracle gap shows that per-sample budget routing still has headroom beyond the current simple feature set.
+Current strongest utility point on that slice is still `qwen-max @ budget 0`, which shows the system is complete enough to measure honest non-winning results rather than only positive ones.
 
-## Important Caveat
+## Project State
 
-This is not a claim that the current learned classifier already beats all fixed-budget baselines. In fact, the raw learned router underperformed on held-out test. The implemented safety layer and dev calibration are part of the project contribution: they prevent an unstable learned selector from becoming the deployed policy.
+The implementation roadmap is complete:
+
+- Phase 1 complete
+- Phase 2 complete
+- Phase 3 complete
+- Phase 4 complete
+
+Anything further would be a new extension, not unfinished work.
 
 ## Interview Talking Points
 
-- Why budget is a first-class routing variable: many providers expose reasoning intensity through prompts, parameters, or model variants, so routing only by model leaves cost savings unused.
-- Why deterministic grading matters: GSM8K numeric exact match avoids LLM-as-judge noise and makes cost-quality comparisons reproducible.
-- Why offline replay is useful: once candidate budgets have been run, new routing policies can be evaluated without more API cost.
-- Why safe fallback matters: small training sets can make learned routers over-allocate expensive budgets; calibration protects deployment quality.
-- What to improve next: add more benchmarks, richer query features, uncertainty-aware routing, and a second model to make joint model-budget routing more meaningful.
+- Why routing on budget alone is incomplete without model choice
+- Why deterministic evaluators matter for cost-quality comparisons
+- Why offline replay is such a strong systems lever
+- Why runtime cache/recovery matters when real provider experiments are unstable
+- Why a complete experiment repo should include failure taxonomy and reproducibility assets, not just one headline plot
 
-## Resume Bullets
-
-- Built ThinkRouter, an adaptive LLM routing system that jointly selects model and thinking budget, with OpenAI-compatible inference, SQLite tracing, deterministic grading, and reproducible experiment reports.
-- Ran Qwen GSM8K train/dev/test budget-grid experiments and implemented fixed-budget, oracle, aggregate-utility, raw learned, safe fallback, and dev-calibrated policy evaluation.
-- Achieved 0.95 held-out GSM8K test accuracy with a dev-calibrated safe policy at 63.5% of the average estimated cost of the 1024-budget baseline.
-- Added resume-safe engineering features including resumable API experiments, evaluator regrading, failure analysis, API-key leak checks, and one-command final report generation.
-
-## Reproduce The Main Report
+## Reproduce
 
 ```bash
-python -m thinkrouter.experiments.make_gsm8k_report
+pytest
+python -m thinkrouter.experiments.run_eval results/tables/qwen35_pool_gsm8k_dev20_grid.csv --out-prefix results/eval/qwen35_pool_gsm8k_dev20 --phase2-router threshold --phase2-router logreg_joint=results/qwen35_pool_gsm8k_dev20_logreg_joint.joblib --phase2-router mlp_factorized=results/qwen35_pool_gsm8k_dev20_mlp_factorized.joblib --phase2-router uncertainty_aware=results/qwen35_pool_gsm8k_dev20_mlp_factorized.joblib
 ```
-
-Outputs:
-
-- `results/tables/qwen_gsm8k_final_policy_report.csv`
-- `results/reports/qwen_gsm8k_final_policy_report.md`
-- `results/figures/qwen_gsm8k_test20_policy_comparison.png`

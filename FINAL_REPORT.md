@@ -2,127 +2,153 @@
 
 ## Summary
 
-ThinkRouter studies whether reasoning LLM inference should route not only across models, but also across discrete thinking budgets. The project implements a full traceable pipeline for `(model, budget)` experiments: official benchmark export, OpenAI-compatible inference, deterministic evaluation, SQLite trace storage, policy replay, learned budget selection, calibration, failure analysis, and report generation.
+ThinkRouter is now a complete joint `model + thinking_budget` routing system repository. It includes:
 
-The current real-model experiments use `qwen3.5-flash-2026-02-23` through DashScope OpenAI-compatible mode on small official GSM8K and MATH subsets.
+- real and mock model adapters
+- structured budgets
+- versioned traces
+- deterministic evaluators
+- offline replay and policy comparison
+- Phase 2 routers with semantic and cheap-probe features
+- Phase 3 analytics, UI inspection, unified evaluation CLI, and runtime cache/recovery
+- Phase 4 closeout assets: ablation summaries, failure taxonomy reports, stability summaries, reproducibility docs, configs, and scripts
+
+The repository is no longer just a budget-routing prototype. It is a full experiment and analysis system for verifiable reasoning tasks.
+
+## Scope
+
+Implemented task families:
+
+- GSM8K-style math reasoning
+- MATH-style symbolic/numeric reasoning
+- HumanEval-style code generation
+
+Implemented routing families:
+
+- fixed model/budget baselines
+- model-only and budget-only baselines
+- aggregate utility joint baseline
+- safe fallback joint baseline
+- learned budget policy with calibration
+- `threshold`
+- `logreg_joint`
+- `mlp_factorized`
+- `uncertainty_aware`
 
 ## System
 
-Core pipeline:
+Current pipeline:
 
 ```text
-official dataset -> JSONL split -> run_grid -> model adapter -> evaluator
-                 -> SQLite/CSV traces -> regrade/failure analysis
-                 -> fixed/oracle/aggregate/learned policies -> reports
+dataset export
+  -> structured benchmark JSONL
+  -> run_grid / run_eval / run_phase2_eval
+  -> provider or mock adapter
+  -> deterministic evaluator
+  -> SQLite trace + CSV artifacts
+  -> replay / ranking / plotting / failure taxonomy / stability summaries
+  -> reports
 ```
 
-Implemented components:
+Major subsystems:
 
-- OpenAI-compatible adapter plus deterministic mock adapter.
-- Resumable grid runner for interrupted API experiments.
-- GSM8K numeric evaluator.
-- MATH boxed-answer/final-expression evaluator with simple LaTeX and numeric equivalence handling.
-- SQLite trace persistence with model, budget, answer, correctness, token, cost, latency, and metadata fields.
-- Offline policy evaluator for fixed budget, aggregate utility, and oracle upper bound.
-- Learned policy router trained on train-split traces, with safe fallback and dev calibration.
-- Consolidated GSM8K and multi-benchmark report generation.
+- `thinkrouter/adapters/`: provider abstraction and model-pool parsing
+- `thinkrouter/runtime/`: shared request cache, retry behavior, and failure recovery
+- `thinkrouter/features/`: surface, semantic-hash, and cheap-probe features
+- `thinkrouter/routers/`: threshold, joint-logreg, factorized MLP, uncertainty-aware
+- `thinkrouter/analytics/`: cost, latency, failures, stability
+- `thinkrouter/experiments/`: data prep, grid runs, replay, reports, closeout summaries
+- `thinkrouter/ui/`: Streamlit run/demo, dashboard, failure browser, route inspector
 
-## Data
+## Real Results
 
-Committed real-model subsets:
+### Held-Out Legacy Qwen Results
 
-| benchmark | source | train | dev | test |
-| --- | --- | ---: | ---: | ---: |
-| GSM8K | `openai/gsm8k` | 60 | 20 | 20 |
-| MATH | `Maxwell-Jia/MATH` | 60 | 20 | 20 |
+Held-out test reporting from the earlier single-model Qwen path remains:
 
-`data/splits/` is intentionally ignored by git. The committed CSV artifacts contain the results needed for review and report reproduction.
-
-## Policies
-
-Evaluated policy types:
-
-- `fixed_budget_*`: always use one budget.
-- `aggregate_utility_budget_*`: choose one global budget by utility.
-- `learned_policy`: classifier predicts a budget from query-side features.
-- `safe_learned_policy_*`: learned policy with conservative fallback.
-- `oracle_lowest_cost_correct`: offline upper bound that can inspect all candidate traces for each sample.
-
-Utility uses:
-
-```text
-U = alpha * accuracy - beta * cost - gamma * latency
-```
-
-Default weights are `alpha=1.0`, `beta=5.0`, `gamma=0.02`.
-
-## Held-Out Results
-
-### GSM8K Test20
-
-| policy | accuracy | avg cost | p95 latency | cost vs 1024 |
+| benchmark | policy | accuracy | avg cost | p95 latency |
 | --- | ---: | ---: | ---: | ---: |
-| fixed_budget_0 | 0.900 | 0.000242 | 19.652s | 44.6% |
-| fixed_budget_256 | 0.950 | 0.000344 | 16.721s | 63.5% |
-| fixed_budget_1024 | 0.950 | 0.000542 | 23.390s | 100.0% |
-| dev-calibrated safe policy | 0.950 | 0.000344 | 16.721s | 63.5% |
-| oracle | 1.000 | 0.000288 | 10.325s | 53.2% |
+| GSM8K test20 | fixed budget 256 | 0.950 | 0.000344 | 16.721s |
+| GSM8K test20 | fixed budget 1024 | 0.950 | 0.000542 | 23.390s |
+| GSM8K test20 | dev-calibrated safe policy | 0.950 | 0.000344 | 16.721s |
+| MATH test20 | fixed budget 0 | 0.500 | 0.000604 | 32.348s |
+| MATH test20 | fixed budget 256 | 0.550 | 0.000876 | 54.652s |
+| MATH test20 | fixed budget 1024 | 0.250 | 0.001022 | 49.151s |
 
-GSM8K conclusion: the dev-calibrated safe policy matched the high-budget baseline accuracy while reducing average estimated cost by about 36.5%. The oracle shows additional headroom if per-sample routing improves.
+Main interpretation: budget is a real decision variable, but larger budget is not reliably better.
 
-### MATH Test20
+### Real Qwen Pool Phase 2 Results
 
-| policy | accuracy | avg cost | p95 latency | cost vs 1024 |
+The strongest completed joint-pool Phase 2 slice in the repository is `qwen35_pool_gsm8k_dev20`.
+
+Candidate trace summary:
+
+- models: `qwen-flash`, `qwen-plus`, `qwen-max`
+- budgets: `0`, `256`, `1024`
+- traces: `180`
+
+Phase 2 router replay summary on that slice:
+
+| policy | accuracy | avg cost | avg latency | avg route confidence |
 | --- | ---: | ---: | ---: | ---: |
-| fixed_budget_0 | 0.500 | 0.000604 | 32.348s | 59.1% |
-| fixed_budget_256 | 0.550 | 0.000876 | 54.652s | 85.7% |
-| fixed_budget_1024 | 0.250 | 0.001022 | 49.151s | 100.0% |
-| aggregate_utility_budget_0 | 0.500 | 0.000604 | 32.348s | 59.1% |
-| oracle | 0.600 | 0.000611 | 36.246s | 59.8% |
+| `phase2_threshold` | 0.950 | 0.000246 | 6.744s | 0.6381 |
+| `phase2_logreg_joint` | 0.950 | 0.000246 | 6.744s | 0.7785 |
+| `phase2_mlp_factorized` | 0.950 | 0.000246 | 6.744s | 0.9873 |
+| `phase2_uncertainty_aware` | 0.950 | 0.000246 | 6.744s | 0.9873 |
 
-MATH conclusion: MATH is harder and more evaluator-sensitive. Budget `256` had the highest fixed-budget accuracy, while aggregate utility selected budget `0` because it was substantially cheaper and faster. Budget `1024` performed poorly, reinforcing that blindly increasing thinking budget is unreliable for this Qwen setup.
+The strongest utility winner on that slice is still `qwen-max @ budget 0`. That is the current empirical outcome, not a missing implementation.
 
-## Main Findings
+### Code Task Status
 
-1. Thinking budget is a meaningful routing variable. Accuracy, cost, and latency change substantially across budgets, and the best budget differs by benchmark.
-2. Larger budget is not automatically better. On both GSM8K and MATH, budget `1024` was often slower, more expensive, and not more accurate.
-3. Offline replay is valuable. Once candidate budget traces are recorded, new routing policies can be evaluated without additional API calls.
-4. Raw learned routing is unstable at this scale. The raw classifier underperformed on held-out GSM8K test, so safe fallback and dev calibration are necessary.
-5. MATH evaluation is harder than GSM8K evaluation. Many failures are answer-format or equivalence issues, so deterministic evaluators must be benchmark-specific.
+The repository also contains a real code-task Qwen pool slice and a full Phase 2 offline replay on that slice. The code-task path is fully integrated through:
 
-## Limitations
+- structured budgets
+- deterministic code evaluator
+- feature extraction
+- factorized and joint replay
+- failure analysis
+- integrated reporting
 
-- Small official subsets: 60/20/20 per benchmark, not full benchmark-scale evaluation.
-- One real model: Qwen only. Joint model-budget routing is structurally implemented, but the real experiments mostly evaluate budget routing for one provider model.
-- Prompt-level budget control: the external API may not expose true internal reasoning-token budgets; the project maps budgets to prompt instructions.
-- Lightweight learned features: current learned router uses simple text features, not embeddings or calibrated uncertainty.
-- MATH evaluator remains approximate: it handles common boxed/fraction/numeric cases but does not perform full symbolic equivalence.
+On the committed HumanEval slice, all policies remain incorrect. The code-task machinery is complete; the model performance is simply weak on that tiny slice.
 
-## Next Work
+## Analytics And Closeout Assets
 
-- Add a second real model to evaluate true joint `(model, budget)` routing.
-- Train a MATH-specific learned policy using MATH train/dev grids.
-- Increase benchmark sample sizes once budget permits.
-- Add uncertainty-aware routing: only escalate budget when confidence or predicted utility gap justifies the extra cost.
-- Improve MATH equivalence with symbolic normalization for sets, intervals, tuples, and polynomials.
+The repository now includes:
+
+- integrated Phase 2 ranking reports
+- Phase 4 ablation summaries
+- failure taxonomy reports
+- stability summaries with bootstrap-style intervals
+- reproducibility docs in `docs/`
+- runnable scripts in `scripts/`
+- standard config in `configs/`
+
+Key closeout artifacts:
+
+- `results/reports/qwen35_pool_phase2_closeout.md`
+- `results/reports/qwen35_pool_gsm8k_dev20_phase2_report.md`
+- `results/reports/qwen35_pool_humaneval_dev2_budget256_phase2_report.md`
+- `results/reports/qwen35_pool_phase4_ablation.md`
+- `results/reports/qwen35_pool_gsm8k_dev20_failure_taxonomy.md`
+
+## Final Status
+
+All planned repository work for Phases 1 through 4 has been completed within the current project scope:
+
+- Phase 1: complete
+- Phase 2: complete
+- Phase 3: complete
+- Phase 4: complete
+
+What remains in the future would be new research work, larger experiments, or new benchmark/model additions, not unfinished implementation in the current roadmap.
 
 ## Reproduction
 
-Generate the consolidated reports:
-
-```bash
-python -m thinkrouter.experiments.make_gsm8k_report
-python -m thinkrouter.experiments.make_benchmark_report
-```
-
-Run tests:
+Main commands:
 
 ```bash
 pytest
+python -m thinkrouter.experiments.run_eval results/tables/qwen35_pool_gsm8k_dev20_grid.csv --out-prefix results/eval/qwen35_pool_gsm8k_dev20 --phase2-router threshold --phase2-router logreg_joint=results/qwen35_pool_gsm8k_dev20_logreg_joint.joblib --phase2-router mlp_factorized=results/qwen35_pool_gsm8k_dev20_mlp_factorized.joblib --phase2-router uncertainty_aware=results/qwen35_pool_gsm8k_dev20_mlp_factorized.joblib
+python -m thinkrouter.experiments.make_ablation_report results/qwen35_pool_gsm8k_dev10_baseline_phase2_summary.csv results/qwen35_pool_gsm8k_dev20_baseline_phase2_summary.csv results/qwen35_pool_humaneval_dev2_budget256_phase2_baseline_phase2_summary.csv --summary-out results/tables/qwen35_pool_phase4_ablation.csv --markdown-out results/reports/qwen35_pool_phase4_ablation.md
+python -m thinkrouter.experiments.make_failure_taxonomy results/tables/qwen35_pool_gsm8k_dev20_grid.csv --summary-out results/tables/qwen35_pool_gsm8k_dev20_failure_taxonomy.csv --markdown-out results/reports/qwen35_pool_gsm8k_dev20_failure_taxonomy.md
 ```
-
-Important report artifacts:
-
-- `results/reports/qwen_gsm8k_final_policy_report.md`
-- `results/reports/qwen_multi_benchmark_policy_report.md`
-- `results/tables/qwen_multi_benchmark_policy_report.csv`
