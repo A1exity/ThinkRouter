@@ -1,0 +1,3 @@
+error_type,count,avg_cost,avg_latency
+answer_format_extraction_error,7,0.0040738241428571,56.000684028582846
+wrong_answer,5,0.00163460339999996,32.02794040001463

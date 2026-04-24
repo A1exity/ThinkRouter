@@ -242,6 +242,14 @@ Run the unified evaluation entrypoint:
 python -m thinkrouter.experiments.run_eval results/tables/qwen35_pool_gsm8k_dev20_grid.csv --out-prefix results/eval/qwen35_pool_gsm8k_dev20 --phase2-router threshold --phase2-router logreg_joint=results/qwen35_pool_gsm8k_dev20_logreg_joint.joblib --phase2-router mlp_factorized=results/qwen35_pool_gsm8k_dev20_mlp_factorized.joblib --phase2-router uncertainty_aware=results/qwen35_pool_gsm8k_dev20_mlp_factorized.joblib
 ```
 
+Build Phase 4 closeout summaries:
+
+```bash
+python -m thinkrouter.experiments.make_ablation_report results/qwen35_pool_gsm8k_dev10_baseline_phase2_summary.csv results/qwen35_pool_gsm8k_dev20_baseline_phase2_summary.csv results/qwen35_pool_humaneval_dev2_budget256_phase2_baseline_phase2_summary.csv --summary-out results/tables/qwen35_pool_phase4_ablation.csv --markdown-out results/reports/qwen35_pool_phase4_ablation.md
+python -m thinkrouter.experiments.make_failure_taxonomy results/tables/qwen35_pool_gsm8k_dev20_grid.csv --summary-out results/tables/qwen35_pool_gsm8k_dev20_failure_taxonomy.csv --markdown-out results/reports/qwen35_pool_gsm8k_dev20_failure_taxonomy.md
+python -m thinkrouter.experiments.summarize results/tables/qwen35_pool_gsm8k_dev20_grid.csv --out results/tables/qwen35_pool_gsm8k_dev20_stability_summary.csv
+```
+
 Replay a Phase 2 router on the same grid:
 
 ```bash

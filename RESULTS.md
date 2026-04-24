@@ -553,6 +553,21 @@ What is complete:
 
 What remains is no longer Phase 2 work. The next meaningful block is Phase 3 system/runtime work and later Phase 4 evaluation hardening.
 
+## Phase 4 Offline Closeout Assets
+
+The repository now also includes offline closeout summaries built from the committed Phase 2 outputs:
+
+- ablation grouping report:
+  - `results/tables/qwen35_pool_phase4_ablation.csv`
+  - `results/reports/qwen35_pool_phase4_ablation.md`
+- failure taxonomy report on the real GSM8K dev20 grid:
+  - `results/tables/qwen35_pool_gsm8k_dev20_failure_taxonomy.csv`
+  - `results/reports/qwen35_pool_gsm8k_dev20_failure_taxonomy.md`
+- bootstrap-style stability summary on the real GSM8K dev20 grid:
+  - `results/tables/qwen35_pool_gsm8k_dev20_stability_summary.csv`
+
+These do not add new provider calls. They summarize the committed real and replay artifacts already present in the repository.
+
 ## Final Reporting Targets
 
 The final report should include:
