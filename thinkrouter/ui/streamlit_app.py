@@ -6,6 +6,7 @@ import pandas as pd
 import streamlit as st
 from dotenv import load_dotenv
 
+from thinkrouter.app.api import config as api_config
 from thinkrouter.app.api import run_query
 from thinkrouter.app.budgets import BUDGET_LEVELS
 from thinkrouter.app.models import default_model_configs
@@ -21,6 +22,7 @@ st.caption("Adaptive thinking-budget routing for verifiable reasoning tasks")
 
 configs = default_model_configs()
 model_ids = list(configs.keys())
+router_names = [None] + list(api_config()["routers"])
 samples = load_day1_samples()
 config_rows = pd.DataFrame(
     [
@@ -39,6 +41,7 @@ config_rows = pd.DataFrame(
 with st.sidebar:
     st.header("Run")
     use_router = st.checkbox("Use router", value=False)
+    selected_router = st.selectbox("Router", router_names, index=0, disabled=not use_router, format_func=lambda value: "legacy_joint_policy" if value is None else str(value))
     selected_model = st.selectbox("Model", model_ids, disabled=use_router)
     selected_budget = st.selectbox("Budget", list(BUDGET_LEVELS), index=0, disabled=use_router)
     db_path = st.text_input("SQLite DB", os.getenv("THINKROUTER_DB_PATH", "results/traces/thinkrouter.sqlite"))
@@ -59,11 +62,17 @@ if st.button("Run query", type="primary"):
             model_id=selected_model,
             budget=int(selected_budget),
             use_router=use_router,
+            router_name=selected_router,
         )
     )
     if response.route:
         st.subheader("Route")
         st.json(model_to_dict(response.route))
+        route_metrics = st.columns(4)
+        route_metrics[0].metric("Router", response.route.router_name or "legacy_joint_policy")
+        route_metrics[1].metric("Confidence", "-" if response.route.route_confidence is None else f"{response.route.route_confidence:.3f}")
+        route_metrics[2].metric("Fallback", "yes" if response.route.fallback_triggered else "no")
+        route_metrics[3].metric("Fallback reason", response.route.fallback_reason or "-")
     st.subheader("Model output")
     st.write(response.model_response.output_text)
     metric_cols = st.columns(4)
@@ -91,6 +100,9 @@ try:
                     "selected_model_provider",
                     "selected_model_tier",
                     "selected_budget",
+                    "route_confidence",
+                    "fallback_triggered",
+                    "fallback_reason",
                     "is_correct",
                     "cost_usd",
                     "latency_s",

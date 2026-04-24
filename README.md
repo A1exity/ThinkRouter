@@ -120,6 +120,8 @@ Important environment variables:
 | `THINKROUTER_STRONG_MODEL` | real model id, for example `qwen3.5-flash-2026-02-23` |
 | `THINKROUTER_STRONG_COST_PER_1K` | estimated cost per 1K tokens |
 | `THINKROUTER_DB_PATH` | default SQLite trace database path |
+| `THINKROUTER_PROVIDER_MAX_RETRIES` | provider retry count for timeout/connection/rate-limit errors |
+| `THINKROUTER_PROVIDER_RETRY_BACKOFF_S` | base retry backoff in seconds |
 | `THINKROUTER_DIFFICULTY_MODEL_PATH` | optional sklearn difficulty model |
 | `THINKROUTER_BUDGET_MODEL_PATH` | optional sklearn budget model |
 
@@ -225,6 +227,12 @@ Or run the full Phase 2 train + replay bundle in one step:
 python -m thinkrouter.experiments.run_phase2_eval results/tables/qwen35_pool_gsm8k_dev10_grid.csv --out-prefix results/qwen35_pool_gsm8k_dev10
 ```
 
+Build a utility-ranked Phase 2 report from the integrated summary:
+
+```bash
+python -m thinkrouter.experiments.make_phase2_report results/qwen35_pool_gsm8k_dev20_baseline_phase2_summary.csv --summary-out results/tables/qwen35_pool_gsm8k_dev20_phase2_ranked.csv --markdown-out results/reports/qwen35_pool_gsm8k_dev20_phase2_report.md
+```
+
 Replay a Phase 2 router on the same grid:
 
 ```bash
@@ -266,6 +274,8 @@ Run Streamlit:
 ```bash
 streamlit run thinkrouter/ui/streamlit_app.py
 ```
+
+The Streamlit demo now exposes the Phase 2 router names, plus route confidence and fallback status for each run.
 
 ## Repository Notes
 

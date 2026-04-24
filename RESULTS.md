@@ -492,6 +492,41 @@ Produced files:
 - `results/qwen35_pool_gsm8k_dev10_baseline_phase2_summary.csv`
 - `results/qwen35_pool_gsm8k_dev10_phase2_pareto.png`
 
+## Phase 2 Qwen 3.5 Pool GSM8K Dev20 Slice
+
+To make the Phase 2 results less toy-like, the full official GSM8K `dev20` slice was then run with the same real Qwen `flash / plus / max` pool and budgets `0 / 256 / 1024`. This produced `180` real traces in `results/tables/qwen35_pool_gsm8k_dev20_grid.csv` with overall candidate-trace accuracy `0.933`.
+
+The same `run_phase2_eval` flow was applied to that completed grid, followed by `make_phase2_report` to rank policies by utility.
+
+Key Phase 2 rows on dev20:
+
+| policy | accuracy | avg cost | avg latency | avg route confidence | fallback rate | utility |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| `phase2_threshold` | 0.950 | 0.000246 | 6.744s | 0.6381 | 0.0 | 0.813895 |
+| `phase2_logreg_joint` | 0.950 | 0.000246 | 6.744s | 0.7785 | 0.0 | 0.813895 |
+| `phase2_mlp_factorized` | 0.950 | 0.000246 | 6.744s | 0.9873 | 0.0 | 0.813895 |
+| `phase2_uncertainty_aware` | 0.950 | 0.000246 | 6.744s | 0.9873 | 0.0 | 0.813895 |
+
+Compared against the strongest fixed and aggregate baselines on the same slice, the utility winner remained `qwen-max @ budget 0` with utility `0.904947`. The main Phase 2 takeaway on dev20 is therefore not that the learned routers are already utility-optimal, but that the full Phase 2 stack is now complete and stable on a larger real multi-model slice: semantic features, factorized/joint routers, uncertainty-aware replay, integrated Pareto plots, and ranked reports all run end to end.
+
+Produced files:
+
+- `results/tables/qwen35_pool_gsm8k_dev20_grid.csv`
+- `results/qwen35_pool_gsm8k_dev20_logreg_joint.joblib`
+- `results/qwen35_pool_gsm8k_dev20_mlp_factorized.joblib`
+- `results/qwen35_pool_gsm8k_dev20_threshold_summary.csv`
+- `results/qwen35_pool_gsm8k_dev20_logreg_joint_summary.csv`
+- `results/qwen35_pool_gsm8k_dev20_mlp_factorized_summary.csv`
+- `results/qwen35_pool_gsm8k_dev20_uncertainty_aware_summary.csv`
+- `results/qwen35_pool_gsm8k_dev20_baseline_phase2_summary.csv`
+- `results/qwen35_pool_gsm8k_dev20_phase2_pareto.png`
+- `results/tables/qwen35_pool_gsm8k_dev20_phase2_ranked.csv`
+- `results/reports/qwen35_pool_gsm8k_dev20_phase2_report.md`
+
+## Humaneval Phase 2 Status
+
+A larger real Humaneval Phase 2 slice was started with the same pool and structured budgets, but network instability caused repeated provider interruptions before completion. The partial SQLite trace file was kept locally so it can be resumed later with `--resume`, but it is not treated as a completed Phase 2 result.
+
 ## Final Reporting Targets
 
 The final report should include:
