@@ -6,6 +6,7 @@ import pandas as pd
 import streamlit as st
 from dotenv import load_dotenv
 
+from thinkrouter.analytics import summarize_costs, summarize_latency
 from thinkrouter.app.api import config as api_config
 from thinkrouter.app.api import run_query
 from thinkrouter.app.budgets import BUDGET_LEVELS
@@ -13,6 +14,7 @@ from thinkrouter.app.models import default_model_configs
 from thinkrouter.app.schemas import RunRequest, model_to_dict
 from thinkrouter.app.store import TraceStore
 from thinkrouter.experiments.sample_data import load_day1_samples
+from thinkrouter.ui.streamlit_pages import render_dashboard, render_failure_browser, render_route_inspector
 
 load_dotenv()
 
@@ -91,26 +93,34 @@ try:
     traces = TraceStore(db_path).list_traces(limit=100)
     if traces:
         df = pd.DataFrame([model_to_dict(trace) for trace in traces])
-        st.dataframe(
-            df[
-                [
-                    "id",
-                    "task_type",
-                    "selected_model",
-                    "selected_model_provider",
-                    "selected_model_tier",
-                    "selected_budget",
-                    "route_confidence",
-                    "fallback_triggered",
-                    "fallback_reason",
-                    "is_correct",
-                    "cost_usd",
-                    "latency_s",
-                    "query",
-                ]
-            ],
-            use_container_width=True,
-        )
+        trace_tab, dashboard_tab, inspector_tab, failure_tab = st.tabs(["Trace Table", "Dashboard", "Route Inspector", "Failure Browser"])
+        with trace_tab:
+            st.dataframe(
+                df[
+                    [
+                        "id",
+                        "task_type",
+                        "selected_model",
+                        "selected_model_provider",
+                        "selected_model_tier",
+                        "selected_budget",
+                        "route_confidence",
+                        "fallback_triggered",
+                        "fallback_reason",
+                        "is_correct",
+                        "cost_usd",
+                        "latency_s",
+                        "query",
+                    ]
+                ],
+                use_container_width=True,
+            )
+        with dashboard_tab:
+            render_dashboard(df)
+        with inspector_tab:
+            render_route_inspector(df)
+        with failure_tab:
+            render_failure_browser("results/tables/qwen35_pool_gsm8k_dev20_grid.csv")
     else:
         st.info("No traces yet. Run a query or execute the Day-1 grid script.")
 except Exception as exc:

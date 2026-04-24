@@ -53,6 +53,7 @@ Core files:
 | `thinkrouter/features/` | Phase 2 feature pipeline: surface, semantic-hash, and cheap-probe extractors |
 | `thinkrouter/routers/` | threshold, joint-logreg, factorized MLP, and uncertainty-aware routers |
 | `thinkrouter/training/` | utility objective plus trace-to-training-set conversion |
+| `thinkrouter/analytics/` | cost, latency, and failure-browser summaries for Phase 3 analysis |
 | `thinkrouter/app/models.py` | compatibility exports for adapter/model config entrypoints |
 | `thinkrouter/app/evaluators.py` | GSM8K, MATH, and exact-match evaluators |
 | `thinkrouter/app/store.py` | SQLite trace persistence |
@@ -233,6 +234,12 @@ Build a utility-ranked Phase 2 report from the integrated summary:
 python -m thinkrouter.experiments.make_phase2_report results/qwen35_pool_gsm8k_dev20_baseline_phase2_summary.csv --summary-out results/tables/qwen35_pool_gsm8k_dev20_phase2_ranked.csv --markdown-out results/reports/qwen35_pool_gsm8k_dev20_phase2_report.md
 ```
 
+Run the unified evaluation entrypoint:
+
+```bash
+python -m thinkrouter.experiments.run_eval results/tables/qwen35_pool_gsm8k_dev20_grid.csv --out-prefix results/eval/qwen35_pool_gsm8k_dev20 --phase2-router threshold --phase2-router logreg_joint=results/qwen35_pool_gsm8k_dev20_logreg_joint.joblib --phase2-router mlp_factorized=results/qwen35_pool_gsm8k_dev20_mlp_factorized.joblib --phase2-router uncertainty_aware=results/qwen35_pool_gsm8k_dev20_mlp_factorized.joblib
+```
+
 Replay a Phase 2 router on the same grid:
 
 ```bash
@@ -276,6 +283,7 @@ streamlit run thinkrouter/ui/streamlit_app.py
 ```
 
 The Streamlit demo now exposes the Phase 2 router names, plus route confidence and fallback status for each run.
+It also includes a dashboard tab, a route inspector tab, and a failure browser tab for completed grid CSV files.
 
 ## Repository Notes
 
