@@ -6,9 +6,14 @@ from pathlib import Path
 import pandas as pd
 
 from thinkrouter.experiments.evaluate_policy import UtilityWeights, add_sample_id, aggregate_utility_policy, best_budget_only_policy, best_model_only_policy, safe_fallback_policy, summarize_selection
+from thinkrouter.experiments.phase2_router_replay import replay_router_specs
 
 
-def summarize_baselines(csv_path: str, weights: UtilityWeights | None = None) -> pd.DataFrame:
+def summarize_baselines(
+    csv_path: str,
+    weights: UtilityWeights | None = None,
+    phase2_routers: list[str] | None = None,
+) -> pd.DataFrame:
     weights = weights or UtilityWeights()
     df = add_sample_id(pd.read_csv(csv_path))
     if df.empty:
@@ -109,6 +114,10 @@ def summarize_baselines(csv_path: str, weights: UtilityWeights | None = None) ->
     )
 
     summary = pd.DataFrame(rows)
+    if phase2_routers:
+        phase2_summary, _ = replay_router_specs(csv_path, phase2_routers)
+        if not phase2_summary.empty:
+            summary = pd.concat([summary, phase2_summary], ignore_index=True)
     return summary.sort_values(["policy_family", "accuracy", "avg_cost"], ascending=[True, False, True]).reset_index(drop=True)
 
 
@@ -128,8 +137,18 @@ def main() -> None:
     parser.add_argument("--alpha", type=float, default=1.0)
     parser.add_argument("--beta", type=float, default=5.0)
     parser.add_argument("--gamma", type=float, default=0.02)
+    parser.add_argument(
+        "--phase2-router",
+        action="append",
+        default=[],
+        help="Optional Phase 2 router replay spec. Use NAME or NAME=artifact_path.",
+    )
     args = parser.parse_args()
-    summary = summarize_baselines(args.csv, UtilityWeights(alpha=args.alpha, beta=args.beta, gamma=args.gamma))
+    summary = summarize_baselines(
+        args.csv,
+        UtilityWeights(alpha=args.alpha, beta=args.beta, gamma=args.gamma),
+        phase2_routers=args.phase2_router,
+    )
     out = Path(args.out)
     out.parent.mkdir(parents=True, exist_ok=True)
     summary.to_csv(out, index=False)

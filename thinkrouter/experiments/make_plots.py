@@ -17,8 +17,8 @@ FAMILY_STYLES = {
 }
 
 
-def make_pareto_plot(csv_path: str, out_path: str) -> None:
-    summary = summarize_baselines(csv_path)
+def make_pareto_plot(csv_path: str, out_path: str, phase2_routers: list[str] | None = None) -> None:
+    summary = summarize_baselines(csv_path, phase2_routers=phase2_routers)
     if summary.empty:
         raise ValueError("Input CSV is empty.")
     fig, ax = plt.subplots(figsize=(7, 5))
@@ -47,8 +47,14 @@ def main() -> None:
     parser = argparse.ArgumentParser(description="Create ThinkRouter plots from trace CSV.")
     parser.add_argument("csv", help="Trace CSV path.")
     parser.add_argument("--out", default="results/figures/pareto.png")
+    parser.add_argument(
+        "--phase2-router",
+        action="append",
+        default=[],
+        help="Optional Phase 2 router replay spec. Use NAME or NAME=artifact_path.",
+    )
     args = parser.parse_args()
-    make_pareto_plot(args.csv, args.out)
+    make_pareto_plot(args.csv, args.out, phase2_routers=args.phase2_router)
     print(f"Wrote {args.out}")
 
 

@@ -7,7 +7,8 @@ from typing import Any
 
 import pandas as pd
 
-from thinkrouter.experiments.analyze_failures import parse_metadata
+from thinkrouter.experiments.phase2_router_replay import replay_router_specs
+from thinkrouter.experiments.policy_utils import add_sample_id, summarize_selection
 
 
 @dataclass(frozen=True)
@@ -17,35 +18,11 @@ class UtilityWeights:
     gamma: float = 0.02
 
 
-def add_sample_id(df: pd.DataFrame) -> pd.DataFrame:
-    out = df.copy()
-    if "sample_id" not in out.columns:
-        metadata_values = out["metadata"] if "metadata" in out.columns else [None] * len(out)
-        row_ids = out["id"] if "id" in out.columns else range(len(out))
-        out["sample_id"] = [parse_metadata(value).get("sample_id", str(row_id)) for value, row_id in zip(metadata_values, row_ids)]
-    return out
-
-
 def utility(row: pd.Series, weights: UtilityWeights) -> float:
     accuracy = float(row.get("accuracy", row.get("is_correct", 0.0)))
     cost = float(row.get("avg_cost", row.get("cost_usd", 0.0)))
     latency = float(row.get("avg_latency", row.get("latency_s", 0.0)))
     return weights.alpha * accuracy - weights.beta * cost - weights.gamma * latency
-
-
-def summarize_selection(name: str, selected: pd.DataFrame) -> dict[str, Any]:
-    if selected.empty:
-        return {"policy": name, "accuracy": 0.0, "avg_cost": 0.0, "total_cost": 0.0, "avg_latency": 0.0, "p95_latency": 0.0, "n": 0}
-    return {
-        "policy": name,
-        "accuracy": float(selected["is_correct"].mean()),
-        "avg_cost": float(selected["cost_usd"].mean()),
-        "total_cost": float(selected["cost_usd"].sum()),
-        "avg_latency": float(selected["latency_s"].mean()),
-        "p95_latency": float(selected["latency_s"].quantile(0.95)),
-        "n": int(len(selected)),
-    }
-
 
 def fixed_model_budget_policy(df: pd.DataFrame, model_id: str, budget: int) -> pd.DataFrame:
     return df[(df["selected_model"].astype(str) == str(model_id)) & (df["selected_budget"].astype(int) == int(budget))].copy()
@@ -133,7 +110,11 @@ def safe_fallback_policy(
     return pd.DataFrame(selected_rows)
 
 
-def evaluate_policies(csv_path: str, weights: UtilityWeights | None = None) -> tuple[pd.DataFrame, pd.DataFrame]:
+def evaluate_policies(
+    csv_path: str,
+    weights: UtilityWeights | None = None,
+    phase2_routers: list[str] | None = None,
+) -> tuple[pd.DataFrame, pd.DataFrame]:
     weights = weights or UtilityWeights()
     df = add_sample_id(pd.read_csv(csv_path))
     rows: list[dict[str, Any]] = []
@@ -157,7 +138,12 @@ def evaluate_policies(csv_path: str, weights: UtilityWeights | None = None) -> t
             safe_selected,
         )
     )
-    return pd.DataFrame(rows), aggregate_stats
+    summary = pd.DataFrame(rows)
+    if phase2_routers:
+        phase2_summary, _ = replay_router_specs(csv_path, phase2_routers)
+        if not phase2_summary.empty:
+            summary = pd.concat([summary, phase2_summary], ignore_index=True)
+    return summary, aggregate_stats
 
 
 def main() -> None:
@@ -168,9 +154,19 @@ def main() -> None:
     parser.add_argument("--alpha", type=float, default=1.0)
     parser.add_argument("--beta", type=float, default=5.0)
     parser.add_argument("--gamma", type=float, default=0.02)
+    parser.add_argument(
+        "--phase2-router",
+        action="append",
+        default=[],
+        help="Optional Phase 2 router replay spec. Use NAME or NAME=artifact_path.",
+    )
     args = parser.parse_args()
 
-    summary, stats = evaluate_policies(args.csv, UtilityWeights(alpha=args.alpha, beta=args.beta, gamma=args.gamma))
+    summary, stats = evaluate_policies(
+        args.csv,
+        UtilityWeights(alpha=args.alpha, beta=args.beta, gamma=args.gamma),
+        phase2_routers=args.phase2_router,
+    )
     out_path = Path(args.out)
     out_path.parent.mkdir(parents=True, exist_ok=True)
     summary.to_csv(out_path, index=False)

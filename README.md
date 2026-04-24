@@ -226,6 +226,13 @@ python -m thinkrouter.experiments.evaluate_phase2_router results/tables/qwen35_p
 python -m thinkrouter.experiments.evaluate_phase2_router results/tables/qwen35_pool_gsm8k_dev5_grid.csv --router uncertainty_aware --model results/models/qwen35_pool_gsm8k_dev5_factorized.joblib --out results/tables/qwen35_pool_gsm8k_dev5_uncertainty_summary.csv --selected-out results/tables/qwen35_pool_gsm8k_dev5_uncertainty_selected.csv
 ```
 
+Append Phase 2 routers to the standard baseline and plot outputs:
+
+```bash
+python -m thinkrouter.experiments.eval_baselines results/tables/qwen35_pool_gsm8k_dev5_grid.csv --phase2-router threshold --phase2-router logreg_joint=results/models/qwen35_pool_gsm8k_dev5_logreg_joint.joblib --phase2-router uncertainty_aware=results/models/qwen35_pool_gsm8k_dev5_mlp_factorized.joblib --out results/tables/qwen35_pool_gsm8k_dev5_baseline_phase2_summary.csv
+python -m thinkrouter.experiments.make_plots results/tables/qwen35_pool_gsm8k_dev5_grid.csv --phase2-router threshold --phase2-router logreg_joint=results/models/qwen35_pool_gsm8k_dev5_logreg_joint.joblib --phase2-router uncertainty_aware=results/models/qwen35_pool_gsm8k_dev5_mlp_factorized.joblib --out results/figures/qwen35_pool_gsm8k_dev5_phase2_pareto.png
+```
+
 Current Phase 2 router names are:
 
 - `threshold`

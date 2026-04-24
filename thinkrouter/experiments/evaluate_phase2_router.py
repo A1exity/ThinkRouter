@@ -3,52 +3,7 @@ from __future__ import annotations
 import argparse
 from pathlib import Path
 
-import pandas as pd
-
-from thinkrouter.adapters import default_model_configs
-from thinkrouter.experiments.evaluate_policy import add_sample_id, summarize_selection
-from thinkrouter.routers import LogRegJointRouter, MLPFactorizedRouter, ThresholdRouter, UncertaintyAwareRouter, load_factorized_artifact, load_logreg_joint_artifact
-
-
-def replay_router(csv_path: str, router_name: str, model_path: str | None = None) -> tuple[pd.DataFrame, pd.DataFrame]:
-    df = add_sample_id(pd.read_csv(csv_path))
-    models = list(default_model_configs().values())
-    if router_name == "threshold":
-        router = ThresholdRouter(models)
-    elif router_name == "logreg_joint":
-        if not model_path:
-            raise ValueError("--model is required for logreg_joint")
-        router = LogRegJointRouter(models, artifact=load_logreg_joint_artifact(model_path))
-    elif router_name == "mlp_factorized":
-        if not model_path:
-            raise ValueError("--model is required for mlp_factorized")
-        router = MLPFactorizedRouter(models, artifact=load_factorized_artifact(model_path))
-    elif router_name == "uncertainty_aware":
-        if not model_path:
-            raise ValueError("--model is required for uncertainty_aware")
-        router = UncertaintyAwareRouter(models, artifact=load_factorized_artifact(model_path))
-    else:
-        raise ValueError(f"Unsupported router: {router_name}")
-
-    selected_rows: list[pd.Series] = []
-    for sample_id, group in df.groupby("sample_id", sort=False):
-        first = group.iloc[0]
-        decision = router.route(str(first["query"]), str(first["task_type"]))
-        exact = group[
-            (group["selected_model"].astype(str) == decision.model_id)
-            & (group["selected_budget"].astype(int) == int(decision.budget))
-        ]
-        candidates = exact if not exact.empty else group.sort_values(["cost_usd", "latency_s", "selected_budget"], ascending=[True, True, True])
-        selected = candidates.iloc[0].copy()
-        selected["policy"] = router_name
-        selected["route_confidence"] = decision.route_confidence
-        selected["fallback_triggered"] = decision.fallback_triggered
-        selected["fallback_reason"] = decision.fallback_reason
-        selected["router_name"] = decision.router_name
-        selected_rows.append(selected)
-    selected_df = pd.DataFrame(selected_rows)
-    summary = pd.DataFrame([summarize_selection(router_name, selected_df)])
-    return summary, selected_df
+from thinkrouter.experiments.phase2_router_replay import replay_router
 
 
 def main() -> None:

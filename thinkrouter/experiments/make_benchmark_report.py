@@ -14,6 +14,8 @@ REPORT_INPUTS = [
 
 
 def classify_policy_family(policy: str) -> str:
+    if policy.startswith("phase2_"):
+        return policy
     if policy.startswith("fixed_budget_"):
         return "fixed_budget"
     if policy.startswith("fixed_model_budget_"):
@@ -52,7 +54,11 @@ def load_rows() -> pd.DataFrame:
 
 def add_relative_cost(df: pd.DataFrame) -> pd.DataFrame:
     out = df.copy()
-    out["policy_family"] = out["policy"].astype(str).map(classify_policy_family)
+    if "policy_family" in out.columns:
+        existing = out["policy_family"].astype("string")
+        out["policy_family"] = existing.where(existing.notna(), out["policy"].astype(str).map(classify_policy_family))
+    else:
+        out["policy_family"] = out["policy"].astype(str).map(classify_policy_family)
     out["cost_vs_fixed_1024"] = pd.NA
     for (benchmark, split), group in out.groupby(["benchmark", "split"]):
         baseline = group[group["policy"] == "fixed_budget_1024"]

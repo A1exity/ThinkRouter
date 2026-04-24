@@ -424,6 +424,36 @@ Added artifacts:
 - `results/tables/qwen35_pool_humaneval_dev2_budget256_failures.csv`
 - `results/figures/qwen35_pool_humaneval_dev2_budget256_pareto.png`
 
+## Phase 2 Router Foundation On Qwen 3.5 Pool
+
+The new Phase 2 router stack was smoke-tested on the committed `qwen35_pool_gsm8k_dev5_grid.csv` slice. This is not a held-out benchmark result. It is a small replay target used to verify that the new feature pipeline, learned router artifacts, uncertainty fallback path, and integrated baseline/plot pipeline all work end to end.
+
+Trained artifacts:
+
+- `results/models/qwen35_pool_gsm8k_dev5_logreg_joint.joblib`
+- `results/models/qwen35_pool_gsm8k_dev5_mlp_factorized.joblib`
+
+Replay summaries:
+
+| policy | accuracy | avg cost | avg latency | avg route confidence | fallback rate |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| `phase2_threshold` | 1.000 | 0.000202 | 4.682s | 0.7025 | 0.0 |
+| `phase2_logreg_joint` | 1.000 | 0.000202 | 4.682s | 0.8271 | 0.0 |
+| `phase2_uncertainty_aware` | 1.000 | 0.000202 | 4.682s | 0.8134 | 0.4 |
+
+On this tiny dev5 slice, all three Phase 2 routers replayed to the cheap Qwen flash tier and matched the best observed accuracy while staying below the stronger fixed-model points on cost. The uncertainty-aware router triggered fallback on 40% of the samples, which confirms that the fallback path is active and recorded in the selected-trace outputs.
+
+Produced files:
+
+- `results/tables/qwen35_pool_gsm8k_dev5_threshold_summary.csv`
+- `results/tables/qwen35_pool_gsm8k_dev5_threshold_selected.csv`
+- `results/tables/qwen35_pool_gsm8k_dev5_logreg_joint_summary.csv`
+- `results/tables/qwen35_pool_gsm8k_dev5_logreg_joint_selected.csv`
+- `results/tables/qwen35_pool_gsm8k_dev5_uncertainty_aware_summary.csv`
+- `results/tables/qwen35_pool_gsm8k_dev5_uncertainty_aware_selected.csv`
+- `results/tables/qwen35_pool_gsm8k_dev5_baseline_phase2_summary.csv`
+- `results/figures/qwen35_pool_gsm8k_dev5_phase2_pareto.png`
+
 ## Final Reporting Targets
 
 The final report should include:
