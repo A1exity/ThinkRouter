@@ -1,581 +1,104 @@
 # RESULTS
 
-No final multi-benchmark official report has been produced yet. The repository now includes deterministic mock-model pipeline checks, provider-backed Qwen GSM8K train/dev/test experiments, and an initial provider-backed Qwen MATH smoke test.
+This file is the result inventory for the current repository state. It uses the same narrative as [`README.md`](README.md), [`FINAL_REPORT.md`](FINAL_REPORT.md), and [`METHOD.md`](METHOD.md).
 
 ## Current Status
 
-Implemented Day-1 and Week-2 pipeline components:
+ThinkRouter now has:
 
-- built-in GSM8K-style, MATH-style, and HumanEval-style seed samples,
-- fixed budgets `0`, `256`, `1024`, `4096`,
-- mock and OpenAI-compatible model adapters,
-- GSM8K numeric exact-match evaluator,
-- MATH boxed-answer and final-expression evaluator,
-- exact-match evaluator for non-GSM8K seed tasks,
-- SQLite trace store,
-- Day-1 grid runner,
-- frozen train/dev/test grid runner,
-- benchmark JSONL export and input loader,
-- official GSM8K subset export to JSONL,
-- official MATH subset export to JSONL,
-- real OpenAI-compatible endpoint configuration preflight,
-- FastAPI endpoints,
-- Streamlit trace demo,
-- baseline summary and Pareto plotting scripts,
-- failure analysis and trace regrading scripts,
-- offline fixed-budget, oracle, and aggregate-utility policy evaluation,
-- learned policy router training and cross-split replay,
-- sklearn difficulty estimator training,
-- sklearn budget predictor training,
-- optional router loading from joblib model paths.
+- a frozen official experiment protocol
+- a Phase 2 router stack as the default online routing path
+- real sentence-transformer semantic features in the learned-router pipeline
+- deterministic evaluators for math and code
+- a single official command chain for future formal reruns
 
-## Frozen Seed Splits
+What it does **not** yet have in the committed artifacts is the final official multi-benchmark rerun.
 
-The local seed suite is for deterministic pipeline validation only. It is not a replacement for official GSM8K, MATH-500, or HumanEval benchmark reporting.
+That means the repository is in this state:
 
-| task | train | dev | test |
-| --- | ---: | ---: | ---: |
-| gsm8k | 12 | 4 | 4 |
-| math | 6 | 2 | 2 |
-| humaneval | 4 | 2 | 2 |
+- system implementation: current
+- protocol definition: frozen
+- official rerun outputs: not yet committed
 
-Generated trace tables:
+## Frozen Official Protocol
 
-| table | traces | task coverage |
-| --- | ---: | --- |
-| `results/tables/train_grid.csv` | 132 | gsm8k, math, humaneval |
-| `results/tables/dev_grid.csv` | 48 | gsm8k, math, humaneval |
-| `results/tables/test_grid.csv` | 48 | gsm8k, math, humaneval |
+The only official protocol is:
 
-The trace counts reflect 2 mock models and 3 budget levels per sample.
+- config: [`configs/official_protocol.json`](configs/official_protocol.json)
+- code: [`thinkrouter/official_protocol.py`](thinkrouter/official_protocol.py)
+- pipeline entrypoint: [`thinkrouter/experiments/run_official_pipeline.py`](thinkrouter/experiments/run_official_pipeline.py)
+- one-command wrapper: [`scripts/run_official_pipeline.ps1`](scripts/run_official_pipeline.ps1)
 
-## Generated Artifacts
+Formal settings:
 
-- Day-1 trace database: `results/traces/day1.sqlite`
-- frozen train/dev/test trace databases: `results/traces/train_grid.sqlite`, `results/traces/dev_grid.sqlite`, `results/traces/test_grid.sqlite`
-- Day-1 grid table: `results/tables/day1_grid.csv`
-- frozen split tables: `results/tables/train_grid.csv`, `results/tables/dev_grid.csv`, `results/tables/test_grid.csv`
-- Day-1 baseline summary: `results/tables/baseline_summary.csv`
-- dev baseline summary: `results/tables/dev_baseline_summary.csv`
-- Day-1 Pareto figure: `results/figures/pareto.png`
-- dev Pareto figure: `results/figures/dev_pareto.png`
-- train-split difficulty model: `results/models/difficulty.joblib`
-- train-split budget model: `results/models/budget.joblib`
+| field | value |
+| --- | --- |
+| model pool | `qwen-flash,qwen-plus,qwen-max` |
+| budgets | `0,256,1024` |
+| benchmarks | `gsm8k`, `math500`, `humaneval` |
+| split sizes | `60 train / 20 dev / 20 test` |
+| learned routers | `logreg_joint`, `mlp_factorized`, `uncertainty_aware` |
+| explanation baseline | `threshold` |
+| utility | `accuracy - 5 * cost - 0.02 * latency` |
+| online default router | `uncertainty_aware` |
 
-## Reproduction Commands
+## Current Main Committed Reference Results
 
-```bash
-python -m thinkrouter.experiments.run_day1_grid --limit 20 --db results/traces/day1.sqlite --out results/tables/day1_grid.csv
-python -m thinkrouter.experiments.eval_baselines results/tables/day1_grid.csv --out results/tables/baseline_summary.csv
-python -m thinkrouter.experiments.make_plots results/tables/day1_grid.csv --out results/figures/pareto.png
+The main committed multi-model reference slice is still the historical Qwen pool GSM8K `dev20` run:
 
-python -m thinkrouter.experiments.prepare_data --source seed --task all --split all --out data/splits/seed.jsonl --summary
-python -m thinkrouter.experiments.run_grid --input data/splits/seed.jsonl --task all --split train --budgets 0,256,1024 --db results/traces/train_grid.sqlite --out results/tables/train_grid.csv
-python -m thinkrouter.experiments.run_grid --input data/splits/seed.jsonl --task all --split dev --budgets 0,256,1024 --db results/traces/dev_grid.sqlite --out results/tables/dev_grid.csv
-python -m thinkrouter.experiments.run_grid --input data/splits/seed.jsonl --task all --split test --budgets 0,256,1024 --db results/traces/test_grid.sqlite --out results/tables/test_grid.csv
+- summary: [`results/qwen35_pool_gsm8k_dev20_baseline_phase2_summary.csv`](results/qwen35_pool_gsm8k_dev20_baseline_phase2_summary.csv)
+- plot: [`results/qwen35_pool_gsm8k_dev20_phase2_pareto.png`](results/qwen35_pool_gsm8k_dev20_phase2_pareto.png)
+- report: [`results/reports/qwen35_pool_gsm8k_dev20_phase2_report.md`](results/reports/qwen35_pool_gsm8k_dev20_phase2_report.md)
 
-python -m thinkrouter.experiments.train_difficulty results/tables/train_grid.csv --out results/models/difficulty.joblib
-python -m thinkrouter.experiments.train_budget results/tables/train_grid.csv --out results/models/budget.joblib
-python -m thinkrouter.experiments.eval_baselines results/tables/dev_grid.csv --out results/tables/dev_baseline_summary.csv
-python -m thinkrouter.experiments.make_plots results/tables/dev_grid.csv --out results/figures/dev_pareto.png
-```
+Reference rows from that committed slice:
 
-The JSONL interface was smoke-tested by exporting 38 seed samples to `data/splits/seed.jsonl` and running a small `run_grid --input` job. `data/splits/` and SQLite traces are intentionally ignored by git.
+| benchmark | policy | accuracy | avg cost | p95 latency | utility |
+| --- | --- | ---: | ---: | ---: | ---: |
+| GSM8K dev20 | strongest fixed: `qwen-max @ 0` | 1.000 | 0.000849 | 8.263 | 0.904947 |
+| GSM8K dev20 | learned routers | 0.950 | 0.000246 | 14.738 | 0.813895 |
 
-A real endpoint can be checked with `python -m thinkrouter.experiments.smoke_real_model --model <model-id>`. Passing `--run` performs an actual provider call and can incur cost.
+Current interpretation:
 
-Because the early committed results use deterministic mock adapters, all mock accuracies are expected to be perfect. The value of those stages is validating the train/dev/test and JSONL experiment plumbing, not measuring model quality.
+- the learned router stack is operational and routed to the cheap flash tier on this slice
+- the strongest fixed baseline is still better on utility in the committed reference run
+- the repository therefore cannot yet claim an official learned-router win
 
-## Official GSM8K Data Export
+## HumanEval Status
 
-`prepare_data --source gsm8k` was used to download `openai/gsm8k` through the Hugging Face mirror and export a local JSONL subset:
+HumanEval is now part of the frozen official protocol and the exporter exists:
 
-| file | total | train | dev | test |
-| --- | ---: | ---: | ---: | ---: |
-| `data/splits/gsm8k.jsonl` | 100 | 60 | 20 | 20 |
+- official split export path: [`data/splits/official_humaneval.jsonl`](data/splits/official_humaneval.jsonl)
 
-The exported JSONL file and Hugging Face cache are local artifacts and are not committed. A 2-sample mock `run_grid --input data/splits/gsm8k.jsonl` smoke test passed, confirming the official GSM8K JSONL is compatible with the grid runner.
+The currently committed multi-model code-task result is still the historical small slice:
 
-## Official MATH Data Export
+- grid: [`results/tables/qwen35_pool_humaneval_dev2_budget256_grid.csv`](results/tables/qwen35_pool_humaneval_dev2_budget256_grid.csv)
+- replay report: [`results/reports/qwen35_pool_humaneval_dev2_budget256_phase2_report.md`](results/reports/qwen35_pool_humaneval_dev2_budget256_phase2_report.md)
 
-`prepare_data --source math` was used to download `Maxwell-Jia/MATH` through the Hugging Face mirror and export a local JSONL subset:
+That slice is only a wiring proof. It is not the final official HumanEval result line.
 
-| file | total | train | dev | test |
-| --- | ---: | ---: | ---: | ---: |
-| `data/splits/math.jsonl` | 100 | 60 | 20 | 20 |
+## Official Outputs Expected From The Frozen Pipeline
 
-The exporter extracts the final `\boxed{...}` answer from each official solution. The exported JSONL file and Hugging Face cache are local artifacts and are not committed. A 3-sample mock grid passed, confirming the official MATH JSONL is compatible with the grid runner and MATH evaluator.
+When the official rerun is executed and committed, the main outputs will be:
 
-Generated mock artifacts:
+- `results/tables/final_official_results.csv`
+- `results/figures/final_official_pareto.png`
+- `results/tables/final_official_failures.csv`
+- `results/reports/final_official_report.md`
 
-- `results/tables/math_mock_dev3_grid.csv`
-- `results/tables/math_mock_dev3_grid_regraded.csv`
-- `results/tables/math_mock_dev3_summary.csv`
-- `results/figures/math_mock_dev3_pareto.png`
+Per-benchmark official outputs will be written under:
 
-## Qwen Real-Model Smoke Tests
+- `results/official/gsm8k/`
+- `results/official/math500/`
+- `results/official/humaneval/`
 
-Small provider-backed smoke tests were run with `qwen3.5-flash-2026-02-23` through DashScope OpenAI-compatible mode. These are not benchmark results; they validate that the real model path works and that budget-level traces can be recorded.
+## Historical Appendix
 
-| file | rows | task | split | budgets | accuracy | total estimated cost | avg latency |
-| --- | ---: | --- | --- | --- | ---: | ---: | ---: |
-| `results/tables/qwen_gsm8k_dev_smoke.csv` | 4 | gsm8k | dev | 0 | 1.000 | 0.000500 | 3.022s |
-| `results/tables/qwen_gsm8k_dev_budget_grid.csv` | 12 | gsm8k | dev | 0,256,1024 | 1.000 | 0.001778 | 3.461s |
+The following are historical or debugging artifacts and are no longer part of the main result story:
 
-Budget-grid summary:
+- Day-1 seed runs
+- smoke runs
+- `dev5`, `dev10`, `dev20` slices
+- old single-model held-out `test20` summaries
+- old `qwen_gsm8k_final_policy_report` / `qwen_multi_benchmark_policy_report` assets
 
-| budget | accuracy | avg cost | p95 latency | n |
-| ---: | ---: | ---: | ---: | ---: |
-| 0 | 1.000 | 0.000115 | 4.814s | 4 |
-| 256 | 1.000 | 0.000131 | 3.147s | 4 |
-| 1024 | 1.000 | 0.000199 | 6.496s | 4 |
-
-Generated artifacts:
-
-- `results/tables/qwen_gsm8k_dev_budget_grid.csv`
-- `results/tables/qwen_gsm8k_dev_budget_summary.csv`
-- `results/figures/qwen_gsm8k_dev_budget_pareto.png`
-
-The local `.env` file contains the API key and is intentionally ignored by git. SQLite traces under `results/traces/` are also ignored.
-
-## Official GSM8K Qwen Dev Smoke Test
-
-A small official GSM8K provider-backed run was executed on the exported `data/splits/gsm8k.jsonl` dev split using `qwen3.5-flash-2026-02-23`. This is still a smoke test, not a final benchmark, because it covers only 5 examples and one real model.
-
-| file | rows | task | split | limit | budgets | accuracy | total estimated cost |
-| --- | ---: | --- | --- | ---: | --- | ---: | ---: |
-| `results/tables/qwen_gsm8k_official_dev5.csv` | 10 | gsm8k | dev | 5 | 0,256 | 1.000 | 0.002365 |
-
-Budget summary:
-
-| budget | accuracy | avg cost | p95 latency | n |
-| ---: | ---: | ---: | ---: | ---: |
-| 0 | 1.000 | 0.000203 | 9.785s | 5 |
-| 256 | 1.000 | 0.000270 | 10.777s | 5 |
-
-Generated artifacts:
-
-- `results/tables/qwen_gsm8k_official_dev5.csv`
-- `results/tables/qwen_gsm8k_official_dev5_summary.csv`
-- `results/figures/qwen_gsm8k_official_dev5_pareto.png`
-
-## Official MATH Qwen Dev Smoke Test
-
-A small official MATH provider-backed run was executed on the exported `data/splits/math.jsonl` dev split using `qwen3.5-flash-2026-02-23`. This is a smoke test, not a benchmark result, because it covers only 5 examples and one real model.
-
-Original evaluator accuracy was 0.500 because several outputs contained the correct answer without a boxed or marked final answer. After improving the MATH final-expression extractor and regrading, all 10 rows were correct:
-
-| budget | regraded accuracy | avg cost | p95 latency | n |
-| ---: | ---: | ---: | ---: | ---: |
-| 0 | 1.000 | 0.000428 | 18.620s | 5 |
-| 256 | 1.000 | 0.000428 | 17.919s | 5 |
-
-Generated artifacts:
-
-- `results/tables/qwen_math_official_dev5.csv`
-- `results/tables/qwen_math_official_dev5_regraded.csv`
-- `results/tables/qwen_math_official_dev5_summary_regraded.csv`
-- `results/tables/qwen_math_official_dev5_failures_regraded.csv`
-- `results/figures/qwen_math_official_dev5_pareto_regraded.png`
-
-## Official MATH Qwen Dev20 Budget Grid
-
-A larger official MATH dev run was executed with `qwen3.5-flash-2026-02-23` over all 20 exported dev examples and three budget levels. This is the second real benchmark path in the project, but it is still a dev-set result rather than a held-out MATH test result.
-
-After improving simple MATH equivalence checks and regrading, the budget summary is:
-
-| budget | regraded accuracy | avg cost | p95 latency | n |
-| ---: | ---: | ---: | ---: | ---: |
-| 0 | 0.800 | 0.001702 | 58.935s | 20 |
-| 256 | 0.700 | 0.000649 | 42.538s | 20 |
-| 1024 | 0.350 | 0.000779 | 32.662s | 20 |
-
-Offline policy summary:
-
-| policy | accuracy | avg cost | total cost | avg latency | p95 latency | n |
-| --- | ---: | ---: | ---: | ---: | ---: | ---: |
-| fixed_budget_0 | 0.800 | 0.001702 | 0.034038 | 39.063s | 58.935s | 20 |
-| fixed_budget_256 | 0.700 | 0.000649 | 0.012984 | 15.822s | 42.538s | 20 |
-| fixed_budget_1024 | 0.350 | 0.000779 | 0.015573 | 17.870s | 32.662s | 20 |
-| oracle_lowest_cost_correct | 0.800 | 0.000486 | 0.009720 | 11.274s | 29.652s | 20 |
-| aggregate_utility_budget_256 | 0.700 | 0.000649 | 0.012984 | 15.822s | 42.538s | 20 |
-
-Interpretation: MATH is harder and more evaluator-sensitive than GSM8K. On this dev subset, budget `0` had the best accuracy but much higher cost and latency, while aggregate utility selected budget `256`. The oracle result shows cost/latency headroom from per-sample routing, but the current learned router has not yet been trained or calibrated on MATH.
-
-Generated artifacts:
-
-- `results/tables/qwen_math_official_dev20_budget_grid.csv`
-- `results/tables/qwen_math_official_dev20_budget_grid_regraded.csv`
-- `results/tables/qwen_math_official_dev20_budget_summary_regraded.csv`
-- `results/tables/qwen_math_official_dev20_policy_summary.csv`
-- `results/tables/qwen_math_official_dev20_policy_stats.csv`
-- `results/tables/qwen_math_official_dev20_failures_regraded.csv`
-- `results/figures/qwen_math_official_dev20_budget_pareto_regraded.png`
-
-## Official MATH Qwen Test20 Budget Grid
-
-A held-out official MATH test run was executed with `qwen3.5-flash-2026-02-23` over all 20 exported test examples and three budget levels.
-
-Regraded budget summary:
-
-| budget | regraded accuracy | avg cost | p95 latency | n |
-| ---: | ---: | ---: | ---: | ---: |
-| 0 | 0.500 | 0.000604 | 32.348s | 20 |
-| 256 | 0.550 | 0.000876 | 54.652s | 20 |
-| 1024 | 0.250 | 0.001022 | 49.151s | 20 |
-
-Offline policy summary:
-
-| policy | accuracy | avg cost | total cost | avg latency | p95 latency | n |
-| --- | ---: | ---: | ---: | ---: | ---: | ---: |
-| fixed_budget_0 | 0.500 | 0.000604 | 0.012073 | 13.984s | 32.348s | 20 |
-| fixed_budget_256 | 0.550 | 0.000876 | 0.017518 | 28.854s | 54.652s | 20 |
-| fixed_budget_1024 | 0.250 | 0.001022 | 0.020439 | 23.268s | 49.151s | 20 |
-| oracle_lowest_cost_correct | 0.600 | 0.000611 | 0.012228 | 14.560s | 36.246s | 20 |
-| aggregate_utility_budget_0 | 0.500 | 0.000604 | 0.012073 | 13.984s | 32.348s | 20 |
-
-Interpretation: on held-out MATH, budget `256` has the best fixed-budget accuracy, while aggregate utility chooses budget `0` because it is much cheaper and faster. The `1024` setting again performs poorly, reinforcing that blindly increasing the thinking budget is not reliable for this Qwen setup.
-
-Generated artifacts:
-
-- `results/tables/qwen_math_official_test20_budget_grid.csv`
-- `results/tables/qwen_math_official_test20_budget_grid_regraded.csv`
-- `results/tables/qwen_math_official_test20_budget_summary_regraded.csv`
-- `results/tables/qwen_math_official_test20_policy_summary.csv`
-- `results/tables/qwen_math_official_test20_policy_stats.csv`
-- `results/tables/qwen_math_official_test20_failures_regraded.csv`
-- `results/figures/qwen_math_official_test20_budget_pareto_regraded.png`
-
-## Official GSM8K Qwen Dev20 Budget Grid
-
-A larger official GSM8K dev run was executed with `qwen3.5-flash-2026-02-23` over all 20 exported dev examples and three budget levels. This is the first run where budget differences become visible.
-
-Original extractor result:
-
-| file | rows | task | split | budgets | accuracy | total estimated cost |
-| --- | ---: | --- | --- | --- | ---: | ---: |
-| `results/tables/qwen_gsm8k_official_dev20_budget_grid.csv` | 60 | gsm8k | dev | 0,256,1024 | 0.883 | 0.023382 |
-
-Original budget summary:
-
-| budget | accuracy | correct | avg cost | p95 latency | n |
-| ---: | ---: | ---: | ---: | ---: | ---: |
-| 0 | 0.950 | 19 | 0.000297 | 14.334s | 20 |
-| 256 | 0.950 | 19 | 0.000319 | 11.370s | 20 |
-| 1024 | 0.750 | 15 | 0.000553 | 28.879s | 20 |
-
-Failure analysis found 7 incorrect traces across 5 unique samples. Four of the five `1024` failures contained the correct numeric answer in the output but ended with another number, causing the earlier extractor to select the wrong value. Those same samples were correct at budgets `0` and `256`.
-
-After improving the answer-heading extractor and regrading, 3 rows changed from incorrect to correct. The regraded summary is:
-
-| budget | regraded accuracy | correct | avg cost | p95 latency | n |
-| ---: | ---: | ---: | ---: | ---: | ---: |
-| 0 | 0.950 | 19 | 0.000297 | 14.334s | 20 |
-| 256 | 0.950 | 19 | 0.000319 | 11.370s | 20 |
-| 1024 | 0.900 | 18 | 0.000553 | 28.879s | 20 |
-
-Regraded interpretation: higher budget still did not improve accuracy on this subset, and `1024` remained substantially more expensive and slower. The strongest conclusion is therefore not "1024 is always worse," but "blindly increasing budget is not cost-effective and can introduce answer-format instability."
-
-Offline policy evaluation on the regraded grid:
-
-| policy | accuracy | avg cost | total cost | avg latency | p95 latency | n |
-| --- | ---: | ---: | ---: | ---: | ---: | ---: |
-| fixed_budget_0 | 0.950 | 0.000297 | 0.005939 | 6.996s | 14.334s | 20 |
-| fixed_budget_256 | 0.950 | 0.000319 | 0.006385 | 6.592s | 11.370s | 20 |
-| fixed_budget_1024 | 0.900 | 0.000553 | 0.011059 | 13.159s | 28.879s | 20 |
-| oracle_lowest_cost_correct | 0.950 | 0.000233 | 0.004670 | 4.895s | 8.396s | 20 |
-| aggregate_utility_budget_256 | 0.950 | 0.000319 | 0.006385 | 6.592s | 11.370s | 20 |
-
-The oracle policy is an offline upper bound that can inspect all completed candidate traces for each sample. It is not deployable as-is, but it shows the routing headroom: per-sample selection can match the best observed accuracy while reducing cost and latency. The aggregate utility baseline selected budget `256`, which matched budget `0` accuracy with lower p95 latency but slightly higher cost.
-
-Generated artifacts:
-
-- `results/tables/qwen_gsm8k_official_dev20_budget_grid.csv`
-- `results/tables/qwen_gsm8k_official_dev20_budget_summary.csv`
-- `results/figures/qwen_gsm8k_official_dev20_budget_pareto.png`
-- `results/tables/qwen_gsm8k_official_dev20_failures.csv`
-- `results/tables/qwen_gsm8k_official_dev20_budget_grid_regraded.csv`
-- `results/tables/qwen_gsm8k_official_dev20_budget_summary_regraded.csv`
-- `results/tables/qwen_gsm8k_official_dev20_failures_regraded.csv`
-- `results/figures/qwen_gsm8k_official_dev20_budget_pareto_regraded.png`
-- `results/tables/qwen_gsm8k_official_dev20_policy_summary.csv`
-- `results/tables/qwen_gsm8k_official_dev20_policy_stats.csv`
-
-## Official GSM8K Qwen Train60 Learned Policy
-
-The 60-example train split was run with the same Qwen model and budgets. The first network attempt was interrupted after 26 traces; `run_grid --resume` then skipped existing `(sample_id, model, budget)` combinations and completed the 180-row grid.
-
-Regraded train60 budget summary:
-
-| budget | regraded accuracy | avg cost | p95 latency | n |
-| ---: | ---: | ---: | ---: | ---: |
-| 0 | 0.983 | 0.000266 | 10.907s | 60 |
-| 256 | 0.983 | 0.000352 | 20.436s | 60 |
-| 1024 | 0.917 | 0.000495 | 36.716s | 60 |
-
-Train60 offline policy summary:
-
-| policy | accuracy | avg cost | total cost | avg latency | p95 latency | n |
-| --- | ---: | ---: | ---: | ---: | ---: | ---: |
-| fixed_budget_0 | 0.983 | 0.000266 | 0.015967 | 6.703s | 10.907s | 60 |
-| fixed_budget_256 | 0.983 | 0.000352 | 0.021121 | 8.493s | 20.436s | 60 |
-| fixed_budget_1024 | 0.917 | 0.000495 | 0.029706 | 12.852s | 36.716s | 60 |
-| oracle_lowest_cost_correct | 0.983 | 0.000239 | 0.014354 | 5.785s | 10.788s | 60 |
-| aggregate_utility_budget_0 | 0.983 | 0.000266 | 0.015967 | 6.703s | 10.907s | 60 |
-
-The learned policy router was trained on train60 labels derived from per-sample utility. Label counts were `0: 41`, `256: 17`, `1024: 2`. Training selected a safe fallback budget of `0`, matching the train-split aggregate-utility policy.
-
-Replaying the raw learned classifier and the safe learned policy on the separate dev20 grid produced:
-
-| policy | train split | eval split | accuracy | avg cost | total cost | avg latency | p95 latency | n |
-| --- | --- | --- | ---: | ---: | ---: | ---: | ---: | ---: |
-| learned_policy_raw | train60 | dev20 | 0.950 | 0.000373 | 0.007465 | 8.377s | 14.455s | 20 |
-| safe_learned_policy_fallback_budget_0 | train60 | dev20 | 0.950 | 0.000297 | 0.005939 | 6.996s | 14.334s | 20 |
-
-The raw learned router predicted budget `0` for 10 dev samples, `256` for 7, and `1024` for 3. It matched the best fixed-budget accuracy on dev20, but did not beat fixed budget `0` or `256` on cost/latency. Dev calibration selected fallback budget `256`, which had the highest dev utility among raw learned and fixed-budget candidates.
-
-Held-out test20 results:
-
-| policy | train split | calibration split | eval split | accuracy | avg cost | total cost | avg latency | p95 latency | n |
-| --- | --- | --- | --- | ---: | ---: | ---: | ---: | ---: | ---: |
-| fixed_budget_0 | - | - | test20 | 0.900 | 0.000242 | 0.004836 | 6.424s | 19.652s | 20 |
-| fixed_budget_256 | - | - | test20 | 0.950 | 0.000344 | 0.006883 | 8.725s | 16.721s | 20 |
-| fixed_budget_1024 | - | - | test20 | 0.950 | 0.000542 | 0.010840 | 13.555s | 23.390s | 20 |
-| learned_policy_raw | train60 | - | test20 | 0.900 | 0.000284 | 0.005677 | 7.243s | 19.652s | 20 |
-| safe_learned_policy_fallback_budget_0 | train60 | - | test20 | 0.900 | 0.000242 | 0.004836 | 6.424s | 19.652s | 20 |
-| safe_learned_policy_fallback_budget_256 | train60 | dev20 | test20 | 0.950 | 0.000344 | 0.006883 | 8.725s | 16.721s | 20 |
-| oracle_lowest_cost_correct | - | - | test20 | 1.000 | 0.000288 | 0.005765 | 7.674s | 10.325s | 20 |
-
-The calibrated policy matches the best fixed-budget test accuracy and avoids the train-only fallback's accuracy drop. It still does not close the gap to the oracle, so the remaining router opportunity is per-sample budget selection rather than global fallback selection.
-
-A consolidated report was generated from the committed dev/test policy CSVs. The multi-benchmark report uses held-out `test20` rows for both GSM8K and MATH.
-
-- `results/tables/qwen_gsm8k_final_policy_report.csv`
-- `results/reports/qwen_gsm8k_final_policy_report.md`
-- `results/figures/qwen_gsm8k_test20_policy_comparison.png`
-- `results/tables/qwen_multi_benchmark_policy_report.csv`
-- `results/reports/qwen_multi_benchmark_policy_report.md`
-
-Generated artifacts:
-
-- `results/tables/qwen_gsm8k_official_train60_budget_grid.csv`
-- `results/tables/qwen_gsm8k_official_train60_budget_summary.csv`
-- `results/tables/qwen_gsm8k_official_train60_budget_grid_regraded.csv`
-- `results/tables/qwen_gsm8k_official_train60_budget_summary_regraded.csv`
-- `results/tables/qwen_gsm8k_official_train60_policy_summary.csv`
-- `results/tables/qwen_gsm8k_official_train60_policy_stats.csv`
-- `results/tables/qwen_gsm8k_official_train60_failures_regraded.csv`
-- `results/figures/qwen_gsm8k_official_train60_budget_pareto_regraded.png`
-- `results/models/qwen_gsm8k_official_train60_learned_policy.joblib`
-- `results/tables/qwen_gsm8k_official_train60_to_dev20_learned_policy_summary.csv`
-- `results/tables/qwen_gsm8k_official_train60_to_dev20_learned_policy_selected.csv`
-- `results/tables/qwen_gsm8k_official_train60_to_dev20_raw_learned_policy_summary.csv`
-- `results/tables/qwen_gsm8k_official_train60_to_dev20_raw_learned_policy_selected.csv`
-- `results/tables/qwen_gsm8k_official_train60_to_dev20_safe_policy_summary.csv`
-- `results/tables/qwen_gsm8k_official_train60_to_dev20_safe_policy_selected.csv`
-- `results/tables/qwen_gsm8k_official_test20_budget_grid.csv`
-- `results/tables/qwen_gsm8k_official_test20_budget_grid_regraded.csv`
-- `results/tables/qwen_gsm8k_official_test20_budget_summary_regraded.csv`
-- `results/tables/qwen_gsm8k_official_test20_policy_summary.csv`
-- `results/tables/qwen_gsm8k_official_test20_policy_stats.csv`
-- `results/tables/qwen_gsm8k_official_test20_failures_regraded.csv`
-- `results/figures/qwen_gsm8k_official_test20_budget_pareto_regraded.png`
-- `results/models/qwen_gsm8k_official_train60_dev20_calibrated_policy.joblib`
-- `results/tables/qwen_gsm8k_official_dev20_calibration_summary.csv`
-- `results/tables/qwen_gsm8k_official_train60_to_test20_raw_learned_policy_summary.csv`
-- `results/tables/qwen_gsm8k_official_train60_to_test20_raw_learned_policy_selected.csv`
-- `results/tables/qwen_gsm8k_official_train60_to_test20_safe_policy_summary.csv`
-- `results/tables/qwen_gsm8k_official_train60_to_test20_safe_policy_selected.csv`
-- `results/tables/qwen_gsm8k_official_train60_dev20_to_test20_calibrated_policy_summary.csv`
-- `results/tables/qwen_gsm8k_official_train60_dev20_to_test20_calibrated_policy_selected.csv`
-- `results/tables/qwen_gsm8k_final_policy_report.csv`
-- `results/reports/qwen_gsm8k_final_policy_report.md`
-- `results/figures/qwen_gsm8k_test20_policy_comparison.png`
-
-## Qwen 3.5 Pool Phase 1 Completion Slice
-
-Phase 1 was closed out with a real three-tier Qwen pool on DashScope:
-
-- `qwen3.5-flash-2026-02-23`
-- `qwen3.5-plus-2026-02-15`
-- `qwen3-max-2026-01-23`
-
-Two final small real-benchmark slices were added to verify the multi-model system path end to end:
-
-1. GSM8K `dev5` with `flash / plus / max` and budgets `0 / 256 / 1024`
-2. HumanEval seed `dev2` with `flash / plus / max` at budget `256`
-
-The GSM8K slice completed all `45` traces and all runs were correct. The strongest utility winner on this small slice was `qwen3-max-2026-01-23` at budget `0`, while the cheapest always-correct point was still the flash tier at budget `0`.
-
-The HumanEval slice completed `6` traces and all were incorrect, which is still useful for Phase 1 because it validates the real code-generation evaluation path, failure taxonomy, and multi-model trace/report flow. On this small code slice, `qwen3-max-2026-01-23` was the least costly failed option and the flash `budget 0` configuration was intentionally not used because it produced pathological runtimes on the seed tasks.
-
-Added artifacts:
-
-- `results/tables/qwen35_pool_gsm8k_dev5_grid.csv`
-- `results/tables/qwen35_pool_gsm8k_dev5_baseline_summary.csv`
-- `results/tables/qwen35_pool_gsm8k_dev5_policy_summary.csv`
-- `results/tables/qwen35_pool_gsm8k_dev5_policy_stats.csv`
-- `results/tables/qwen35_pool_gsm8k_dev5_failures.csv`
-- `results/figures/qwen35_pool_gsm8k_dev5_pareto.png`
-- `results/tables/qwen35_pool_humaneval_dev2_budget256_grid.csv`
-- `results/tables/qwen35_pool_humaneval_dev2_budget256_baseline_summary.csv`
-- `results/tables/qwen35_pool_humaneval_dev2_budget256_policy_summary.csv`
-- `results/tables/qwen35_pool_humaneval_dev2_budget256_policy_stats.csv`
-- `results/tables/qwen35_pool_humaneval_dev2_budget256_failures.csv`
-- `results/figures/qwen35_pool_humaneval_dev2_budget256_pareto.png`
-
-## Phase 2 Router Foundation On Qwen 3.5 Pool
-
-The new Phase 2 router stack was smoke-tested on the committed `qwen35_pool_gsm8k_dev5_grid.csv` slice. This is not a held-out benchmark result. It is a small replay target used to verify that the new feature pipeline, learned router artifacts, uncertainty fallback path, and integrated baseline/plot pipeline all work end to end.
-
-Trained artifacts:
-
-- `results/models/qwen35_pool_gsm8k_dev5_logreg_joint.joblib`
-- `results/models/qwen35_pool_gsm8k_dev5_mlp_factorized.joblib`
-
-Replay summaries:
-
-| policy | accuracy | avg cost | avg latency | avg route confidence | fallback rate |
-| --- | ---: | ---: | ---: | ---: | ---: |
-| `phase2_threshold` | 1.000 | 0.000202 | 4.682s | 0.7025 | 0.0 |
-| `phase2_logreg_joint` | 1.000 | 0.000202 | 4.682s | 0.8271 | 0.0 |
-| `phase2_uncertainty_aware` | 1.000 | 0.000202 | 4.682s | 0.8134 | 0.4 |
-
-On this tiny dev5 slice, all three Phase 2 routers replayed to the cheap Qwen flash tier and matched the best observed accuracy while staying below the stronger fixed-model points on cost. The uncertainty-aware router triggered fallback on 40% of the samples, which confirms that the fallback path is active and recorded in the selected-trace outputs.
-
-Produced files:
-
-- `results/tables/qwen35_pool_gsm8k_dev5_threshold_summary.csv`
-- `results/tables/qwen35_pool_gsm8k_dev5_threshold_selected.csv`
-- `results/tables/qwen35_pool_gsm8k_dev5_logreg_joint_summary.csv`
-- `results/tables/qwen35_pool_gsm8k_dev5_logreg_joint_selected.csv`
-- `results/tables/qwen35_pool_gsm8k_dev5_uncertainty_aware_summary.csv`
-- `results/tables/qwen35_pool_gsm8k_dev5_uncertainty_aware_selected.csv`
-- `results/tables/qwen35_pool_gsm8k_dev5_baseline_phase2_summary.csv`
-- `results/figures/qwen35_pool_gsm8k_dev5_phase2_pareto.png`
-
-## Phase 2 Qwen 3.5 Pool GSM8K Dev10 Slice
-
-A larger real Phase 2 slice was then executed on the official GSM8K `dev` split with `limit=10`, the full Qwen `flash / plus / max` pool, and budgets `0 / 256 / 1024`. This produced `90` real traces in `results/tables/qwen35_pool_gsm8k_dev10_grid.csv` with overall candidate-trace accuracy `0.978`.
-
-The new `run_phase2_eval` orchestration script was used to train and replay all four Phase 2 routers on that completed grid:
-
-- `threshold`
-- `logreg_joint`
-- `mlp_factorized`
-- `uncertainty_aware`
-
-Replay summary:
-
-| policy | accuracy | avg cost | avg latency | avg route confidence | fallback rate |
-| --- | ---: | ---: | ---: | ---: | ---: |
-| `phase2_threshold` | 1.000 | 0.000234 | 6.135s | 0.6750 | 0.0 |
-| `phase2_logreg_joint` | 1.000 | 0.000234 | 6.135s | 0.9116 | 0.0 |
-| `phase2_mlp_factorized` | 1.000 | 0.000234 | 6.135s | 0.9478 | 0.0 |
-| `phase2_uncertainty_aware` | 1.000 | 0.000234 | 6.135s | 0.9478 | 0.1 |
-
-On this dev10 slice, all four Phase 2 routers selected the cheap flash tier and matched the best observed accuracy while staying far below the `qwen-max` aggregate-utility point on cost. The uncertainty-aware router triggered fallback on one of the ten samples, confirming that the fallback path remains active on a larger real slice and not only on the earlier dev5 smoke evaluation.
-
-Produced files:
-
-- `results/tables/qwen35_pool_gsm8k_dev10_grid.csv`
-- `results/qwen35_pool_gsm8k_dev10_logreg_joint.joblib`
-- `results/qwen35_pool_gsm8k_dev10_mlp_factorized.joblib`
-- `results/qwen35_pool_gsm8k_dev10_threshold_summary.csv`
-- `results/qwen35_pool_gsm8k_dev10_threshold_selected.csv`
-- `results/qwen35_pool_gsm8k_dev10_logreg_joint_summary.csv`
-- `results/qwen35_pool_gsm8k_dev10_logreg_joint_selected.csv`
-- `results/qwen35_pool_gsm8k_dev10_mlp_factorized_summary.csv`
-- `results/qwen35_pool_gsm8k_dev10_mlp_factorized_selected.csv`
-- `results/qwen35_pool_gsm8k_dev10_uncertainty_aware_summary.csv`
-- `results/qwen35_pool_gsm8k_dev10_uncertainty_aware_selected.csv`
-- `results/qwen35_pool_gsm8k_dev10_baseline_phase2_summary.csv`
-- `results/qwen35_pool_gsm8k_dev10_phase2_pareto.png`
-
-## Phase 2 Qwen 3.5 Pool GSM8K Dev20 Slice
-
-To make the Phase 2 results less toy-like, the full official GSM8K `dev20` slice was then run with the same real Qwen `flash / plus / max` pool and budgets `0 / 256 / 1024`. This produced `180` real traces in `results/tables/qwen35_pool_gsm8k_dev20_grid.csv` with overall candidate-trace accuracy `0.933`.
-
-The same `run_phase2_eval` flow was applied to that completed grid, followed by `make_phase2_report` to rank policies by utility.
-
-Key Phase 2 rows on dev20:
-
-| policy | accuracy | avg cost | avg latency | avg route confidence | fallback rate | utility |
-| --- | ---: | ---: | ---: | ---: | ---: | ---: |
-| `phase2_threshold` | 0.950 | 0.000246 | 6.744s | 0.6381 | 0.0 | 0.813895 |
-| `phase2_logreg_joint` | 0.950 | 0.000246 | 6.744s | 0.7785 | 0.0 | 0.813895 |
-| `phase2_mlp_factorized` | 0.950 | 0.000246 | 6.744s | 0.9873 | 0.0 | 0.813895 |
-| `phase2_uncertainty_aware` | 0.950 | 0.000246 | 6.744s | 0.9873 | 0.0 | 0.813895 |
-
-Compared against the strongest fixed and aggregate baselines on the same slice, the utility winner remained `qwen-max @ budget 0` with utility `0.904947`. The main Phase 2 takeaway on dev20 is therefore not that the learned routers are already utility-optimal, but that the full Phase 2 stack is now complete and stable on a larger real multi-model slice: semantic features, factorized/joint routers, uncertainty-aware replay, integrated Pareto plots, and ranked reports all run end to end.
-
-Produced files:
-
-- `results/tables/qwen35_pool_gsm8k_dev20_grid.csv`
-- `results/qwen35_pool_gsm8k_dev20_logreg_joint.joblib`
-- `results/qwen35_pool_gsm8k_dev20_mlp_factorized.joblib`
-- `results/qwen35_pool_gsm8k_dev20_threshold_summary.csv`
-- `results/qwen35_pool_gsm8k_dev20_logreg_joint_summary.csv`
-- `results/qwen35_pool_gsm8k_dev20_mlp_factorized_summary.csv`
-- `results/qwen35_pool_gsm8k_dev20_uncertainty_aware_summary.csv`
-- `results/qwen35_pool_gsm8k_dev20_baseline_phase2_summary.csv`
-- `results/qwen35_pool_gsm8k_dev20_phase2_pareto.png`
-- `results/tables/qwen35_pool_gsm8k_dev20_phase2_ranked.csv`
-- `results/reports/qwen35_pool_gsm8k_dev20_phase2_report.md`
-
-## Humaneval Phase 2 Status
-
-The larger `dev4` Humaneval continuation was interrupted by network instability and was not used as a final result. To complete the Phase 2 code-task requirement without relying on unstable provider sessions, the already committed real `qwen35_pool_humaneval_dev2_budget256_grid.csv` slice was replayed through the full Phase 2 stack offline.
-
-That replay confirms that the code-task path is fully wired through the same feature pipeline, joint/factorized routers, uncertainty-aware replay, integrated summary, Pareto generation, and ranked Phase 2 reporting. On this tiny two-sample slice, every policy remained incorrect, so the utility winner is simply the cheapest strong-tier point rather than a learned routing improvement.
-
-Produced files:
-
-- `results/qwen35_pool_humaneval_dev2_budget256_phase2_logreg_joint.joblib`
-- `results/qwen35_pool_humaneval_dev2_budget256_phase2_mlp_factorized.joblib`
-- `results/qwen35_pool_humaneval_dev2_budget256_phase2_baseline_phase2_summary.csv`
-- `results/qwen35_pool_humaneval_dev2_budget256_phase2_phase2_pareto.png`
-- `results/tables/qwen35_pool_humaneval_dev2_budget256_phase2_ranked.csv`
-- `results/reports/qwen35_pool_humaneval_dev2_budget256_phase2_report.md`
-
-## Phase 2 Completion
-
-With the GSM8K `dev20` real Qwen pool run, the offline Phase 2 router stack, the integrated evaluation/plot/report flow, the Streamlit confidence/fallback display, and the code-task Phase 2 replay on the existing real Humaneval slice, Phase 2 is now considered complete for this repository.
-
-What is complete:
-
-- feature pipeline with surface, semantic, and cheap-probe features
-- joint and factorized router structures
-- uncertainty-aware replay and fallback metadata
-- utility-ranked Phase 2 summaries and reports
-- online confidence/fallback surfacing in the demo UI
-- real multi-model GSM8K Phase 2 slice plus real code-task Phase 2 replay
-
-What remains is no longer Phase 2 work. The next meaningful block is Phase 3 system/runtime work and later Phase 4 evaluation hardening.
-
-## Phase 4 Offline Closeout Assets
-
-The repository now also includes offline closeout summaries built from the committed Phase 2 outputs:
-
-- ablation grouping report:
-  - `results/tables/qwen35_pool_phase4_ablation.csv`
-  - `results/reports/qwen35_pool_phase4_ablation.md`
-- failure taxonomy report on the real GSM8K dev20 grid:
-  - `results/tables/qwen35_pool_gsm8k_dev20_failure_taxonomy.csv`
-  - `results/reports/qwen35_pool_gsm8k_dev20_failure_taxonomy.md`
-- bootstrap-style stability summary on the real GSM8K dev20 grid:
-  - `results/tables/qwen35_pool_gsm8k_dev20_stability_summary.csv`
-
-These do not add new provider calls. They summarize the committed real and replay artifacts already present in the repository.
-
-## Final Reporting Targets
-
-The final report should include:
-
-- accuracy,
-- average cost per query,
-- p95 latency,
-- cost reduction vs Always Strong + Max Budget,
-- accuracy drop vs Always Strong + Max Budget,
-- cost-accuracy Pareto plot,
-- per-benchmark comparison for GSM8K, MATH-500, and HumanEval.
+They remain useful for debugging and provenance, but they are appendix-only.

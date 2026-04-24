@@ -11,6 +11,7 @@ from thinkrouter.app.evaluators import get_evaluator
 from thinkrouter.app.models import build_adapter, default_model_configs
 from thinkrouter.app.router import JointPolicyEngine, available_router_names, build_runtime_router
 from thinkrouter.app.schemas import EvalResult, ModelRequest, ModelResponse, RunRequest, RunResponse, TraceRecord, model_to_dict
+from thinkrouter.official_protocol import OFFICIAL_PROTOCOL
 from thinkrouter.app.store import TraceStore
 from thinkrouter.runtime import generate_with_runtime
 
@@ -21,6 +22,10 @@ app = FastAPI(title="ThinkRouter", version="0.1.0")
 
 def get_db_path() -> str:
     return os.getenv("THINKROUTER_DB_PATH", "results/traces/thinkrouter.sqlite")
+
+
+def get_default_router_name() -> str:
+    return os.getenv("THINKROUTER_OFFICIAL_RUNTIME_ROUTER", OFFICIAL_PROTOCOL.default_router)
 
 
 def get_runtime() -> tuple[dict, TraceStore, JointPolicyEngine]:
@@ -42,11 +47,12 @@ def run_query(request: RunRequest) -> RunResponse:
     model_id = request.model_id
     budget = request.budget
     if request.use_router:
-        if request.router_name:
-            router = build_runtime_router(list(configs.values()), request.router_name)
-            route = router.route(request.query, request.task_type)
-        else:
+        router_name = request.router_name or get_default_router_name()
+        if router_name == "legacy_joint_policy":
             route = policy.route(request.query, request.task_type)
+        else:
+            router = build_runtime_router(list(configs.values()), router_name)
+            route = router.route(request.query, request.task_type)
         model_id = route.model_id
         budget = route.budget
     validate_budget(budget)
@@ -152,5 +158,7 @@ def config() -> dict[str, object]:
         "model_pool": list(configs.keys()),
         "budgets": [0, 256, 1024, 4096],
         "routers": available_router_names(),
+        "default_router": get_default_router_name(),
+        "official_protocol_version": OFFICIAL_PROTOCOL.version,
     }
 

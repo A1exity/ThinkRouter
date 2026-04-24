@@ -1,134 +1,111 @@
 # ThinkRouter
 
-Adaptive thinking-budget routing for reasoning LLMs.
+ThinkRouter is a routing system for reasoning workloads where the decision is `(model, budget)`, not just `model`. The current codebase supports multi-model Qwen routing, structured budgets, deterministic evaluators, offline replay, Phase 2 learned routers, shared runtime cache/recovery, and an official protocol pipeline.
 
-ThinkRouter treats `(model, thinking_budget)` as the routing decision. It records every run as a trace with correctness, tokens, estimated cost, latency, model id, budget, and benchmark metadata, then evaluates fixed-budget, oracle, aggregate-utility, and learned routing policies offline.
+## Current System
 
-## Highlights
+- Model pool: `qwen-flash`, `qwen-plus`, `qwen-max`
+- Budget set: `0`, `256`, `1024`
+- Benchmarks in the frozen official protocol:
+  - `GSM8K`
+  - `MATH-500`
+  - `HumanEval`
+- Train/dev/test subset size per benchmark: `60 / 20 / 20`
+- Learned router stack:
+  - `threshold`
+  - `logreg_joint`
+  - `mlp_factorized`
+  - `uncertainty_aware`
+- Online default router:
+  - `uncertainty_aware`
+- Semantic feature backend:
+  - `sentence-transformers/all-MiniLM-L6-v2`
+  - lexical SVD fallback is only a local resilience path when the embedding model cannot be loaded
 
-- OpenAI-compatible model adapter with mock-model fallback for zero-cost local testing.
-- Ordered model-pool config with legacy tier vars and built-in Qwen `flash -> plus -> max` aliases.
-- Resumable benchmark grid runner for interrupted API experiments.
-- Official GSM8K and MATH JSONL export pipelines.
-- Deterministic GSM8K and MATH evaluators with regrading support.
-- Offline policy replay for fixed budget, oracle, aggregate utility, raw learned, safe fallback, and dev-calibrated policies.
-- Phase 2 router stack with surface/semantic/cheap-probe features plus `threshold`, `logreg_joint`, `mlp_factorized`, and `uncertainty_aware` routers.
-- Consolidated report generation for GSM8K and multi-benchmark results.
+## Current Main Committed Results
 
-## Key Results
+The main committed multi-model reference result is still the historical Qwen pool GSM8K slice at [`results/qwen35_pool_gsm8k_dev20_phase2_pareto.png`](results/qwen35_pool_gsm8k_dev20_phase2_pareto.png) and [`results/reports/qwen35_pool_gsm8k_dev20_phase2_report.md`](results/reports/qwen35_pool_gsm8k_dev20_phase2_report.md).
 
-Held-out Qwen `test20` results from committed traces:
+On that committed `dev20` slice:
 
-| benchmark | policy | accuracy | avg cost | p95 latency | cost vs 1024 |
+| benchmark | policy | accuracy | avg cost | p95 latency | utility |
 | --- | --- | ---: | ---: | ---: | ---: |
-| GSM8K | fixed budget 1024 | 0.950 | 0.000542 | 23.390s | 100.0% |
-| GSM8K | dev-calibrated safe policy | 0.950 | 0.000344 | 16.721s | 63.5% |
-| MATH | fixed budget 0 | 0.500 | 0.000604 | 32.348s | 59.1% |
-| MATH | fixed budget 256 | 0.550 | 0.000876 | 54.652s | 85.7% |
-| MATH | fixed budget 1024 | 0.250 | 0.001022 | 49.151s | 100.0% |
+| GSM8K dev20 | `qwen-max @ budget 0` strongest fixed point | 1.000 | 0.000849 | 8.263 | 0.904947 |
+| GSM8K dev20 | Phase 2 learned routers | 0.950 | 0.000246 | 6.744 | 0.813895 |
 
-Main takeaway: budget is a real routing variable, but larger budget is not automatically better. On GSM8K, the calibrated safe policy matched the high-budget baseline at lower cost. On MATH, budget behavior was less stable and `1024` performed poorly.
+Current interpretation:
 
-See [FINAL_REPORT.md](FINAL_REPORT.md) for the full technical report and [PROJECT_BRIEF.md](PROJECT_BRIEF.md) for a concise project overview.
+- The system path is complete enough to run multi-model joint routing.
+- The learned router stack is operational, but the committed historical GSM8K slice does **not** yet show a learned-router win over the strongest fixed baseline.
+- The committed HumanEval slice is still only a wiring proof, not a final code-task result line.
 
-## Architecture
+## What Is Not Yet Completed
 
-```text
-official dataset
-  -> JSONL benchmark split
-  -> run_grid.py
-  -> model adapter
-  -> evaluator
-  -> SQLite / CSV traces
-  -> regrade + failure analysis
-  -> policy replay
-  -> reports
+The repository now contains the frozen official protocol and one-command official pipeline, but the **final official rerun** has not yet been committed:
+
+- no committed `final_official_results.csv`
+- no committed `final_official_pareto.png`
+- no committed `results/reports/final_official_report.md` generated from official protocol outputs
+- no committed official `HumanEval` result line at the full `60 / 20 / 20` protocol scale
+
+So the project status is:
+
+- system architecture: implemented
+- official protocol: frozen
+- online default router: switched to Phase 2 stack
+- real semantic features: implemented
+- official multi-benchmark rerun: pending
+
+## Frozen Official Protocol
+
+The only formal protocol is defined in:
+
+- [`configs/official_protocol.json`](configs/official_protocol.json)
+- [`thinkrouter/official_protocol.py`](thinkrouter/official_protocol.py)
+
+Formal settings:
+
+| field | value |
+| --- | --- |
+| model pool | `qwen-flash,qwen-plus,qwen-max` |
+| budgets | `0,256,1024` |
+| benchmarks | `gsm8k`, `math500`, `humaneval` |
+| split sizes | `60 train / 20 dev / 20 test` |
+| baselines | `fixed_model_budget`, `model_only`, `budget_only`, `joint_aggregate_utility`, `joint_safe_fallback` |
+| routers | `threshold`, `logreg_joint`, `mlp_factorized`, `uncertainty_aware` |
+| utility | `1.0 * accuracy - 5.0 * cost - 0.02 * latency` |
+| default online router | `uncertainty_aware` |
+
+Historical smoke/dev slices remain in the repo, but they are appendix artifacts only.
+
+## Official Pipeline
+
+The official command chain is fixed:
+
+```powershell
+.\scripts\run_official_pipeline.ps1
 ```
 
-Core files:
+Equivalent stages:
 
-| path | purpose |
-| --- | --- |
-| `thinkrouter/adapters/` | mock/OpenAI-compatible adapters and model-pool config parsing |
-| `thinkrouter/features/` | Phase 2 feature pipeline: surface, semantic-hash, and cheap-probe extractors |
-| `thinkrouter/routers/` | threshold, joint-logreg, factorized MLP, and uncertainty-aware routers |
-| `thinkrouter/training/` | utility objective plus trace-to-training-set conversion |
-| `thinkrouter/analytics/` | cost, latency, and failure-browser summaries for Phase 3 analysis |
-| `thinkrouter/app/models.py` | compatibility exports for adapter/model config entrypoints |
-| `thinkrouter/app/evaluators.py` | GSM8K, MATH, and exact-match evaluators |
-| `thinkrouter/app/store.py` | SQLite trace persistence |
-| `thinkrouter/app/router.py` | query features and online routing policy |
-| `thinkrouter/experiments/run_grid.py` | resumable budget-grid runner |
-| `thinkrouter/experiments/prepare_data.py` | seed, GSM8K, and MATH JSONL exporters |
-| `thinkrouter/experiments/evaluate_policy.py` | fixed/oracle/aggregate policy replay |
-| `thinkrouter/experiments/learned_policy_router.py` | learned budget selector and safe fallback |
-| `thinkrouter/experiments/make_benchmark_report.py` | multi-benchmark report generation |
+```bash
+python -m thinkrouter.experiments.run_official_pipeline --stage prepare-data
+python -m thinkrouter.experiments.run_official_pipeline --stage grids
+python -m thinkrouter.experiments.run_official_pipeline --stage routers
+python -m thinkrouter.experiments.run_official_pipeline --stage report
+```
 
-## Quick Start
+This pipeline is the only supported path for future formal results.
 
-Create the Conda environment:
+## Setup
 
 ```bash
 conda env create -f environment.yml
 conda activate thinkrouter
-```
-
-Run the test suite:
-
-```bash
 pytest
 ```
 
-Run a zero-cost mock grid:
-
-```bash
-python -m thinkrouter.experiments.run_day1_grid --limit 20 --db results/traces/day1.sqlite --out results/tables/day1_grid.csv
-python -m thinkrouter.experiments.eval_baselines results/tables/day1_grid.csv --out results/tables/baseline_summary.csv
-python -m thinkrouter.experiments.make_plots results/tables/day1_grid.csv --out results/figures/pareto.png
-```
-
-Generate consolidated reports from committed CSV artifacts:
-
-```bash
-python -m thinkrouter.experiments.make_gsm8k_report
-python -m thinkrouter.experiments.make_benchmark_report
-```
-
-Report outputs:
-
-- `results/reports/qwen_gsm8k_final_policy_report.md`
-- `results/reports/qwen_multi_benchmark_policy_report.md`
-- `results/tables/qwen_multi_benchmark_policy_report.csv`
-- `results/figures/qwen_gsm8k_test20_policy_comparison.png`
-
-## Configuration
-
-By default, the project works with mock models and does not require API keys.
-
-For a real OpenAI-compatible endpoint, copy the template and fill in provider settings:
-
-```powershell
-copy .env.example .env
-```
-
-Important environment variables:
-
-| variable | description |
-| --- | --- |
-| `THINKROUTER_OPENAI_BASE_URL` | OpenAI-compatible `/v1` endpoint |
-| `THINKROUTER_OPENAI_API_KEY` | provider API key |
-| `THINKROUTER_MODEL_POOL` | ordered candidate models, for example `qwen-flash,qwen-plus,qwen-max` |
-| `THINKROUTER_STRONG_MODEL` | real model id, for example `qwen3.5-flash-2026-02-23` |
-| `THINKROUTER_STRONG_COST_PER_1K` | estimated cost per 1K tokens |
-| `THINKROUTER_DB_PATH` | default SQLite trace database path |
-| `THINKROUTER_PROVIDER_MAX_RETRIES` | provider retry count for timeout/connection/rate-limit errors |
-| `THINKROUTER_PROVIDER_RETRY_BACKOFF_S` | base retry backoff in seconds |
-| `THINKROUTER_CACHE_PATH` | SQLite request cache path shared by API and experiment runs |
-| `THINKROUTER_DISABLE_CACHE` | disable request cache when set to `1`/`true` |
-| `THINKROUTER_DIFFICULTY_MODEL_PATH` | optional sklearn difficulty model |
-| `THINKROUTER_BUDGET_MODEL_PATH` | optional sklearn budget model |
-
-Qwen pool support:
+Environment variables for the official Qwen pool:
 
 ```text
 THINKROUTER_MODEL_POOL=qwen-flash,qwen-plus,qwen-max
@@ -137,180 +114,10 @@ THINKROUTER_QWEN_PLUS_MODEL=qwen3.5-plus-2026-02-15
 THINKROUTER_QWEN_MAX_MODEL=qwen3-max-2026-01-23
 ```
 
-These snapshot suffixes are not uniform. As of April 24, 2026, DashScope lists `qwen3.5-flash-2026-02-23`, `qwen3.5-plus-2026-02-15`, and `qwen3-max-2026-01-23`.
+## Key Paths
 
-If `THINKROUTER_MODEL_POOL` is unset, the project keeps the legacy `THINKROUTER_CHEAP_MODEL` / `THINKROUTER_MID_MODEL` / `THINKROUTER_STRONG_MODEL` behavior.
-
-Validate the strongest configured model in the pool without making a network call:
-
-```bash
-python -m thinkrouter.experiments.smoke_real_model --model qwen3.5-flash-2026-02-23
-```
-
-Run one real call:
-
-```bash
-python -m thinkrouter.experiments.smoke_real_model --model qwen3.5-flash-2026-02-23 --budget 0 --run
-```
-
-## Benchmark Data
-
-ThinkRouter uses one JSON object per line:
-
-```json
-{"sample_id":"gsm8k_train_001","task_type":"gsm8k","split":"train","query":"...","expected_answer":"..."}
-```
-
-Export built-in seed data:
-
-```bash
-python -m thinkrouter.experiments.prepare_data --source seed --task all --split all --out data/splits/seed.jsonl --summary
-```
-
-Export official GSM8K and MATH subsets:
-
-```bash
-python -m thinkrouter.experiments.prepare_data --source gsm8k --out data/splits/gsm8k.jsonl --hf-endpoint https://hf-mirror.com --summary
-python -m thinkrouter.experiments.prepare_data --source math --out data/splits/math.jsonl --hf-endpoint https://hf-mirror.com --summary
-```
-
-Default official subset sizes are `60 train / 20 dev / 20 test`. `data/splits/` is ignored by git.
-
-## Running Experiments
-
-Run a resumable grid from JSONL:
-
-```bash
-python -m thinkrouter.experiments.run_grid --input data/splits/gsm8k.jsonl --task gsm8k --split dev --budgets 0,256,1024 --models qwen3.5-flash-2026-02-23 --db results/traces/qwen_gsm8k_official_dev20_budget_grid.sqlite --out results/tables/qwen_gsm8k_official_dev20_budget_grid.csv --resume
-```
-
-Analyze a completed grid:
-
-```bash
-python -m thinkrouter.experiments.regrade_traces results/tables/qwen_gsm8k_official_dev20_budget_grid.csv --out results/tables/qwen_gsm8k_official_dev20_budget_grid_regraded.csv
-python -m thinkrouter.experiments.eval_baselines results/tables/qwen_gsm8k_official_dev20_budget_grid_regraded.csv --out results/tables/qwen_gsm8k_official_dev20_budget_summary_regraded.csv
-python -m thinkrouter.experiments.evaluate_policy results/tables/qwen_gsm8k_official_dev20_budget_grid_regraded.csv --out results/tables/qwen_gsm8k_official_dev20_policy_summary.csv --stats-out results/tables/qwen_gsm8k_official_dev20_policy_stats.csv
-python -m thinkrouter.experiments.analyze_failures results/tables/qwen_gsm8k_official_dev20_budget_grid_regraded.csv --out results/tables/qwen_gsm8k_official_dev20_failures_regraded.csv
-```
-
-Useful `run_grid` options:
-
-- `--input path/to/samples.jsonl`
-- `--task gsm8k|math|humaneval|all`
-- `--split train|dev|test|all`
-- `--budgets 0,256,1024,4096`
-- `--models mock-cheap,mock-strong,<real-model-id>`
-- `--limit N`
-- `--resume` to skip sample/model/budget traces already present in `--db`
-
-## Learned Policy Workflow
-
-Train on train, calibrate on dev, evaluate on held-out test:
-
-```bash
-python -m thinkrouter.experiments.train_learned_policy results/tables/qwen_gsm8k_official_train60_budget_grid_regraded.csv --out results/models/qwen_gsm8k_official_train60_learned_policy.joblib
-python -m thinkrouter.experiments.calibrate_learned_policy results/tables/qwen_gsm8k_official_dev20_budget_grid_regraded.csv --model results/models/qwen_gsm8k_official_train60_learned_policy.joblib --out results/models/qwen_gsm8k_official_train60_dev20_calibrated_policy.joblib --summary-out results/tables/qwen_gsm8k_official_dev20_calibration_summary.csv
-python -m thinkrouter.experiments.evaluate_learned_policy results/tables/qwen_gsm8k_official_test20_budget_grid_regraded.csv --model results/models/qwen_gsm8k_official_train60_dev20_calibrated_policy.joblib --out results/tables/qwen_gsm8k_official_train60_dev20_to_test20_calibrated_policy_summary.csv --selected-out results/tables/qwen_gsm8k_official_train60_dev20_to_test20_calibrated_policy_selected.csv
-```
-
-The default learned-policy evaluator uses safe fallback. Add `--unsafe` to replay raw classifier predictions.
-
-## Phase 2 Router Workflow
-
-Train a utility-aware Phase 2 router from a completed grid:
-
-```bash
-python -m thinkrouter.experiments.train_phase2_router results/tables/qwen35_pool_gsm8k_dev5_grid.csv --router logreg_joint --out results/models/qwen35_pool_gsm8k_dev5_logreg.joblib
-python -m thinkrouter.experiments.train_phase2_router results/tables/qwen35_pool_gsm8k_dev5_grid.csv --router mlp_factorized --out results/models/qwen35_pool_gsm8k_dev5_factorized.joblib
-```
-
-Or run the full Phase 2 train + replay bundle in one step:
-
-```bash
-python -m thinkrouter.experiments.run_phase2_eval results/tables/qwen35_pool_gsm8k_dev10_grid.csv --out-prefix results/qwen35_pool_gsm8k_dev10
-```
-
-Build a utility-ranked Phase 2 report from the integrated summary:
-
-```bash
-python -m thinkrouter.experiments.make_phase2_report results/qwen35_pool_gsm8k_dev20_baseline_phase2_summary.csv --summary-out results/tables/qwen35_pool_gsm8k_dev20_phase2_ranked.csv --markdown-out results/reports/qwen35_pool_gsm8k_dev20_phase2_report.md
-```
-
-Run the unified evaluation entrypoint:
-
-```bash
-python -m thinkrouter.experiments.run_eval results/tables/qwen35_pool_gsm8k_dev20_grid.csv --out-prefix results/eval/qwen35_pool_gsm8k_dev20 --phase2-router threshold --phase2-router logreg_joint=results/qwen35_pool_gsm8k_dev20_logreg_joint.joblib --phase2-router mlp_factorized=results/qwen35_pool_gsm8k_dev20_mlp_factorized.joblib --phase2-router uncertainty_aware=results/qwen35_pool_gsm8k_dev20_mlp_factorized.joblib
-```
-
-Build Phase 4 closeout summaries:
-
-```bash
-python -m thinkrouter.experiments.make_ablation_report results/qwen35_pool_gsm8k_dev10_baseline_phase2_summary.csv results/qwen35_pool_gsm8k_dev20_baseline_phase2_summary.csv results/qwen35_pool_humaneval_dev2_budget256_phase2_baseline_phase2_summary.csv --summary-out results/tables/qwen35_pool_phase4_ablation.csv --markdown-out results/reports/qwen35_pool_phase4_ablation.md
-python -m thinkrouter.experiments.make_failure_taxonomy results/tables/qwen35_pool_gsm8k_dev20_grid.csv --summary-out results/tables/qwen35_pool_gsm8k_dev20_failure_taxonomy.csv --markdown-out results/reports/qwen35_pool_gsm8k_dev20_failure_taxonomy.md
-python -m thinkrouter.experiments.summarize results/tables/qwen35_pool_gsm8k_dev20_grid.csv --out results/tables/qwen35_pool_gsm8k_dev20_stability_summary.csv
-```
-
-Replay a Phase 2 router on the same grid:
-
-```bash
-python -m thinkrouter.experiments.evaluate_phase2_router results/tables/qwen35_pool_gsm8k_dev5_grid.csv --router threshold --out results/tables/qwen35_pool_gsm8k_dev5_threshold_summary.csv
-python -m thinkrouter.experiments.evaluate_phase2_router results/tables/qwen35_pool_gsm8k_dev5_grid.csv --router uncertainty_aware --model results/models/qwen35_pool_gsm8k_dev5_factorized.joblib --out results/tables/qwen35_pool_gsm8k_dev5_uncertainty_summary.csv --selected-out results/tables/qwen35_pool_gsm8k_dev5_uncertainty_selected.csv
-```
-
-Append Phase 2 routers to the standard baseline and plot outputs:
-
-```bash
-python -m thinkrouter.experiments.eval_baselines results/tables/qwen35_pool_gsm8k_dev5_grid.csv --phase2-router threshold --phase2-router logreg_joint=results/models/qwen35_pool_gsm8k_dev5_logreg_joint.joblib --phase2-router uncertainty_aware=results/models/qwen35_pool_gsm8k_dev5_mlp_factorized.joblib --out results/tables/qwen35_pool_gsm8k_dev5_baseline_phase2_summary.csv
-python -m thinkrouter.experiments.make_plots results/tables/qwen35_pool_gsm8k_dev5_grid.csv --phase2-router threshold --phase2-router logreg_joint=results/models/qwen35_pool_gsm8k_dev5_logreg_joint.joblib --phase2-router uncertainty_aware=results/models/qwen35_pool_gsm8k_dev5_mlp_factorized.joblib --out results/figures/qwen35_pool_gsm8k_dev5_phase2_pareto.png
-```
-
-Current Phase 2 router names are:
-
-- `threshold`
-- `logreg_joint`
-- `mlp_factorized`
-- `uncertainty_aware`
-
-## API and Demo
-
-Run FastAPI:
-
-```bash
-uvicorn thinkrouter.app.api:app --reload
-```
-
-Useful endpoints:
-
-- `GET /health`
-- `GET /config` returns the configured model pool and available router names
-- `POST /run` accepts `use_router`, `router_name`, `candidate_models`, and `candidate_budgets`
-- `GET /traces`
-
-Run Streamlit:
-
-```bash
-streamlit run thinkrouter/ui/streamlit_app.py
-```
-
-The Streamlit demo now exposes the Phase 2 router names, plus route confidence and fallback status for each run.
-It also includes a dashboard tab, a route inspector tab, and a failure browser tab for completed grid CSV files.
-
-Runtime behavior:
-
-- API calls and experiment runs share a SQLite request cache unless `THINKROUTER_DISABLE_CACHE=1`.
-- `run_grid` now records failed traces with `error_type` instead of aborting the whole experiment on a single provider error.
-- Provider-backed adapters retry timeout, connection, rate-limit, and internal-server errors before failing.
-
-## Repository Notes
-
-- `.env` is ignored and must not be committed.
-- `results/traces/` is ignored because SQLite traces can grow and may contain raw outputs.
-- `data/splits/` is ignored because benchmark exports and Hugging Face caches are local artifacts.
-- Committed `results/tables/`, `results/figures/`, and `results/reports/` files are small reproducibility artifacts.
-
-## Limitations
-
-- Current real-model experiments use one provider model.
-- Official subsets are small, not full benchmark-scale runs.
-- Thinking budgets are prompt-level instructions, not guaranteed internal reasoning-token controls.
-- MATH evaluation is deterministic but approximate; it does not perform full symbolic equivalence.
+- [`METHOD.md`](METHOD.md): current method and protocol definition
+- [`RESULTS.md`](RESULTS.md): current result inventory and appendix/historical index
+- [`FINAL_REPORT.md`](FINAL_REPORT.md): current repository-wide status summary
+- [`results/reports/`](results/reports): generated report artifacts
+- [`results/official/`](results/official): official protocol outputs after reruns

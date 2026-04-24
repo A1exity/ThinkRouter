@@ -13,6 +13,7 @@ from thinkrouter.adapters.base import ModelConfig
 from thinkrouter.app.budgets import BUDGET_LEVELS
 from thinkrouter.app.schemas import RouteDecision, TaskType
 from thinkrouter.features import make_feature_frame
+from thinkrouter.features.embedding import SEMANTIC_FEATURE_COLUMNS
 from thinkrouter.routers.common import RouterWeights, clamp_budget, estimate_accuracy, estimate_cost, estimate_latency
 
 
@@ -25,14 +26,10 @@ NUMERIC_FEATURES = [
     "punctuation_count",
     "code_marker_count",
     "avg_word_length",
-    "embedding_hash_mean",
-    "embedding_hash_std",
-    "semantic_bucket",
-    "semantic_diversity",
     "cheap_probe_difficulty",
     "cheap_probe_confidence",
     "cheap_probe_consistency",
-]
+] + list(SEMANTIC_FEATURE_COLUMNS)
 CATEGORICAL_FEATURES = ["task_type"]
 
 

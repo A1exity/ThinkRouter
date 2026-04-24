@@ -1,53 +1,50 @@
 # Experiments
 
-This repository now has three experiment layers:
+This repository now distinguishes between:
 
-1. grid collection
-2. offline replay and reporting
-3. stability / closeout analysis
+1. the frozen official protocol
+2. historical appendix slices
 
-## Real Qwen pool collection
+Only the official protocol should be used for future formal results.
 
-Example GSM8K dev20 collection:
+## Official Entry Point
 
-```bash
-python -m thinkrouter.experiments.run_grid \
-  --input data/splits/gsm8k.jsonl \
-  --task gsm8k \
-  --split dev \
-  --limit 20 \
-  --budgets 0,256,1024 \
-  --models qwen-flash,qwen-plus,qwen-max \
-  --db results/traces/qwen35_pool_gsm8k_dev20_phase2.sqlite \
-  --out results/tables/qwen35_pool_gsm8k_dev20_grid.csv \
-  --resume
+```powershell
+.\scripts\run_official_pipeline.ps1
 ```
 
-## Phase 2 replay
+Equivalent staged commands:
 
 ```bash
-python -m thinkrouter.experiments.run_phase2_eval \
-  results/tables/qwen35_pool_gsm8k_dev20_grid.csv \
-  --out-prefix results/qwen35_pool_gsm8k_dev20
+python -m thinkrouter.experiments.run_official_pipeline --stage prepare-data
+python -m thinkrouter.experiments.run_official_pipeline --stage grids
+python -m thinkrouter.experiments.run_official_pipeline --stage routers
+python -m thinkrouter.experiments.run_official_pipeline --stage report
 ```
 
-## Integrated report
+## Frozen Official Protocol
 
-```bash
-python -m thinkrouter.experiments.make_phase2_report \
-  results/qwen35_pool_gsm8k_dev20_baseline_phase2_summary.csv \
-  --summary-out results/tables/qwen35_pool_gsm8k_dev20_phase2_ranked.csv \
-  --markdown-out results/reports/qwen35_pool_gsm8k_dev20_phase2_report.md
-```
+- model pool: `qwen-flash,qwen-plus,qwen-max`
+- budgets: `0,256,1024`
+- benchmarks: `gsm8k`, `math500`, `humaneval`
+- split sizes: `60 train / 20 dev / 20 test`
+- default runtime router: `uncertainty_aware`
 
-## Unified eval entrypoint
+## Output Layout
 
-```bash
-python -m thinkrouter.experiments.run_eval \
-  results/tables/qwen35_pool_gsm8k_dev20_grid.csv \
-  --out-prefix results/eval/qwen35_pool_gsm8k_dev20 \
-  --phase2-router threshold \
-  --phase2-router logreg_joint=results/qwen35_pool_gsm8k_dev20_logreg_joint.joblib \
-  --phase2-router mlp_factorized=results/qwen35_pool_gsm8k_dev20_mlp_factorized.joblib \
-  --phase2-router uncertainty_aware=results/qwen35_pool_gsm8k_dev20_mlp_factorized.joblib
-```
+Official rerun outputs are written under:
+
+- `results/official/gsm8k/`
+- `results/official/math500/`
+- `results/official/humaneval/`
+
+Top-level official report targets are:
+
+- `results/tables/final_official_results.csv`
+- `results/figures/final_official_pareto.png`
+- `results/tables/final_official_failures.csv`
+- `results/reports/final_official_report.md`
+
+## Historical Appendix
+
+Older `dev5/dev10/dev20`, smoke, and seed slices remain in the repository for debugging only. They should not be cited as the official benchmark protocol.

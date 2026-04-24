@@ -73,7 +73,12 @@ def summarize_phase2_selection(policy: str, router_name: str, selected: pd.DataF
     }
 
 
-def replay_router(csv_path: str, router_name: str, model_path: str | None = None) -> tuple[pd.DataFrame, pd.DataFrame]:
+def replay_router(
+    csv_path: str,
+    router_name: str,
+    model_path: str | None = None,
+    confidence_threshold: float | None = None,
+) -> tuple[pd.DataFrame, pd.DataFrame]:
     df = add_sample_id(pd.read_csv(csv_path))
     models = list(default_model_configs().values())
     if router_name == "threshold":
@@ -89,7 +94,11 @@ def replay_router(csv_path: str, router_name: str, model_path: str | None = None
     elif router_name == "uncertainty_aware":
         if not model_path:
             raise ValueError("--model is required for uncertainty_aware")
-        router = UncertaintyAwareRouter(models, artifact=load_factorized_artifact(model_path))
+        router = UncertaintyAwareRouter(
+            models,
+            artifact=load_factorized_artifact(model_path),
+            confidence_threshold=0.55 if confidence_threshold is None else float(confidence_threshold),
+        )
     else:
         raise ValueError(f"Unsupported router: {router_name}")
 

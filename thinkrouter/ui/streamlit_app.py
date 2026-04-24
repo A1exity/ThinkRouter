@@ -24,7 +24,9 @@ st.caption("Adaptive thinking-budget routing for verifiable reasoning tasks")
 
 configs = default_model_configs()
 model_ids = list(configs.keys())
-router_names = [None] + list(api_config()["routers"])
+runtime_config = api_config()
+default_router = runtime_config.get("default_router")
+router_names = ["legacy_joint_policy"] + list(runtime_config["routers"])
 samples = load_day1_samples()
 config_rows = pd.DataFrame(
     [
@@ -42,8 +44,9 @@ config_rows = pd.DataFrame(
 
 with st.sidebar:
     st.header("Run")
-    use_router = st.checkbox("Use router", value=False)
-    selected_router = st.selectbox("Router", router_names, index=0, disabled=not use_router, format_func=lambda value: "legacy_joint_policy" if value is None else str(value))
+    use_router = st.checkbox("Use router", value=True)
+    default_router_index = router_names.index(default_router) if default_router in router_names else 0
+    selected_router = st.selectbox("Router", router_names, index=default_router_index, disabled=not use_router)
     selected_model = st.selectbox("Model", model_ids, disabled=use_router)
     selected_budget = st.selectbox("Budget", list(BUDGET_LEVELS), index=0, disabled=use_router)
     db_path = st.text_input("SQLite DB", os.getenv("THINKROUTER_DB_PATH", "results/traces/thinkrouter.sqlite"))
@@ -64,7 +67,7 @@ if st.button("Run query", type="primary"):
             model_id=selected_model,
             budget=int(selected_budget),
             use_router=use_router,
-            router_name=selected_router,
+            router_name=None if selected_router == "legacy_joint_policy" else selected_router,
         )
     )
     if response.route:
@@ -120,7 +123,7 @@ try:
         with inspector_tab:
             render_route_inspector(df)
         with failure_tab:
-            render_failure_browser("results/tables/qwen35_pool_gsm8k_dev20_grid.csv")
+            render_failure_browser("results/official/gsm8k/gsm8k_official_learned_selected.csv")
     else:
         st.info("No traces yet. Run a query or execute the Day-1 grid script.")
 except Exception as exc:

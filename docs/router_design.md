@@ -1,29 +1,35 @@
 # Router Design
 
-ThinkRouter Phase 2 compares four router families:
+ThinkRouter compares four router families:
 
 - `threshold`
 - `logreg_joint`
 - `mlp_factorized`
 - `uncertainty_aware`
 
-## Feature pipeline
+## Feature Stack
 
-The feature stack is intentionally small and extensible:
+The active feature stack is:
 
 - surface features
-- semantic hash features
-- cheap-probe difficulty / confidence / consistency
+- sentence-transformer semantic features
+- cheap-probe features
 
-## Decision structures
+The earlier semantic-hash placeholder is no longer the main semantic path.
 
-Two routing structures are implemented:
+## Decision Structures
 
-1. joint classification over `(model, budget)`
-2. factorized prediction over `model` and `budget`
+Two learned decision structures are implemented:
 
-The uncertainty-aware router wraps the factorized router and can fall back to a simpler policy when confidence is too low or the primary artifact is missing.
+1. joint `(model, budget)` classification
+2. factorized `model` head plus `budget` head
 
-## Current conclusion
+`uncertainty_aware` wraps the factorized router and falls back when confidence is below threshold.
 
-The router stack is complete and measurable on real Qwen pool slices, but the strongest baseline can still win on utility. That is a model-selection outcome, not an implementation gap.
+## Runtime Position
+
+The Phase 2 router stack is now the default online path. The old `JointPolicyEngine` remains only as a legacy baseline.
+
+## Current Conclusion
+
+The router stack is implemented and reportable. The current committed historical GSM8K reference slice still favors the strongest fixed baseline on utility, so the remaining gap is experimental outcome, not missing router infrastructure.

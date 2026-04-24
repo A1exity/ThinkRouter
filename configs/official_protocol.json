@@ -1,0 +1,33 @@
+{
+  "version": "official_v1",
+  "model_pool": ["qwen-flash", "qwen-plus", "qwen-max"],
+  "budgets": [0, 256, 1024],
+  "benchmarks": [
+    {"benchmark": "gsm8k", "task_type": "gsm8k", "source": "gsm8k", "train_count": 60, "dev_count": 20, "test_count": 20},
+    {"benchmark": "math500", "task_type": "math", "source": "math500", "train_count": 60, "dev_count": 20, "test_count": 20},
+    {"benchmark": "humaneval", "task_type": "humaneval", "source": "humaneval", "train_count": 60, "dev_count": 20, "test_count": 20}
+  ],
+  "baselines": [
+    "fixed_model_budget",
+    "model_only",
+    "budget_only",
+    "joint_aggregate_utility",
+    "joint_safe_fallback"
+  ],
+  "routers": ["threshold", "logreg_joint", "mlp_factorized", "uncertainty_aware"],
+  "default_router": "uncertainty_aware",
+  "utility": {"alpha": 1.0, "beta": 5.0, "gamma": 0.02},
+  "report_fields": [
+    "benchmark",
+    "policy",
+    "policy_family",
+    "accuracy",
+    "avg_cost",
+    "p95_latency",
+    "utility",
+    "cost_reduction_vs_strongest_fixed",
+    "accuracy_drop_vs_strongest_fixed"
+  ],
+  "semantic_backend": "sentence-transformers",
+  "semantic_model_name": "sentence-transformers/all-MiniLM-L6-v2"
+}
