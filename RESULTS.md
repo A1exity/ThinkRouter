@@ -525,7 +525,33 @@ Produced files:
 
 ## Humaneval Phase 2 Status
 
-A larger real Humaneval Phase 2 slice was started with the same pool and structured budgets, but network instability caused repeated provider interruptions before completion. The partial SQLite trace file was kept locally so it can be resumed later with `--resume`, but it is not treated as a completed Phase 2 result.
+The larger `dev4` Humaneval continuation was interrupted by network instability and was not used as a final result. To complete the Phase 2 code-task requirement without relying on unstable provider sessions, the already committed real `qwen35_pool_humaneval_dev2_budget256_grid.csv` slice was replayed through the full Phase 2 stack offline.
+
+That replay confirms that the code-task path is fully wired through the same feature pipeline, joint/factorized routers, uncertainty-aware replay, integrated summary, Pareto generation, and ranked Phase 2 reporting. On this tiny two-sample slice, every policy remained incorrect, so the utility winner is simply the cheapest strong-tier point rather than a learned routing improvement.
+
+Produced files:
+
+- `results/qwen35_pool_humaneval_dev2_budget256_phase2_logreg_joint.joblib`
+- `results/qwen35_pool_humaneval_dev2_budget256_phase2_mlp_factorized.joblib`
+- `results/qwen35_pool_humaneval_dev2_budget256_phase2_baseline_phase2_summary.csv`
+- `results/qwen35_pool_humaneval_dev2_budget256_phase2_phase2_pareto.png`
+- `results/tables/qwen35_pool_humaneval_dev2_budget256_phase2_ranked.csv`
+- `results/reports/qwen35_pool_humaneval_dev2_budget256_phase2_report.md`
+
+## Phase 2 Completion
+
+With the GSM8K `dev20` real Qwen pool run, the offline Phase 2 router stack, the integrated evaluation/plot/report flow, the Streamlit confidence/fallback display, and the code-task Phase 2 replay on the existing real Humaneval slice, Phase 2 is now considered complete for this repository.
+
+What is complete:
+
+- feature pipeline with surface, semantic, and cheap-probe features
+- joint and factorized router structures
+- uncertainty-aware replay and fallback metadata
+- utility-ranked Phase 2 summaries and reports
+- online confidence/fallback surfacing in the demo UI
+- real multi-model GSM8K Phase 2 slice plus real code-task Phase 2 replay
+
+What remains is no longer Phase 2 work. The next meaningful block is Phase 3 system/runtime work and later Phase 4 evaluation hardening.
 
 ## Final Reporting Targets
 
