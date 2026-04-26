@@ -1,1 +1,0 @@
-sample_id,split,task_type,selected_model,selected_budget,expected_answer,extracted_answer,error_type,correct_budgets_for_sample,any_other_budget_correct,total_tokens,cost_usd,latency_s,query,output_preview,output_text

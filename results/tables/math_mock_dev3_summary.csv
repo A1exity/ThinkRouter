@@ -1,5 +1,0 @@
-selected_model,selected_budget,accuracy,avg_cost,p95_latency,n
-mock-cheap,0,1.0,0.0,2.2010000247973948e-05,3
-mock-cheap,256,1.0,0.0,3.0239997431635854e-05,3
-mock-strong,0,1.0,0.0,1.4829999417997896e-05,3
-mock-strong,256,1.0,0.0,1.1729990364983677e-05,3

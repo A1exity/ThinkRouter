@@ -83,6 +83,6 @@ The following remain historical or debugging artifacts only:
 - smoke runs
 - `dev5`, `dev10`, `dev20` slices
 - old single-model held-out `test20` summaries
-- old `qwen_gsm8k_final_policy_report` / `qwen_multi_benchmark_policy_report` assets
+- older pre-official policy report assets
 
 They remain useful for debugging and provenance, but they are appendix-only.

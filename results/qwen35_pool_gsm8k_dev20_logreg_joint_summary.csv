@@ -1,2 +1,0 @@
-policy,accuracy,avg_cost,total_cost,avg_latency,p95_latency,n,policy_family,router_name,selected_model,selected_model_provider,selected_model_tier,selected_model_alias,selected_budget,avg_route_confidence,fallback_rate
-phase2_logreg_joint,0.95,0.00024594464999996504,0.004918892999999301,6.743785115005449,14.73771411501221,20,phase2_logreg_joint,logreg_joint,qwen3.5-flash-2026-02-23,qwen,cheap,qwen-flash,mixed,0.7785098733433556,0.0

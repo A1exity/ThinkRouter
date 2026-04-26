@@ -1,2 +1,0 @@
-policy,accuracy,avg_cost,total_cost,avg_latency,p95_latency,n
-safe_learned_policy_fallback_budget_0,0.9,0.000241811849999965,0.0048362369999993,6.423566695000045,19.651759915003648,20

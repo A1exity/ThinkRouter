@@ -9,4 +9,3 @@ Top-level summaries:
 
 - [../README.md](../README.md)
 - [../FINAL_REPORT.md](../FINAL_REPORT.md)
-- [../PROJECT_BRIEF.md](../PROJECT_BRIEF.md)
