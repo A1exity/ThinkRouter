@@ -1,0 +1,7 @@
+{
+  "benchmark": "math500",
+  "official_router_name": "logreg_joint",
+  "official_router_policy": "phase2_logreg_joint",
+  "uncertainty_threshold": 0.55,
+  "dev_utility": -0.7434343545999783
+}

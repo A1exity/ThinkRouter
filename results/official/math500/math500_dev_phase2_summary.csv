@@ -1,0 +1,5 @@
+policy,accuracy,avg_cost,total_cost,avg_latency,p95_latency,n,policy_family,router_name,selected_model,selected_model_provider,selected_model_tier,selected_model_alias,selected_budget,avg_route_confidence,fallback_rate,benchmark,utility
+phase2_threshold,0.35,0.0008605120999999599,0.0172102419999992,24.46546118999968,54.45658970499892,20,phase2_threshold,threshold,mixed,qwen,mixed,mixed,mixed,0.6762499999999999,0.0,math500,-0.7434343545999783
+phase2_logreg_joint,0.35,0.0008605120999999599,0.0172102419999992,24.46546118999968,54.45658970499892,20,phase2_logreg_joint,logreg_joint,mixed,qwen,mixed,mixed,mixed,0.6062751175566048,0.0,math500,-0.7434343545999783
+phase2_mlp_factorized,0.35,0.0008605120999999599,0.0172102419999992,24.46546118999968,54.45658970499892,20,phase2_mlp_factorized,mlp_factorized,mixed,qwen,mixed,mixed,mixed,0.8128808803102012,0.0,math500,-0.7434343545999783
+phase2_uncertainty_aware,0.35,0.0008605120999999599,0.0172102419999992,24.46546118999968,54.45658970499892,20,phase2_uncertainty_aware,uncertainty_aware,mixed,qwen,mixed,mixed,mixed,0.8128808803102012,0.1,math500,-0.7434343545999783

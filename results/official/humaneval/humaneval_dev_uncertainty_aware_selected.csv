@@ -1,0 +1,1989 @@
+id,schema_version,query_id,benchmark,query,query_text,task_type,selected_model,selected_model_provider,selected_model_tier,selected_model_alias,selected_budget,selected_budget_id,budget_config,output_text,parsed_output,score,is_correct,expected_answer,extracted_answer,judge_metadata,prompt_tokens,completion_tokens,total_tokens,cost_usd,latency_s,error_type,router_features,route_reason,candidate_set_signature,prompt_template_version,provider_response_meta,route_confidence,fallback_triggered,fallback_reason,created_at,metadata,sample_id,policy,router_name
+3,2,humaneval_dev_001,humaneval,"
+
+def sum_to_n(n: int):
+    """"""sum_to_n is a function that sums numbers from 1 to n.
+    >>> sum_to_n(30)
+    465
+    >>> sum_to_n(100)
+    5050
+    >>> sum_to_n(5)
+    15
+    >>> sum_to_n(10)
+    55
+    >>> sum_to_n(1)
+    1
+    """"""
+","
+
+def sum_to_n(n: int):
+    """"""sum_to_n is a function that sums numbers from 1 to n.
+    >>> sum_to_n(30)
+    465
+    >>> sum_to_n(100)
+    5050
+    >>> sum_to_n(5)
+    15
+    >>> sum_to_n(10)
+    55
+    >>> sum_to_n(1)
+    1
+    """"""
+",humaneval,qwen3.5-flash-2026-02-23,qwen,cheap,qwen-flash,1024,budget-1024,"{'budget_id': 'budget-1024', 'effort_level': 'medium', 'max_output_tokens': 1200, 'provider_controls': {'reasoning_effort': 'medium'}, 'prompt_template_version': 'v2', 'legacy_budget': 1024}","```python
+def sum_to_n(n: int):
+    """"""sum_to_n is a function that sums numbers from 1 to n.
+    >>> sum_to_n(30)
+    465
+    >>> sum_to_n(100)
+    5050
+    >>> sum_to_n(5)
+    15
+    >>> sum_to_n(10)
+    55
+    >>> sum_to_n(1)
+    1
+    """"""
+    return n * (n + 1) // 2
+```
+
+**Reasoning:**
+
+The sum of all integers from 1 to n can be calculated using the well-known arithmetic series formula:
+
+\[
+\text{Sum} = \frac{n \times (n + 1)}{2}
+\]
+
+This formula is derived from pairing terms in the sequence (e.g., 1 + n, 2 + (n−1), etc.), each pair summing to \(n + 1\), with \(n/2\) such pairs.
+
+**Verification with Examples:**
+
+| n   | Calculation           | Result | Expected | Match |
+|-----|------------------------|--------|----------|-------|
+| 30  | 30 × 31 ÷ 2            | 465    | 465      | ✅    |
+| 100 | 100 × 101 ÷ 2          | 5050   | 5050     | ✅    |
+| 5   | 5 × 6 ÷ 2              | 15     | 15       | ✅    |
+| 10  | 10 × 11 ÷ 2            | 55     | 55       | ✅    |
+| 1   | 1 × 2 ÷ 2              | 1      | 1        | ✅    |
+
+**Implementation Notes:**
+
+- Uses integer division (`//`) to ensure the result is an integer.
+- Time complexity: O(1) — constant time operation.
+- Space complexity: O(1) — no additional memory used.
+
+This solution is both efficient and accurate for all valid positive integer inputs.","def sum_to_n(n: int):
+    """"""sum_to_n is a function that sums numbers from 1 to n.
+    >>> sum_to_n(30)
+    465
+    >>> sum_to_n(100)
+    5050
+    >>> sum_to_n(5)
+    15
+    >>> sum_to_n(10)
+    55
+    >>> sum_to_n(1)
+    1
+    """"""
+    return n * (n + 1) // 2",1.0,True,pass,"def sum_to_n(n: int):
+    """"""sum_to_n is a function that sums numbers from 1 to n.
+    >>> sum_to_n(30)
+    465
+    >>> sum_to_n(100)
+    5050
+    >>> sum_to_n(5)
+    15
+    >>> sum_to_n(10)
+    55
+    >>> sum_to_n(1)
+    1
+    """"""
+    return n * (n + 1) // 2","{'task_type': 'humaneval', 'entry_point': 'sum_to_n', 'tests_passed': True}",134,859,993,0.0002849909999999,7.960024500003783,,{},,"models=qwen3.5-flash-2026-02-23,qwen3.5-plus-2026-02-15,qwen3-max-2026-01-23|budgets=0,256,1024",v2,"{'id': 'chatcmpl-c9f9a748-069c-9160-a344-13e9e2bf6bb5', 'model': 'qwen3.5-flash-2026-02-23', 'provider': 'qwen', 'tier': 'cheap', 'budget_id': 'budget-1024', 'cache_hit': False}",0.9939209673858092,False,,2026-04-26 07:48:47.446418+00:00,"{'sample_id': 'humaneval_dev_001', 'split': 'dev', 'experiment': 'jsonl_grid', 'cache_hit': False, 'selected_model_provider': 'qwen', 'selected_model_tier': 'cheap', 'selected_model_alias': 'qwen-flash'}",humaneval_dev_001,phase2_uncertainty_aware,uncertainty_aware
+12,2,humaneval_dev_002,humaneval,"
+
+def correct_bracketing(brackets: str):
+    """""" brackets is a string of ""("" and "")"".
+    return True if every opening bracket has a corresponding closing bracket.
+
+    >>> correct_bracketing(""("")
+    False
+    >>> correct_bracketing(""()"")
+    True
+    >>> correct_bracketing(""(()())"")
+    True
+    >>> correct_bracketing("")(()"")
+    False
+    """"""
+","
+
+def correct_bracketing(brackets: str):
+    """""" brackets is a string of ""("" and "")"".
+    return True if every opening bracket has a corresponding closing bracket.
+
+    >>> correct_bracketing(""("")
+    False
+    >>> correct_bracketing(""()"")
+    True
+    >>> correct_bracketing(""(()())"")
+    True
+    >>> correct_bracketing("")(()"")
+    False
+    """"""
+",humaneval,qwen3.5-flash-2026-02-23,qwen,cheap,qwen-flash,1024,budget-1024,"{'budget_id': 'budget-1024', 'effort_level': 'medium', 'max_output_tokens': 1200, 'provider_controls': {'reasoning_effort': 'medium'}, 'prompt_template_version': 'v2', 'legacy_budget': 1024}","Here's the implementation of the `correct_bracketing` function that checks whether every opening bracket `""(""` has a corresponding closing bracket `"")""` in the correct order:
+
+```python
+def correct_bracketing(brackets: str):
+    """""" brackets is a string of ""("" and "")"".
+    return True if every opening bracket has a corresponding closing bracket.
+
+    >>> correct_bracketing(""("")
+    False
+    >>> correct_bracketing(""()"")
+    True
+    >>> correct_bracketing(""(()())"")
+    True
+    >>> correct_bracketing("")(()"")
+    False
+    """"""
+    count = 0
+    for char in brackets:
+        if char == '(':
+            count += 1
+        elif char == ')':
+            count -= 1
+            if count < 0:
+                return False
+    return count == 0
+```
+
+### How It Works:
+- A counter tracks the balance between opening and closing brackets.
+- Each `""(""` increases the counter; each `"")""` decreases it.
+- If the counter ever drops below zero, a closing bracket appears without a matching opening one — invalid.
+- At the end, the counter must be exactly zero for all brackets to be properly matched.
+
+### Example Traces:
+- `""(""` → count = 1 → returns `False`
+- `""()""` → count = 0 → returns `True`
+- `""(()())""` → count ends at 0 → returns `True`
+- `"")(()""` → count becomes -1 early → returns `False`
+
+This solution runs in O(n) time and uses O(1) space, making it efficient and reliable for validating bracket sequences.","def correct_bracketing(brackets: str):
+    """""" brackets is a string of ""("" and "")"".
+    return True if every opening bracket has a corresponding closing bracket.
+
+    >>> correct_bracketing(""("")
+    False
+    >>> correct_bracketing(""()"")
+    True
+    >>> correct_bracketing(""(()())"")
+    True
+    >>> correct_bracketing("")(()"")
+    False
+    """"""
+    count = 0
+    for char in brackets:
+        if char == '(':
+            count += 1
+        elif char == ')':
+            count -= 1
+            if count < 0:
+                return False
+    return count == 0",1.0,True,pass,"def correct_bracketing(brackets: str):
+    """""" brackets is a string of ""("" and "")"".
+    return True if every opening bracket has a corresponding closing bracket.
+
+    >>> correct_bracketing(""("")
+    False
+    >>> correct_bracketing(""()"")
+    True
+    >>> correct_bracketing(""(()())"")
+    True
+    >>> correct_bracketing("")(()"")
+    False
+    """"""
+    count = 0
+    for char in brackets:
+        if char == '(':
+            count += 1
+        elif char == ')':
+            count -= 1
+            if count < 0:
+                return False
+    return count == 0","{'task_type': 'humaneval', 'entry_point': 'correct_bracketing', 'tests_passed': True}",121,880,1001,0.0002872869999999,7.386551499992493,,{},,"models=qwen3.5-flash-2026-02-23,qwen3.5-plus-2026-02-15,qwen3-max-2026-01-23|budgets=0,256,1024",v2,"{'id': 'chatcmpl-630e3a41-1152-9712-8dc1-ed0a240f9aa4', 'model': 'qwen3.5-flash-2026-02-23', 'provider': 'qwen', 'tier': 'cheap', 'budget_id': 'budget-1024', 'cache_hit': False}",0.9993378757540491,False,,2026-04-26 08:02:15.407163+00:00,"{'sample_id': 'humaneval_dev_002', 'split': 'dev', 'experiment': 'jsonl_grid', 'cache_hit': False, 'selected_model_provider': 'qwen', 'selected_model_tier': 'cheap', 'selected_model_alias': 'qwen-flash'}",humaneval_dev_002,phase2_uncertainty_aware,uncertainty_aware
+21,2,humaneval_dev_003,humaneval,"
+
+def derivative(xs: list):
+    """""" xs represent coefficients of a polynomial.
+    xs[0] + xs[1] * x + xs[2] * x^2 + ....
+     Return derivative of this polynomial in the same form.
+    >>> derivative([3, 1, 2, 4, 5])
+    [1, 4, 12, 20]
+    >>> derivative([1, 2, 3])
+    [2, 6]
+    """"""
+","
+
+def derivative(xs: list):
+    """""" xs represent coefficients of a polynomial.
+    xs[0] + xs[1] * x + xs[2] * x^2 + ....
+     Return derivative of this polynomial in the same form.
+    >>> derivative([3, 1, 2, 4, 5])
+    [1, 4, 12, 20]
+    >>> derivative([1, 2, 3])
+    [2, 6]
+    """"""
+",humaneval,qwen3.5-flash-2026-02-23,qwen,cheap,qwen-flash,1024,budget-1024,"{'budget_id': 'budget-1024', 'effort_level': 'medium', 'max_output_tokens': 1200, 'provider_controls': {'reasoning_effort': 'medium'}, 'prompt_template_version': 'v2', 'legacy_budget': 1024}","```python
+def derivative(xs: list):
+    """""" xs represent coefficients of a polynomial.
+    xs[0] + xs[1] * x + xs[2] * x^2 + ....
+     Return derivative of this polynomial in the same form.
+    >>> derivative([3, 1, 2, 4, 5])
+    [1, 4, 12, 20]
+    >>> derivative([1, 2, 3])
+    [2, 6]
+    """"""
+    # The derivative of a constant (xs[0]) is 0, so we skip it
+    # For each coefficient at index i, multiply by i to get the new coefficient
+    # The result has one fewer element than the input
+    return [i * xs[i] for i in range(1, len(xs))]
+```","def derivative(xs: list):
+    """""" xs represent coefficients of a polynomial.
+    xs[0] + xs[1] * x + xs[2] * x^2 + ....
+     Return derivative of this polynomial in the same form.
+    >>> derivative([3, 1, 2, 4, 5])
+    [1, 4, 12, 20]
+    >>> derivative([1, 2, 3])
+    [2, 6]
+    """"""
+    # The derivative of a constant (xs[0]) is 0, so we skip it
+    # For each coefficient at index i, multiply by i to get the new coefficient
+    # The result has one fewer element than the input
+    return [i * xs[i] for i in range(1, len(xs))]",1.0,True,pass,"def derivative(xs: list):
+    """""" xs represent coefficients of a polynomial.
+    xs[0] + xs[1] * x + xs[2] * x^2 + ....
+     Return derivative of this polynomial in the same form.
+    >>> derivative([3, 1, 2, 4, 5])
+    [1, 4, 12, 20]
+    >>> derivative([1, 2, 3])
+    [2, 6]
+    """"""
+    # The derivative of a constant (xs[0]) is 0, so we skip it
+    # For each coefficient at index i, multiply by i to get the new coefficient
+    # The result has one fewer element than the input
+    return [i * xs[i] for i in range(1, len(xs))]","{'task_type': 'humaneval', 'entry_point': 'derivative', 'tests_passed': True}",140,630,770,0.0002209899999999,5.49658969999291,,{},,"models=qwen3.5-flash-2026-02-23,qwen3.5-plus-2026-02-15,qwen3-max-2026-01-23|budgets=0,256,1024",v2,"{'id': 'chatcmpl-72e511ae-515f-9064-bb64-5218a3a0130f', 'model': 'qwen3.5-flash-2026-02-23', 'provider': 'qwen', 'tier': 'cheap', 'budget_id': 'budget-1024', 'cache_hit': False}",0.9898972545454248,False,,2026-04-26 08:04:29.052793+00:00,"{'sample_id': 'humaneval_dev_003', 'split': 'dev', 'experiment': 'jsonl_grid', 'cache_hit': False, 'selected_model_provider': 'qwen', 'selected_model_tier': 'cheap', 'selected_model_alias': 'qwen-flash'}",humaneval_dev_003,phase2_uncertainty_aware,uncertainty_aware
+29,2,humaneval_dev_004,humaneval,"
+
+def fibfib(n: int):
+    """"""The FibFib number sequence is a sequence similar to the Fibbonacci sequnece that's defined as follows:
+    fibfib(0) == 0
+    fibfib(1) == 0
+    fibfib(2) == 1
+    fibfib(n) == fibfib(n-1) + fibfib(n-2) + fibfib(n-3).
+    Please write a function to efficiently compute the n-th element of the fibfib number sequence.
+    >>> fibfib(1)
+    0
+    >>> fibfib(5)
+    4
+    >>> fibfib(8)
+    24
+    """"""
+","
+
+def fibfib(n: int):
+    """"""The FibFib number sequence is a sequence similar to the Fibbonacci sequnece that's defined as follows:
+    fibfib(0) == 0
+    fibfib(1) == 0
+    fibfib(2) == 1
+    fibfib(n) == fibfib(n-1) + fibfib(n-2) + fibfib(n-3).
+    Please write a function to efficiently compute the n-th element of the fibfib number sequence.
+    >>> fibfib(1)
+    0
+    >>> fibfib(5)
+    4
+    >>> fibfib(8)
+    24
+    """"""
+",humaneval,qwen3.5-flash-2026-02-23,qwen,cheap,qwen-flash,256,budget-256,"{'budget_id': 'budget-256', 'effort_level': 'brief', 'max_output_tokens': 600, 'provider_controls': {'reasoning_effort': 'brief'}, 'prompt_template_version': 'v2', 'legacy_budget': 256}","To compute the n-th FibFib number efficiently, we can use an iterative approach that tracks only the last three values at each step. This avoids the exponential overhead of naive recursion while maintaining constant space usage.
+
+### Reasoning:
+- The sequence is defined as:
+  - `fibfib(0) = 0`
+  - `fibfib(1) = 0`
+  - `fibfib(2) = 1`
+  - `fibfib(n) = fibfib(n-1) + fibfib(n-2) + fibfib(n-3)` for `n ≥ 3`
+- We initialize the first three values and iterate from 3 up to `n`, updating the last three values at each step.
+- This yields an O(n) time complexity and O(1) space complexity.
+
+### Final Answer:
+```python
+def fibfib(n: int):
+    """"""The FibFib number sequence is a sequence similar to the Fibbonacci sequnece that's defined as follows:
+    fibfib(0) == 0
+    fibfib(1) == 0
+    fibfib(2) == 1
+    fibfib(n) == fibfib(n-1) + fibfib(n-2) + fibfib(n-3).
+    Please write a function to efficiently compute the n-th element of the fibfib number sequence.
+    >>> fibfib(1)
+    0
+    >>> fibfib(5)
+    4
+    >>> fibfib(8)
+    24
+    """"""
+    if n == 0:
+        return 0
+    if n == 1:
+        return 0
+    if n == 2:
+        return 1
+    
+    a, b, c = 0, 0, 1  # fibfib(0), fibfib(1), fibfib(2)
+    
+    for _ in range(3, n + 1):
+        a, b, c = b, c, a + b + c
+    
+    return c
+```","def fibfib(n: int):
+    """"""The FibFib number sequence is a sequence similar to the Fibbonacci sequnece that's defined as follows:
+    fibfib(0) == 0
+    fibfib(1) == 0
+    fibfib(2) == 1
+    fibfib(n) == fibfib(n-1) + fibfib(n-2) + fibfib(n-3).
+    Please write a function to efficiently compute the n-th element of the fibfib number sequence.
+    >>> fibfib(1)
+    0
+    >>> fibfib(5)
+    4
+    >>> fibfib(8)
+    24
+    """"""
+    if n == 0:
+        return 0
+    if n == 1:
+        return 0
+    if n == 2:
+        return 1
+    
+    a, b, c = 0, 0, 1  # fibfib(0), fibfib(1), fibfib(2)
+    
+    for _ in range(3, n + 1):
+        a, b, c = b, c, a + b + c
+    
+    return c",1.0,True,pass,"def fibfib(n: int):
+    """"""The FibFib number sequence is a sequence similar to the Fibbonacci sequnece that's defined as follows:
+    fibfib(0) == 0
+    fibfib(1) == 0
+    fibfib(2) == 1
+    fibfib(n) == fibfib(n-1) + fibfib(n-2) + fibfib(n-3).
+    Please write a function to efficiently compute the n-th element of the fibfib number sequence.
+    >>> fibfib(1)
+    0
+    >>> fibfib(5)
+    4
+    >>> fibfib(8)
+    24
+    """"""
+    if n == 0:
+        return 0
+    if n == 1:
+        return 0
+    if n == 2:
+        return 1
+    
+    a, b, c = 0, 0, 1  # fibfib(0), fibfib(1), fibfib(2)
+    
+    for _ in range(3, n + 1):
+        a, b, c = b, c, a + b + c
+    
+    return c","{'task_type': 'humaneval', 'entry_point': 'fibfib', 'tests_passed': True}",177,1068,1245,0.000357315,9.226452200004132,,{},,"models=qwen3.5-flash-2026-02-23,qwen3.5-plus-2026-02-15,qwen3-max-2026-01-23|budgets=0,256,1024",v2,"{'id': 'chatcmpl-5be6d971-66b2-9c91-9983-32caf8db7b56', 'model': 'qwen3.5-flash-2026-02-23', 'provider': 'qwen', 'tier': 'cheap', 'budget_id': 'budget-256', 'cache_hit': False}",0.9914815220412423,False,,2026-04-26 08:07:26.792453+00:00,"{'sample_id': 'humaneval_dev_004', 'split': 'dev', 'experiment': 'jsonl_grid', 'cache_hit': False, 'selected_model_provider': 'qwen', 'selected_model_tier': 'cheap', 'selected_model_alias': 'qwen-flash'}",humaneval_dev_004,phase2_uncertainty_aware,uncertainty_aware
+39,2,humaneval_dev_005,humaneval,"
+FIX = """"""
+Add more test cases.
+""""""
+
+def vowels_count(s):
+    """"""Write a function vowels_count which takes a string representing
+    a word as input and returns the number of vowels in the string.
+    Vowels in this case are 'a', 'e', 'i', 'o', 'u'. Here, 'y' is also a
+    vowel, but only when it is at the end of the given word.
+
+    Example:
+    >>> vowels_count(""abcde"")
+    2
+    >>> vowels_count(""ACEDY"")
+    3
+    """"""
+","
+FIX = """"""
+Add more test cases.
+""""""
+
+def vowels_count(s):
+    """"""Write a function vowels_count which takes a string representing
+    a word as input and returns the number of vowels in the string.
+    Vowels in this case are 'a', 'e', 'i', 'o', 'u'. Here, 'y' is also a
+    vowel, but only when it is at the end of the given word.
+
+    Example:
+    >>> vowels_count(""abcde"")
+    2
+    >>> vowels_count(""ACEDY"")
+    3
+    """"""
+",humaneval,qwen3.5-flash-2026-02-23,qwen,cheap,qwen-flash,1024,budget-1024,"{'budget_id': 'budget-1024', 'effort_level': 'medium', 'max_output_tokens': 1200, 'provider_controls': {'reasoning_effort': 'medium'}, 'prompt_template_version': 'v2', 'legacy_budget': 1024}","```python
+def vowels_count(s):
+    """"""Write a function vowels_count which takes a string representing
+    a word as input and returns the number of vowels in the string.
+    Vowels in this case are 'a', 'e', 'i', 'o', 'u'. Here, 'y' is also a
+    vowel, but only when it is at the end of the given word.
+
+    Example:
+    >>> vowels_count(""abcde"")
+    2
+    >>> vowels_count(""ACEDY"")
+    3
+    """"""
+    if not s:
+        return 0
+
+    s_lower = s.lower()
+    count = 0
+
+    # Count standard vowels
+    for char in s_lower:
+        if char in 'aeiou':
+            count += 1
+
+    # Check if 'y' is at the end
+    if s_lower[-1] == 'y':
+        count += 1
+
+    return count
+
+
+# Additional test cases
+if __name__ == ""__main__"":
+    assert vowels_count("""") == 0, ""Empty string""
+    assert vowels_count(""rhythm"") == 0, ""No vowels, y not at end""
+    assert vowels_count(""sky"") == 1, ""Only y at end""
+    assert vowels_count(""happy"") == 2, ""a and y at end""
+    assert vowels_count(""AEIOU"") == 5, ""All uppercase vowels""
+    assert vowels_count(""bcdfg"") == 0, ""Consonants only""
+    assert vowels_count(""y"") == 1, ""Single y""
+    assert vowels_count(""b"") == 0, ""Single consonant""
+    assert vowels_count(""fly"") == 1, ""y at end""
+    assert vowels_count(""yellow"") == 2, ""e and y at end""
+    assert vowels_count(""RHYTHM"") == 0, ""No vowels, Y not at end""
+    assert vowels_count(""beauty"") == 4, ""e, a, u, y at end""
+    print(""All tests passed!"")
+```","def vowels_count(s):
+    """"""Write a function vowels_count which takes a string representing
+    a word as input and returns the number of vowels in the string.
+    Vowels in this case are 'a', 'e', 'i', 'o', 'u'. Here, 'y' is also a
+    vowel, but only when it is at the end of the given word.
+
+    Example:
+    >>> vowels_count(""abcde"")
+    2
+    >>> vowels_count(""ACEDY"")
+    3
+    """"""
+    if not s:
+        return 0
+
+    s_lower = s.lower()
+    count = 0
+
+    # Count standard vowels
+    for char in s_lower:
+        if char in 'aeiou':
+            count += 1
+
+    # Check if 'y' is at the end
+    if s_lower[-1] == 'y':
+        count += 1
+
+    return count
+
+
+# Additional test cases
+if __name__ == ""__main__"":
+    assert vowels_count("""") == 0, ""Empty string""
+    assert vowels_count(""rhythm"") == 0, ""No vowels, y not at end""
+    assert vowels_count(""sky"") == 1, ""Only y at end""
+    assert vowels_count(""happy"") == 2, ""a and y at end""
+    assert vowels_count(""AEIOU"") == 5, ""All uppercase vowels""
+    assert vowels_count(""bcdfg"") == 0, ""Consonants only""
+    assert vowels_count(""y"") == 1, ""Single y""
+    assert vowels_count(""b"") == 0, ""Single consonant""
+    assert vowels_count(""fly"") == 1, ""y at end""
+    assert vowels_count(""yellow"") == 2, ""e and y at end""
+    assert vowels_count(""RHYTHM"") == 0, ""No vowels, Y not at end""
+    assert vowels_count(""beauty"") == 4, ""e, a, u, y at end""
+    print(""All tests passed!"")",1.0,True,pass,"def vowels_count(s):
+    """"""Write a function vowels_count which takes a string representing
+    a word as input and returns the number of vowels in the string.
+    Vowels in this case are 'a', 'e', 'i', 'o', 'u'. Here, 'y' is also a
+    vowel, but only when it is at the end of the given word.
+
+    Example:
+    >>> vowels_count(""abcde"")
+    2
+    >>> vowels_count(""ACEDY"")
+    3
+    """"""
+    if not s:
+        return 0
+
+    s_lower = s.lower()
+    count = 0
+
+    # Count standard vowels
+    for char in s_lower:
+        if char in 'aeiou':
+            count += 1
+
+    # Check if 'y' is at the end
+    if s_lower[-1] == 'y':
+        count += 1
+
+    return count
+
+
+# Additional test cases
+if __name__ == ""__main__"":
+    assert vowels_count("""") == 0, ""Empty string""
+    assert vowels_count(""rhythm"") == 0, ""No vowels, y not at end""
+    assert vowels_count(""sky"") == 1, ""Only y at end""
+    assert vowels_count(""happy"") == 2, ""a and y at end""
+    assert vowels_count(""AEIOU"") == 5, ""All uppercase vowels""
+    assert vowels_count(""bcdfg"") == 0, ""Consonants only""
+    assert vowels_count(""y"") == 1, ""Single y""
+    assert vowels_count(""b"") == 0, ""Single consonant""
+    assert vowels_count(""fly"") == 1, ""y at end""
+    assert vowels_count(""yellow"") == 2, ""e and y at end""
+    assert vowels_count(""RHYTHM"") == 0, ""No vowels, Y not at end""
+    assert vowels_count(""beauty"") == 4, ""e, a, u, y at end""
+    print(""All tests passed!"")","{'task_type': 'humaneval', 'entry_point': 'vowels_count', 'tests_passed': True}",158,890,1048,0.000300776,7.939730600002804,,{},,"models=qwen3.5-flash-2026-02-23,qwen3.5-plus-2026-02-15,qwen3-max-2026-01-23|budgets=0,256,1024",v2,"{'id': 'chatcmpl-d19b4e71-f200-978f-bdc2-cb540141256b', 'model': 'qwen3.5-flash-2026-02-23', 'provider': 'qwen', 'tier': 'cheap', 'budget_id': 'budget-1024', 'cache_hit': False}",0.9997035917041539,False,,2026-04-26 08:12:07.586583+00:00,"{'sample_id': 'humaneval_dev_005', 'split': 'dev', 'experiment': 'jsonl_grid', 'cache_hit': False, 'selected_model_provider': 'qwen', 'selected_model_tier': 'cheap', 'selected_model_alias': 'qwen-flash'}",humaneval_dev_005,phase2_uncertainty_aware,uncertainty_aware
+48,2,humaneval_dev_006,humaneval,"
+def circular_shift(x, shift):
+    """"""Circular shift the digits of the integer x, shift the digits right by shift
+    and return the result as a string.
+    If shift > number of digits, return digits reversed.
+    >>> circular_shift(12, 1)
+    ""21""
+    >>> circular_shift(12, 2)
+    ""12""
+    """"""
+","
+def circular_shift(x, shift):
+    """"""Circular shift the digits of the integer x, shift the digits right by shift
+    and return the result as a string.
+    If shift > number of digits, return digits reversed.
+    >>> circular_shift(12, 1)
+    ""21""
+    >>> circular_shift(12, 2)
+    ""12""
+    """"""
+",humaneval,qwen3.5-flash-2026-02-23,qwen,cheap,qwen-flash,1024,budget-1024,"{'budget_id': 'budget-1024', 'effort_level': 'medium', 'max_output_tokens': 1200, 'provider_controls': {'reasoning_effort': 'medium'}, 'prompt_template_version': 'v2', 'legacy_budget': 1024}","Here's the complete implementation of the `circular_shift` function based on the specified logic:
+
+```python
+def circular_shift(x, shift):
+    """"""Circular shift the digits of the integer x, shift the digits right by shift
+    and return the result as a string.
+    If shift > number of digits, return digits reversed.
+    >>> circular_shift(12, 1)
+    ""21""
+    >>> circular_shift(12, 2)
+    ""12""
+    """"""
+    s = str(x)
+    num_digits = len(s)
+    
+    if shift > num_digits:
+        return s[::-1]  # Reverse the digits
+    else:
+        shift = shift % num_digits  # Normalize shift within digit count
+        return s[-shift:] + s[:-shift] if shift > 0 else s
+```
+
+### Explanation:
+- **Convert to String:** The integer `x` is converted to a string to manipulate its digits.
+- **Check Shift Condition:** If `shift` exceeds the number of digits, the digits are reversed.
+- **Circular Right Shift:** Otherwise, perform a right circular shift using slicing.
+  - `s[-shift:]` gets the last `shift` characters.
+  - `s[:-shift]` gets the remaining characters.
+  - Concatenate them to form the shifted result.
+- **Edge Cases Handled:**
+  - `shift == 0`: Returns the original string.
+  - `shift == num_digits`: Modulo results in 0, returning the original string.
+  - Single-digit numbers: Reversing has no effect.
+  - Negative inputs: Treated as strings; sign is preserved.
+
+### Example Test Cases:
+```python
+print(circular_shift(12, 1))   # Output: ""21""
+print(circular_shift(12, 2))   # Output: ""12""
+print(circular_shift(123, 1))  # Output: ""312""
+print(circular_shift(123, 3))  # Output: ""123""
+print(circular_shift(123, 4))  # Output: ""321""
+print(circular_shift(7, 1))    # Output: ""7""
+print(circular_shift(0, 5))    # Output: ""0""
+```
+
+This implementation satisfies all conditions outlined in the docstring and handles typical edge cases robustly.","print(circular_shift(12, 1))   # Output: ""21""
+print(circular_shift(12, 2))   # Output: ""12""
+print(circular_shift(123, 1))  # Output: ""312""
+print(circular_shift(123, 3))  # Output: ""123""
+print(circular_shift(123, 4))  # Output: ""321""
+print(circular_shift(7, 1))    # Output: ""7""
+print(circular_shift(0, 5))    # Output: ""0""",0.0,False,pass,"print(circular_shift(12, 1))   # Output: ""21""
+print(circular_shift(12, 2))   # Output: ""12""
+print(circular_shift(123, 1))  # Output: ""312""
+print(circular_shift(123, 3))  # Output: ""123""
+print(circular_shift(123, 4))  # Output: ""321""
+print(circular_shift(7, 1))    # Output: ""7""
+print(circular_shift(0, 5))    # Output: ""0""","{'task_type': 'humaneval', 'entry_point': 'circular_shift', 'exception': 'NameError'}",116,1394,1510,0.00043337,12.652651999989756,execution_error,{},,"models=qwen3.5-flash-2026-02-23,qwen3.5-plus-2026-02-15,qwen3-max-2026-01-23|budgets=0,256,1024",v2,"{'id': 'chatcmpl-dcb43790-b19d-9285-b7a9-ea0e69bef52c', 'model': 'qwen3.5-flash-2026-02-23', 'provider': 'qwen', 'tier': 'cheap', 'budget_id': 'budget-1024', 'cache_hit': False}",0.9914740768570768,False,,2026-04-26 08:17:04.808367+00:00,"{'sample_id': 'humaneval_dev_006', 'split': 'dev', 'experiment': 'jsonl_grid', 'cache_hit': False, 'selected_model_provider': 'qwen', 'selected_model_tier': 'cheap', 'selected_model_alias': 'qwen-flash'}",humaneval_dev_006,phase2_uncertainty_aware,uncertainty_aware
+57,2,humaneval_dev_007,humaneval,"
+def digitSum(s):
+    """"""Task
+    Write a function that takes a string as input and returns the sum of the upper characters only'
+    ASCII codes.
+
+    Examples:
+        digitSum("""") => 0
+        digitSum(""abAB"") => 131
+        digitSum(""abcCd"") => 67
+        digitSum(""helloE"") => 69
+        digitSum(""woArBld"") => 131
+        digitSum(""aAaaaXa"") => 153
+    """"""
+","
+def digitSum(s):
+    """"""Task
+    Write a function that takes a string as input and returns the sum of the upper characters only'
+    ASCII codes.
+
+    Examples:
+        digitSum("""") => 0
+        digitSum(""abAB"") => 131
+        digitSum(""abcCd"") => 67
+        digitSum(""helloE"") => 69
+        digitSum(""woArBld"") => 131
+        digitSum(""aAaaaXa"") => 153
+    """"""
+",humaneval,qwen3.5-flash-2026-02-23,qwen,cheap,qwen-flash,1024,budget-1024,"{'budget_id': 'budget-1024', 'effort_level': 'medium', 'max_output_tokens': 1200, 'provider_controls': {'reasoning_effort': 'medium'}, 'prompt_template_version': 'v2', 'legacy_budget': 1024}","```python
+def digitSum(s):
+    """"""Task
+    Write a function that takes a string as input and returns the sum of the upper characters only'
+    ASCII codes.
+
+    Examples:
+        digitSum("""") => 0
+        digitSum(""abAB"") => 131
+        digitSum(""abcCd"") => 67
+        digitSum(""helloE"") => 69
+        digitSum(""woArBld"") => 131
+        digitSum(""aAaaaXa"") => 153
+    """"""
+    return sum(ord(c) for c in s if c.isupper())
+```
+
+**Explanation:**
+
+- The function iterates through each character in the input string.
+- It checks whether the character is uppercase using `c.isupper()`.
+- For each uppercase character, it adds its ASCII code (obtained via `ord(c)`) to the total.
+- If there are no uppercase characters, the sum remains 0.
+
+**Verification with Examples:**
+
+| Input         | Uppercase Chars | ASCII Values     | Sum  |
+|---------------|------------------|------------------|------|
+| """"            | —                | —                | 0    |
+| ""abAB""        | A, B             | 65 + 66          | 131  |
+| ""abcCd""       | C                | 67               | 67   |
+| ""helloE""      | E                | 69               | 69   |
+| ""woArBld""     | A, B             | 65 + 66          | 131  |
+| ""aAaaaXa""     | A, X             | 65 + 88          | 153  |
+
+All test cases pass.","def digitSum(s):
+    """"""Task
+    Write a function that takes a string as input and returns the sum of the upper characters only'
+    ASCII codes.
+
+    Examples:
+        digitSum("""") => 0
+        digitSum(""abAB"") => 131
+        digitSum(""abcCd"") => 67
+        digitSum(""helloE"") => 69
+        digitSum(""woArBld"") => 131
+        digitSum(""aAaaaXa"") => 153
+    """"""
+    return sum(ord(c) for c in s if c.isupper())",1.0,True,pass,"def digitSum(s):
+    """"""Task
+    Write a function that takes a string as input and returns the sum of the upper characters only'
+    ASCII codes.
+
+    Examples:
+        digitSum("""") => 0
+        digitSum(""abAB"") => 131
+        digitSum(""abcCd"") => 67
+        digitSum(""helloE"") => 69
+        digitSum(""woArBld"") => 131
+        digitSum(""aAaaaXa"") => 153
+    """"""
+    return sum(ord(c) for c in s if c.isupper())","{'task_type': 'humaneval', 'entry_point': 'digitSum', 'tests_passed': True}",147,1000,1147,0.0003291889999999,7.682227900004364,,{},,"models=qwen3.5-flash-2026-02-23,qwen3.5-plus-2026-02-15,qwen3-max-2026-01-23|budgets=0,256,1024",v2,"{'id': 'chatcmpl-2afd1a5b-620a-9682-8d69-2293abc68266', 'model': 'qwen3.5-flash-2026-02-23', 'provider': 'qwen', 'tier': 'cheap', 'budget_id': 'budget-1024', 'cache_hit': False}",0.9879243599991177,False,,2026-04-26 08:22:10.476529+00:00,"{'sample_id': 'humaneval_dev_007', 'split': 'dev', 'experiment': 'jsonl_grid', 'cache_hit': False, 'selected_model_provider': 'qwen', 'selected_model_tier': 'cheap', 'selected_model_alias': 'qwen-flash'}",humaneval_dev_007,phase2_uncertainty_aware,uncertainty_aware
+66,2,humaneval_dev_008,humaneval,"
+def fruit_distribution(s,n):
+    """"""
+    In this task, you will be given a string that represents a number of apples and oranges 
+    that are distributed in a basket of fruit this basket contains 
+    apples, oranges, and mango fruits. Given the string that represents the total number of 
+    the oranges and apples and an integer that represent the total number of the fruits 
+    in the basket return the number of the mango fruits in the basket.
+    for examble:
+    fruit_distribution(""5 apples and 6 oranges"", 19) ->19 - 5 - 6 = 8
+    fruit_distribution(""0 apples and 1 oranges"",3) -> 3 - 0 - 1 = 2
+    fruit_distribution(""2 apples and 3 oranges"", 100) -> 100 - 2 - 3 = 95
+    fruit_distribution(""100 apples and 1 oranges"",120) -> 120 - 100 - 1 = 19
+    """"""
+","
+def fruit_distribution(s,n):
+    """"""
+    In this task, you will be given a string that represents a number of apples and oranges 
+    that are distributed in a basket of fruit this basket contains 
+    apples, oranges, and mango fruits. Given the string that represents the total number of 
+    the oranges and apples and an integer that represent the total number of the fruits 
+    in the basket return the number of the mango fruits in the basket.
+    for examble:
+    fruit_distribution(""5 apples and 6 oranges"", 19) ->19 - 5 - 6 = 8
+    fruit_distribution(""0 apples and 1 oranges"",3) -> 3 - 0 - 1 = 2
+    fruit_distribution(""2 apples and 3 oranges"", 100) -> 100 - 2 - 3 = 95
+    fruit_distribution(""100 apples and 1 oranges"",120) -> 120 - 100 - 1 = 19
+    """"""
+",humaneval,qwen3.5-flash-2026-02-23,qwen,cheap,qwen-flash,1024,budget-1024,"{'budget_id': 'budget-1024', 'effort_level': 'medium', 'max_output_tokens': 1200, 'provider_controls': {'reasoning_effort': 'medium'}, 'prompt_template_version': 'v2', 'legacy_budget': 1024}","Here's the complete solution with reasoning and verification:
+
+```python
+def fruit_distribution(s, n):
+    """"""
+    In this task, you will be given a string that represents a number of apples and oranges 
+    that are distributed in a basket of fruit this basket contains 
+    apples, oranges, and mango fruits. Given the string that represents the total number of 
+    the oranges and apples and an integer that represent the total number of the fruits 
+    in the basket return the number of the mango fruits in the basket.
+    for example:
+    fruit_distribution(""5 apples and 6 oranges"", 19) -> 19 - 5 - 6 = 8
+    fruit_distribution(""0 apples and 1 oranges"", 3) -> 3 - 0 - 1 = 2
+    fruit_distribution(""2 apples and 3 oranges"", 100) -> 100 - 2 - 3 = 95
+    fruit_distribution(""100 apples and 1 oranges"", 120) -> 120 - 100 - 1 = 19
+    """"""
+    # Extract the number of apples (first number in the string)
+    apple_count = int(s.split()[0])
+    
+    # Extract the number of oranges (number before 'oranges')
+    words = s.split()
+    orange_index = words.index('oranges')
+    orange_count = int(words[orange_index - 1])
+    
+    # Calculate mango fruits
+    mango_count = n - apple_count - orange_count
+    
+    return mango_count
+```
+
+### Reasoning:
+1. **Parse Apples:** The first token in the string is always the number of apples.
+2. **Parse Oranges:** Locate the word `'oranges'` and take the preceding token as the number of oranges.
+3. **Calculate Mangoes:** Subtract the sum of apples and oranges from the total `n`.
+
+### Verification with Examples:
+- `""5 apples and 6 oranges"", 19` → 19 - 5 - 6 = **8** ✅
+- `""0 apples and 1 oranges"", 3` → 3 - 0 - 1 = **2** ✅
+- `""2 apples and 3 oranges"", 100` → 100 - 2 - 3 = **95** ✅
+- `""100 apples and 1 oranges"", 120` → 120 - 100 - 1 = **19** ✅
+
+All test cases pass. The function correctly computes the number of mango fruits based on the provided inputs.","def fruit_distribution(s, n):
+    """"""
+    In this task, you will be given a string that represents a number of apples and oranges 
+    that are distributed in a basket of fruit this basket contains 
+    apples, oranges, and mango fruits. Given the string that represents the total number of 
+    the oranges and apples and an integer that represent the total number of the fruits 
+    in the basket return the number of the mango fruits in the basket.
+    for example:
+    fruit_distribution(""5 apples and 6 oranges"", 19) -> 19 - 5 - 6 = 8
+    fruit_distribution(""0 apples and 1 oranges"", 3) -> 3 - 0 - 1 = 2
+    fruit_distribution(""2 apples and 3 oranges"", 100) -> 100 - 2 - 3 = 95
+    fruit_distribution(""100 apples and 1 oranges"", 120) -> 120 - 100 - 1 = 19
+    """"""
+    # Extract the number of apples (first number in the string)
+    apple_count = int(s.split()[0])
+    
+    # Extract the number of oranges (number before 'oranges')
+    words = s.split()
+    orange_index = words.index('oranges')
+    orange_count = int(words[orange_index - 1])
+    
+    # Calculate mango fruits
+    mango_count = n - apple_count - orange_count
+    
+    return mango_count",1.0,True,pass,"def fruit_distribution(s, n):
+    """"""
+    In this task, you will be given a string that represents a number of apples and oranges 
+    that are distributed in a basket of fruit this basket contains 
+    apples, oranges, and mango fruits. Given the string that represents the total number of 
+    the oranges and apples and an integer that represent the total number of the fruits 
+    in the basket return the number of the mango fruits in the basket.
+    for example:
+    fruit_distribution(""5 apples and 6 oranges"", 19) -> 19 - 5 - 6 = 8
+    fruit_distribution(""0 apples and 1 oranges"", 3) -> 3 - 0 - 1 = 2
+    fruit_distribution(""2 apples and 3 oranges"", 100) -> 100 - 2 - 3 = 95
+    fruit_distribution(""100 apples and 1 oranges"", 120) -> 120 - 100 - 1 = 19
+    """"""
+    # Extract the number of apples (first number in the string)
+    apple_count = int(s.split()[0])
+    
+    # Extract the number of oranges (number before 'oranges')
+    words = s.split()
+    orange_index = words.index('oranges')
+    orange_count = int(words[orange_index - 1])
+    
+    # Calculate mango fruits
+    mango_count = n - apple_count - orange_count
+    
+    return mango_count","{'task_type': 'humaneval', 'entry_point': 'fruit_distribution', 'tests_passed': True}",253,1103,1356,0.000389172,9.548136999990676,,{},,"models=qwen3.5-flash-2026-02-23,qwen3.5-plus-2026-02-15,qwen3-max-2026-01-23|budgets=0,256,1024",v2,"{'id': 'chatcmpl-7a335ad0-7ba2-9784-9ebf-7643c86542af', 'model': 'qwen3.5-flash-2026-02-23', 'provider': 'qwen', 'tier': 'cheap', 'budget_id': 'budget-1024', 'cache_hit': False}",0.9999391423523586,False,,2026-04-26 08:34:54.212684+00:00,"{'sample_id': 'humaneval_dev_008', 'split': 'dev', 'experiment': 'jsonl_grid', 'cache_hit': False, 'selected_model_provider': 'qwen', 'selected_model_tier': 'cheap', 'selected_model_alias': 'qwen-flash'}",humaneval_dev_008,phase2_uncertainty_aware,uncertainty_aware
+75,2,humaneval_dev_009,humaneval,"
+def pluck(arr):
+    """"""
+    ""Given an array representing a branch of a tree that has non-negative integer nodes
+    your task is to pluck one of the nodes and return it.
+    The plucked node should be the node with the smallest even value.
+    If multiple nodes with the same smallest even value are found return the node that has smallest index.
+
+    The plucked node should be returned in a list, [ smalest_value, its index ],
+    If there are no even values or the given array is empty, return [].
+
+    Example 1:
+        Input: [4,2,3]
+        Output: [2, 1]
+        Explanation: 2 has the smallest even value, and 2 has the smallest index.
+
+    Example 2:
+        Input: [1,2,3]
+        Output: [2, 1]
+        Explanation: 2 has the smallest even value, and 2 has the smallest index. 
+
+    Example 3:
+        Input: []
+        Output: []
+    
+    Example 4:
+        Input: [5, 0, 3, 0, 4, 2]
+        Output: [0, 1]
+        Explanation: 0 is the smallest value, but  there are two zeros,
+                     so we will choose the first zero, which has the smallest index.
+
+    Constraints:
+        * 1 <= nodes.length <= 10000
+        * 0 <= node.value
+    """"""
+","
+def pluck(arr):
+    """"""
+    ""Given an array representing a branch of a tree that has non-negative integer nodes
+    your task is to pluck one of the nodes and return it.
+    The plucked node should be the node with the smallest even value.
+    If multiple nodes with the same smallest even value are found return the node that has smallest index.
+
+    The plucked node should be returned in a list, [ smalest_value, its index ],
+    If there are no even values or the given array is empty, return [].
+
+    Example 1:
+        Input: [4,2,3]
+        Output: [2, 1]
+        Explanation: 2 has the smallest even value, and 2 has the smallest index.
+
+    Example 2:
+        Input: [1,2,3]
+        Output: [2, 1]
+        Explanation: 2 has the smallest even value, and 2 has the smallest index. 
+
+    Example 3:
+        Input: []
+        Output: []
+    
+    Example 4:
+        Input: [5, 0, 3, 0, 4, 2]
+        Output: [0, 1]
+        Explanation: 0 is the smallest value, but  there are two zeros,
+                     so we will choose the first zero, which has the smallest index.
+
+    Constraints:
+        * 1 <= nodes.length <= 10000
+        * 0 <= node.value
+    """"""
+",humaneval,qwen3.5-flash-2026-02-23,qwen,cheap,qwen-flash,1024,budget-1024,"{'budget_id': 'budget-1024', 'effort_level': 'medium', 'max_output_tokens': 1200, 'provider_controls': {'reasoning_effort': 'medium'}, 'prompt_template_version': 'v2', 'legacy_budget': 1024}","Here's a complete and correct implementation of the `pluck` function based on your specifications:
+
+```python
+def pluck(arr):
+    """"""
+    Given an array representing a branch of a tree that has non-negative integer nodes,
+    your task is to pluck one of the nodes and return it.
+    The plucked node should be the node with the smallest even value.
+    If multiple nodes with the same smallest even value are found, return the node 
+    that has the smallest index.
+
+    The plucked node should be returned in a list, [smallest_value, its_index],
+    If there are no even values or the given array is empty, return [].
+    """"""
+    if not arr:
+        return []
+
+    min_even = None
+    min_index = -1
+
+    for i, val in enumerate(arr):
+        if val % 2 == 0:  # Check if the value is even
+            if min_even is None or val < min_even:
+                min_even = val
+                min_index = i
+
+    if min_even is None:
+        return []
+
+    return [min_even, min_index]
+```
+
+### Explanation:
+- **Empty Array Handling:** Returns `[]` immediately if the input array is empty.
+- **Even Value Search:** Iterates through the array to find all even numbers.
+- **Smallest Even Selection:** Tracks the smallest even value and its first occurrence index.
+- **No Even Values:** If no even number is found, returns `[]`.
+- **Result Format:** Returns `[value, index]` where `value` is the smallest even number and `index` is its position in the array.
+
+### Example Test Cases:
+```python
+print(pluck([4, 2, 3]))           # Output: [2, 1]
+print(pluck([1, 2, 3]))           # Output: [2, 1]
+print(pluck([]))                  # Output: []
+print(pluck([5, 0, 3, 0, 4, 2]))  # Output: [0, 1]
+print(pluck([7, 9, 11]))          # Output: []
+print(pluck([8, 6, 4, 2]))        # Output: [2, 3]
+```
+
+This solution runs in O(n) time complexity and uses O(1) extra space, making it efficient and suitable for large inputs within the given constraints.","print(pluck([4, 2, 3]))           # Output: [2, 1]
+print(pluck([1, 2, 3]))           # Output: [2, 1]
+print(pluck([]))                  # Output: []
+print(pluck([5, 0, 3, 0, 4, 2]))  # Output: [0, 1]
+print(pluck([7, 9, 11]))          # Output: []
+print(pluck([8, 6, 4, 2]))        # Output: [2, 3]",0.0,False,pass,"print(pluck([4, 2, 3]))           # Output: [2, 1]
+print(pluck([1, 2, 3]))           # Output: [2, 1]
+print(pluck([]))                  # Output: []
+print(pluck([5, 0, 3, 0, 4, 2]))  # Output: [0, 1]
+print(pluck([7, 9, 11]))          # Output: []
+print(pluck([8, 6, 4, 2]))        # Output: [2, 3]","{'task_type': 'humaneval', 'entry_point': 'pluck', 'exception': 'NameError'}",360,995,1355,0.0003888849999999,8.478324800002156,execution_error,{},,"models=qwen3.5-flash-2026-02-23,qwen3.5-plus-2026-02-15,qwen3-max-2026-01-23|budgets=0,256,1024",v2,"{'id': 'chatcmpl-a0c8fad2-0986-9269-b09c-d330bef9578c', 'model': 'qwen3.5-flash-2026-02-23', 'provider': 'qwen', 'tier': 'cheap', 'budget_id': 'budget-1024', 'cache_hit': False}",0.999901279641343,False,,2026-04-26 08:37:31.775087+00:00,"{'sample_id': 'humaneval_dev_009', 'split': 'dev', 'experiment': 'jsonl_grid', 'cache_hit': False, 'selected_model_provider': 'qwen', 'selected_model_tier': 'cheap', 'selected_model_alias': 'qwen-flash'}",humaneval_dev_009,phase2_uncertainty_aware,uncertainty_aware
+84,2,humaneval_dev_010,humaneval,"
+def search(lst):
+    '''
+    You are given a non-empty list of positive integers. Return the greatest integer that is greater than 
+    zero, and has a frequency greater than or equal to the value of the integer itself. 
+    The frequency of an integer is the number of times it appears in the list.
+    If no such a value exist, return -1.
+    Examples:
+        search([4, 1, 2, 2, 3, 1]) == 2
+        search([1, 2, 2, 3, 3, 3, 4, 4, 4]) == 3
+        search([5, 5, 4, 4, 4]) == -1
+    '''
+","
+def search(lst):
+    '''
+    You are given a non-empty list of positive integers. Return the greatest integer that is greater than 
+    zero, and has a frequency greater than or equal to the value of the integer itself. 
+    The frequency of an integer is the number of times it appears in the list.
+    If no such a value exist, return -1.
+    Examples:
+        search([4, 1, 2, 2, 3, 1]) == 2
+        search([1, 2, 2, 3, 3, 3, 4, 4, 4]) == 3
+        search([5, 5, 4, 4, 4]) == -1
+    '''
+",humaneval,qwen3.5-flash-2026-02-23,qwen,cheap,qwen-flash,1024,budget-1024,"{'budget_id': 'budget-1024', 'effort_level': 'medium', 'max_output_tokens': 1200, 'provider_controls': {'reasoning_effort': 'medium'}, 'prompt_template_version': 'v2', 'legacy_budget': 1024}","```python
+from collections import Counter
+
+def search(lst):
+    '''
+    You are given a non-empty list of positive integers. Return the greatest integer that is greater than 
+    zero, and has a frequency greater than or equal to the value of the integer itself. 
+    The frequency of an integer is the number of times it appears in the list.
+    If no such a value exist, return -1.
+    Examples:
+        search([4, 1, 2, 2, 3, 1]) == 2
+        search([1, 2, 2, 3, 3, 3, 4, 4, 4]) == 3
+        search([5, 5, 4, 4, 4]) == -1
+    '''
+    # Count the frequency of each number
+    freq = Counter(lst)
+    
+    # Find all numbers that satisfy the condition: frequency >= value
+    valid_numbers = [num for num, count in freq.items() if count >= num]
+    
+    # Return the greatest valid number, or -1 if none exist
+    return max(valid_numbers) if valid_numbers else -1
+```","from collections import Counter
+
+def search(lst):
+    '''
+    You are given a non-empty list of positive integers. Return the greatest integer that is greater than 
+    zero, and has a frequency greater than or equal to the value of the integer itself. 
+    The frequency of an integer is the number of times it appears in the list.
+    If no such a value exist, return -1.
+    Examples:
+        search([4, 1, 2, 2, 3, 1]) == 2
+        search([1, 2, 2, 3, 3, 3, 4, 4, 4]) == 3
+        search([5, 5, 4, 4, 4]) == -1
+    '''
+    # Count the frequency of each number
+    freq = Counter(lst)
+    
+    # Find all numbers that satisfy the condition: frequency >= value
+    valid_numbers = [num for num, count in freq.items() if count >= num]
+    
+    # Return the greatest valid number, or -1 if none exist
+    return max(valid_numbers) if valid_numbers else -1",1.0,True,pass,"from collections import Counter
+
+def search(lst):
+    '''
+    You are given a non-empty list of positive integers. Return the greatest integer that is greater than 
+    zero, and has a frequency greater than or equal to the value of the integer itself. 
+    The frequency of an integer is the number of times it appears in the list.
+    If no such a value exist, return -1.
+    Examples:
+        search([4, 1, 2, 2, 3, 1]) == 2
+        search([1, 2, 2, 3, 3, 3, 4, 4, 4]) == 3
+        search([5, 5, 4, 4, 4]) == -1
+    '''
+    # Count the frequency of each number
+    freq = Counter(lst)
+    
+    # Find all numbers that satisfy the condition: frequency >= value
+    valid_numbers = [num for num, count in freq.items() if count >= num]
+    
+    # Return the greatest valid number, or -1 if none exist
+    return max(valid_numbers) if valid_numbers else -1","{'task_type': 'humaneval', 'entry_point': 'search', 'tests_passed': True}",193,874,1067,0.000306229,8.50108660000842,,{},,"models=qwen3.5-flash-2026-02-23,qwen3.5-plus-2026-02-15,qwen3-max-2026-01-23|budgets=0,256,1024",v2,"{'id': 'chatcmpl-bbe83f91-d5e0-9847-bc5d-dbcba839e29e', 'model': 'qwen3.5-flash-2026-02-23', 'provider': 'qwen', 'tier': 'cheap', 'budget_id': 'budget-1024', 'cache_hit': False}",0.9992379813271058,False,,2026-04-26 08:43:42.234837+00:00,"{'sample_id': 'humaneval_dev_010', 'split': 'dev', 'experiment': 'jsonl_grid', 'cache_hit': False, 'selected_model_provider': 'qwen', 'selected_model_tier': 'cheap', 'selected_model_alias': 'qwen-flash'}",humaneval_dev_010,phase2_uncertainty_aware,uncertainty_aware
+93,2,humaneval_dev_011,humaneval,"
+def strange_sort_list(lst):
+    '''
+    Given list of integers, return list in strange order.
+    Strange sorting, is when you start with the minimum value,
+    then maximum of the remaining integers, then minimum and so on.
+
+    Examples:
+    strange_sort_list([1, 2, 3, 4]) == [1, 4, 2, 3]
+    strange_sort_list([5, 5, 5, 5]) == [5, 5, 5, 5]
+    strange_sort_list([]) == []
+    '''
+","
+def strange_sort_list(lst):
+    '''
+    Given list of integers, return list in strange order.
+    Strange sorting, is when you start with the minimum value,
+    then maximum of the remaining integers, then minimum and so on.
+
+    Examples:
+    strange_sort_list([1, 2, 3, 4]) == [1, 4, 2, 3]
+    strange_sort_list([5, 5, 5, 5]) == [5, 5, 5, 5]
+    strange_sort_list([]) == []
+    '''
+",humaneval,qwen3.5-flash-2026-02-23,qwen,cheap,qwen-flash,1024,budget-1024,"{'budget_id': 'budget-1024', 'effort_level': 'medium', 'max_output_tokens': 1200, 'provider_controls': {'reasoning_effort': 'medium'}, 'prompt_template_version': 'v2', 'legacy_budget': 1024}","Here's a complete implementation of the `strange_sort_list` function that follows the specified sorting pattern:
+
+```python
+def strange_sort_list(lst):
+    '''
+    Given list of integers, return list in strange order.
+    Strange sorting, is when you start with the minimum value,
+    then maximum of the remaining integers, then minimum and so on.
+
+    Examples:
+    strange_sort_list([1, 2, 3, 4]) == [1, 4, 2, 3]
+    strange_sort_list([5, 5, 5, 5]) == [5, 5, 5, 5]
+    strange_sort_list([]) == []
+    '''
+    if not lst:
+        return []
+    
+    result = []
+    remaining = lst.copy()
+    
+    while remaining:
+        # Append minimum
+        result.append(min(remaining))
+        remaining.remove(min(remaining))
+        
+        if remaining:
+            # Append maximum
+            result.append(max(remaining))
+            remaining.remove(max(remaining))
+    
+    return result
+```
+
+### Explanation:
+1. If the input list is empty, return an empty list immediately.
+2. Create a copy of the list to avoid modifying the original.
+3. In each iteration:
+   - Append the current minimum value to the result.
+   - Remove that value from the remaining list.
+   - If any elements remain, append the current maximum and remove it as well.
+4. Repeat until no elements remain.
+
+### Example Walkthrough:
+For `[1, 2, 3, 4]`:
+- Pick min → 1, remaining → [2, 3, 4]
+- Pick max → 4, remaining → [2, 3]
+- Pick min → 2, remaining → [3]
+- Pick max → 3, remaining → []
+Result: `[1, 4, 2, 3]`
+
+### Test Cases:
+```python
+print(strange_sort_list([1, 2, 3, 4]))      # [1, 4, 2, 3]
+print(strange_sort_list([5, 5, 5, 5]))      # [5, 5, 5, 5]
+print(strange_sort_list([]))                # []
+print(strange_sort_list([3, 1, 4, 1, 5]))   # [1, 5, 1, 4, 3]
+print(strange_sort_list([10]))              # [10]
+```
+
+This implementation correctly alternates between selecting the minimum and maximum from the remaining elements, handling edge cases such as empty lists and duplicate values appropriately.","print(strange_sort_list([1, 2, 3, 4]))      # [1, 4, 2, 3]
+print(strange_sort_list([5, 5, 5, 5]))      # [5, 5, 5, 5]
+print(strange_sort_list([]))                # []
+print(strange_sort_list([3, 1, 4, 1, 5]))   # [1, 5, 1, 4, 3]
+print(strange_sort_list([10]))              # [10]",0.0,False,pass,"print(strange_sort_list([1, 2, 3, 4]))      # [1, 4, 2, 3]
+print(strange_sort_list([5, 5, 5, 5]))      # [5, 5, 5, 5]
+print(strange_sort_list([]))                # []
+print(strange_sort_list([3, 1, 4, 1, 5]))   # [1, 5, 1, 4, 3]
+print(strange_sort_list([10]))              # [10]","{'task_type': 'humaneval', 'entry_point': 'strange_sort_list', 'exception': 'NameError'}",156,1220,1376,0.0003949119999999,11.086193700000877,execution_error,{},,"models=qwen3.5-flash-2026-02-23,qwen3.5-plus-2026-02-15,qwen3-max-2026-01-23|budgets=0,256,1024",v2,"{'id': 'chatcmpl-4915a5d2-98fc-9949-93f0-cc6314534713', 'model': 'qwen3.5-flash-2026-02-23', 'provider': 'qwen', 'tier': 'cheap', 'budget_id': 'budget-1024', 'cache_hit': False}",0.9955704000806467,False,,2026-04-26 08:46:27.459660+00:00,"{'sample_id': 'humaneval_dev_011', 'split': 'dev', 'experiment': 'jsonl_grid', 'cache_hit': False, 'selected_model_provider': 'qwen', 'selected_model_tier': 'cheap', 'selected_model_alias': 'qwen-flash'}",humaneval_dev_011,phase2_uncertainty_aware,uncertainty_aware
+102,2,humaneval_dev_012,humaneval,"
+def triangle_area(a, b, c):
+    '''
+    Given the lengths of the three sides of a triangle. Return the area of
+    the triangle rounded to 2 decimal points if the three sides form a valid triangle. 
+    Otherwise return -1
+    Three sides make a valid triangle when the sum of any two sides is greater 
+    than the third side.
+    Example:
+    triangle_area(3, 4, 5) == 6.00
+    triangle_area(1, 2, 10) == -1
+    '''
+","
+def triangle_area(a, b, c):
+    '''
+    Given the lengths of the three sides of a triangle. Return the area of
+    the triangle rounded to 2 decimal points if the three sides form a valid triangle. 
+    Otherwise return -1
+    Three sides make a valid triangle when the sum of any two sides is greater 
+    than the third side.
+    Example:
+    triangle_area(3, 4, 5) == 6.00
+    triangle_area(1, 2, 10) == -1
+    '''
+",humaneval,qwen3.5-flash-2026-02-23,qwen,cheap,qwen-flash,1024,budget-1024,"{'budget_id': 'budget-1024', 'effort_level': 'medium', 'max_output_tokens': 1200, 'provider_controls': {'reasoning_effort': 'medium'}, 'prompt_template_version': 'v2', 'legacy_budget': 1024}","```python
+import math
+
+def triangle_area(a, b, c):
+    '''
+    Given the lengths of the three sides of a triangle. Return the area of
+    the triangle rounded to 2 decimal points if the three sides form a valid triangle. 
+    Otherwise return -1
+    Three sides make a valid triangle when the sum of any two sides is greater 
+    than the third side.
+    Example:
+    triangle_area(3, 4, 5) == 6.00
+    triangle_area(1, 2, 10) == -1
+    '''
+    # Check if the sides form a valid triangle
+    if a + b > c and a + c > b and b + c > a:
+        # Calculate semi-perimeter
+        s = (a + b + c) / 2
+        # Calculate area using Heron's formula
+        area = math.sqrt(s * (s - a) * (s - b) * (s - c))
+        # Round to 2 decimal places
+        return round(area, 2)
+    else:
+        return -1
+```","import math
+
+def triangle_area(a, b, c):
+    '''
+    Given the lengths of the three sides of a triangle. Return the area of
+    the triangle rounded to 2 decimal points if the three sides form a valid triangle. 
+    Otherwise return -1
+    Three sides make a valid triangle when the sum of any two sides is greater 
+    than the third side.
+    Example:
+    triangle_area(3, 4, 5) == 6.00
+    triangle_area(1, 2, 10) == -1
+    '''
+    # Check if the sides form a valid triangle
+    if a + b > c and a + c > b and b + c > a:
+        # Calculate semi-perimeter
+        s = (a + b + c) / 2
+        # Calculate area using Heron's formula
+        area = math.sqrt(s * (s - a) * (s - b) * (s - c))
+        # Round to 2 decimal places
+        return round(area, 2)
+    else:
+        return -1",1.0,True,pass,"import math
+
+def triangle_area(a, b, c):
+    '''
+    Given the lengths of the three sides of a triangle. Return the area of
+    the triangle rounded to 2 decimal points if the three sides form a valid triangle. 
+    Otherwise return -1
+    Three sides make a valid triangle when the sum of any two sides is greater 
+    than the third side.
+    Example:
+    triangle_area(3, 4, 5) == 6.00
+    triangle_area(1, 2, 10) == -1
+    '''
+    # Check if the sides form a valid triangle
+    if a + b > c and a + c > b and b + c > a:
+        # Calculate semi-perimeter
+        s = (a + b + c) / 2
+        # Calculate area using Heron's formula
+        area = math.sqrt(s * (s - a) * (s - b) * (s - c))
+        # Round to 2 decimal places
+        return round(area, 2)
+    else:
+        return -1","{'task_type': 'humaneval', 'entry_point': 'triangle_area', 'tests_passed': True}",150,666,816,0.0002341919999999,5.947289999996428,,{},,"models=qwen3.5-flash-2026-02-23,qwen3.5-plus-2026-02-15,qwen3-max-2026-01-23|budgets=0,256,1024",v2,"{'id': 'chatcmpl-a1c359a3-d787-96ea-8109-f665402cbf50', 'model': 'qwen3.5-flash-2026-02-23', 'provider': 'qwen', 'tier': 'cheap', 'budget_id': 'budget-1024', 'cache_hit': False}",0.999329320552073,False,,2026-04-26 08:50:29.298316+00:00,"{'sample_id': 'humaneval_dev_012', 'split': 'dev', 'experiment': 'jsonl_grid', 'cache_hit': False, 'selected_model_provider': 'qwen', 'selected_model_tier': 'cheap', 'selected_model_alias': 'qwen-flash'}",humaneval_dev_012,phase2_uncertainty_aware,uncertainty_aware
+111,2,humaneval_dev_013,humaneval,"
+def will_it_fly(q,w):
+    '''
+    Write a function that returns True if the object q will fly, and False otherwise.
+    The object q will fly if it's balanced (it is a palindromic list) and the sum of its elements is less than or equal the maximum possible weight w.
+
+    Example:
+    will_it_fly([1, 2], 5) ➞ False 
+    # 1+2 is less than the maximum possible weight, but it's unbalanced.
+
+    will_it_fly([3, 2, 3], 1) ➞ False
+    # it's balanced, but 3+2+3 is more than the maximum possible weight.
+
+    will_it_fly([3, 2, 3], 9) ➞ True
+    # 3+2+3 is less than the maximum possible weight, and it's balanced.
+
+    will_it_fly([3], 5) ➞ True
+    # 3 is less than the maximum possible weight, and it's balanced.
+    '''
+","
+def will_it_fly(q,w):
+    '''
+    Write a function that returns True if the object q will fly, and False otherwise.
+    The object q will fly if it's balanced (it is a palindromic list) and the sum of its elements is less than or equal the maximum possible weight w.
+
+    Example:
+    will_it_fly([1, 2], 5) ➞ False 
+    # 1+2 is less than the maximum possible weight, but it's unbalanced.
+
+    will_it_fly([3, 2, 3], 1) ➞ False
+    # it's balanced, but 3+2+3 is more than the maximum possible weight.
+
+    will_it_fly([3, 2, 3], 9) ➞ True
+    # 3+2+3 is less than the maximum possible weight, and it's balanced.
+
+    will_it_fly([3], 5) ➞ True
+    # 3 is less than the maximum possible weight, and it's balanced.
+    '''
+",humaneval,qwen3.5-flash-2026-02-23,qwen,cheap,qwen-flash,1024,budget-1024,"{'budget_id': 'budget-1024', 'effort_level': 'medium', 'max_output_tokens': 1200, 'provider_controls': {'reasoning_effort': 'medium'}, 'prompt_template_version': 'v2', 'legacy_budget': 1024}","```python
+def will_it_fly(q, w):
+    '''
+    Write a function that returns True if the object q will fly, and False otherwise.
+    The object q will fly if it's balanced (it is a palindromic list) and the sum of its elements is less than or equal the maximum possible weight w.
+
+    Example:
+    will_it_fly([1, 2], 5) ➞ False 
+    # 1+2 is less than the maximum possible weight, but it's unbalanced.
+
+    will_it_fly([3, 2, 3], 1) ➞ False
+    # it's balanced, but 3+2+3 is more than the maximum possible weight.
+
+    will_it_fly([3, 2, 3], 9) ➞ True
+    # 3+2+3 is less than the maximum possible weight, and it's balanced.
+
+    will_it_fly([3], 5) ➞ True
+    # 3 is less than the maximum possible weight, and it's balanced.
+    '''
+    # Check if q is balanced (palindrome) AND sum is <= w
+    is_balanced = q == q[::-1]
+    weight_ok = sum(q) <= w
+    return is_balanced and weight_ok
+```","def will_it_fly(q, w):
+    '''
+    Write a function that returns True if the object q will fly, and False otherwise.
+    The object q will fly if it's balanced (it is a palindromic list) and the sum of its elements is less than or equal the maximum possible weight w.
+
+    Example:
+    will_it_fly([1, 2], 5) ➞ False 
+    # 1+2 is less than the maximum possible weight, but it's unbalanced.
+
+    will_it_fly([3, 2, 3], 1) ➞ False
+    # it's balanced, but 3+2+3 is more than the maximum possible weight.
+
+    will_it_fly([3, 2, 3], 9) ➞ True
+    # 3+2+3 is less than the maximum possible weight, and it's balanced.
+
+    will_it_fly([3], 5) ➞ True
+    # 3 is less than the maximum possible weight, and it's balanced.
+    '''
+    # Check if q is balanced (palindrome) AND sum is <= w
+    is_balanced = q == q[::-1]
+    weight_ok = sum(q) <= w
+    return is_balanced and weight_ok",1.0,True,pass,"def will_it_fly(q, w):
+    '''
+    Write a function that returns True if the object q will fly, and False otherwise.
+    The object q will fly if it's balanced (it is a palindromic list) and the sum of its elements is less than or equal the maximum possible weight w.
+
+    Example:
+    will_it_fly([1, 2], 5) ➞ False 
+    # 1+2 is less than the maximum possible weight, but it's unbalanced.
+
+    will_it_fly([3, 2, 3], 1) ➞ False
+    # it's balanced, but 3+2+3 is more than the maximum possible weight.
+
+    will_it_fly([3, 2, 3], 9) ➞ True
+    # 3+2+3 is less than the maximum possible weight, and it's balanced.
+
+    will_it_fly([3], 5) ➞ True
+    # 3 is less than the maximum possible weight, and it's balanced.
+    '''
+    # Check if q is balanced (palindrome) AND sum is <= w
+    is_balanced = q == q[::-1]
+    weight_ok = sum(q) <= w
+    return is_balanced and weight_ok","{'task_type': 'humaneval', 'entry_point': 'will_it_fly', 'tests_passed': True}",262,667,929,0.000266623,6.82833920000121,,{},,"models=qwen3.5-flash-2026-02-23,qwen3.5-plus-2026-02-15,qwen3-max-2026-01-23|budgets=0,256,1024",v2,"{'id': 'chatcmpl-9c6ecfd8-8f8c-919c-b77c-762c97ff0940', 'model': 'qwen3.5-flash-2026-02-23', 'provider': 'qwen', 'tier': 'cheap', 'budget_id': 'budget-1024', 'cache_hit': False}",0.999527677762556,False,,2026-04-26 08:53:35.467604+00:00,"{'sample_id': 'humaneval_dev_013', 'split': 'dev', 'experiment': 'jsonl_grid', 'cache_hit': False, 'selected_model_provider': 'qwen', 'selected_model_tier': 'cheap', 'selected_model_alias': 'qwen-flash'}",humaneval_dev_013,phase2_uncertainty_aware,uncertainty_aware
+120,2,humaneval_dev_014,humaneval,"
+def smallest_change(arr):
+    """"""
+    Given an array arr of integers, find the minimum number of elements that
+    need to be changed to make the array palindromic. A palindromic array is an array that
+    is read the same backwards and forwards. In one change, you can change one element to any other element.
+
+    For example:
+    smallest_change([1,2,3,5,4,7,9,6]) == 4
+    smallest_change([1, 2, 3, 4, 3, 2, 2]) == 1
+    smallest_change([1, 2, 3, 2, 1]) == 0
+    """"""
+","
+def smallest_change(arr):
+    """"""
+    Given an array arr of integers, find the minimum number of elements that
+    need to be changed to make the array palindromic. A palindromic array is an array that
+    is read the same backwards and forwards. In one change, you can change one element to any other element.
+
+    For example:
+    smallest_change([1,2,3,5,4,7,9,6]) == 4
+    smallest_change([1, 2, 3, 4, 3, 2, 2]) == 1
+    smallest_change([1, 2, 3, 2, 1]) == 0
+    """"""
+",humaneval,qwen3.5-flash-2026-02-23,qwen,cheap,qwen-flash,1024,budget-1024,"{'budget_id': 'budget-1024', 'effort_level': 'medium', 'max_output_tokens': 1200, 'provider_controls': {'reasoning_effort': 'medium'}, 'prompt_template_version': 'v2', 'legacy_budget': 1024}","```python
+def smallest_change(arr):
+    """"""
+    Given an array arr of integers, find the minimum number of elements that
+    need to be changed to make the array palindromic. A palindromic array is an array that
+    is read the same backwards and forwards. In one change, you can change one element to any other element.
+
+    For example:
+    smallest_change([1,2,3,5,4,7,9,6]) == 4
+    smallest_change([1, 2, 3, 4, 3, 2, 2]) == 1
+    smallest_change([1, 2, 3, 2, 1]) == 0
+    """"""
+    n = len(arr)
+    changes = 0
+    
+    # Compare elements from both ends moving toward the center
+    for i in range(n // 2):
+        if arr[i] != arr[n - 1 - i]:
+            changes += 1
+    
+    return changes
+```
+
+**Explanation:**
+
+To make an array palindromic, each element at index `i` must match the element at index `n - 1 - i`. We iterate through the first half of the array and compare each element with its corresponding mirror from the end. Each mismatch requires one change. The middle element (in odd-length arrays) does not need to be paired and thus contributes zero to the change count.
+
+**Time Complexity:** O(n)  
+**Space Complexity:** O(1)","def smallest_change(arr):
+    """"""
+    Given an array arr of integers, find the minimum number of elements that
+    need to be changed to make the array palindromic. A palindromic array is an array that
+    is read the same backwards and forwards. In one change, you can change one element to any other element.
+
+    For example:
+    smallest_change([1,2,3,5,4,7,9,6]) == 4
+    smallest_change([1, 2, 3, 4, 3, 2, 2]) == 1
+    smallest_change([1, 2, 3, 2, 1]) == 0
+    """"""
+    n = len(arr)
+    changes = 0
+    
+    # Compare elements from both ends moving toward the center
+    for i in range(n // 2):
+        if arr[i] != arr[n - 1 - i]:
+            changes += 1
+    
+    return changes",1.0,True,pass,"def smallest_change(arr):
+    """"""
+    Given an array arr of integers, find the minimum number of elements that
+    need to be changed to make the array palindromic. A palindromic array is an array that
+    is read the same backwards and forwards. In one change, you can change one element to any other element.
+
+    For example:
+    smallest_change([1,2,3,5,4,7,9,6]) == 4
+    smallest_change([1, 2, 3, 4, 3, 2, 2]) == 1
+    smallest_change([1, 2, 3, 2, 1]) == 0
+    """"""
+    n = len(arr)
+    changes = 0
+    
+    # Compare elements from both ends moving toward the center
+    for i in range(n // 2):
+        if arr[i] != arr[n - 1 - i]:
+            changes += 1
+    
+    return changes","{'task_type': 'humaneval', 'entry_point': 'smallest_change', 'tests_passed': True}",184,931,1115,0.000320005,7.968173900007969,,{},,"models=qwen3.5-flash-2026-02-23,qwen3.5-plus-2026-02-15,qwen3-max-2026-01-23|budgets=0,256,1024",v2,"{'id': 'chatcmpl-1456be81-2bf3-9fda-89cd-bd282181aebd', 'model': 'qwen3.5-flash-2026-02-23', 'provider': 'qwen', 'tier': 'cheap', 'budget_id': 'budget-1024', 'cache_hit': False}",0.9992277183414232,False,,2026-04-26 09:05:47.266681+00:00,"{'sample_id': 'humaneval_dev_014', 'split': 'dev', 'experiment': 'jsonl_grid', 'cache_hit': False, 'selected_model_provider': 'qwen', 'selected_model_tier': 'cheap', 'selected_model_alias': 'qwen-flash'}",humaneval_dev_014,phase2_uncertainty_aware,uncertainty_aware
+129,2,humaneval_dev_015,humaneval,"
+def total_match(lst1, lst2):
+    '''
+    Write a function that accepts two lists of strings and returns the list that has 
+    total number of chars in the all strings of the list less than the other list.
+
+    if the two lists have the same number of chars, return the first list.
+
+    Examples
+    total_match([], []) ➞ []
+    total_match(['hi', 'admin'], ['hI', 'Hi']) ➞ ['hI', 'Hi']
+    total_match(['hi', 'admin'], ['hi', 'hi', 'admin', 'project']) ➞ ['hi', 'admin']
+    total_match(['hi', 'admin'], ['hI', 'hi', 'hi']) ➞ ['hI', 'hi', 'hi']
+    total_match(['4'], ['1', '2', '3', '4', '5']) ➞ ['4']
+    '''
+","
+def total_match(lst1, lst2):
+    '''
+    Write a function that accepts two lists of strings and returns the list that has 
+    total number of chars in the all strings of the list less than the other list.
+
+    if the two lists have the same number of chars, return the first list.
+
+    Examples
+    total_match([], []) ➞ []
+    total_match(['hi', 'admin'], ['hI', 'Hi']) ➞ ['hI', 'Hi']
+    total_match(['hi', 'admin'], ['hi', 'hi', 'admin', 'project']) ➞ ['hi', 'admin']
+    total_match(['hi', 'admin'], ['hI', 'hi', 'hi']) ➞ ['hI', 'hi', 'hi']
+    total_match(['4'], ['1', '2', '3', '4', '5']) ➞ ['4']
+    '''
+",humaneval,qwen3.5-flash-2026-02-23,qwen,cheap,qwen-flash,1024,budget-1024,"{'budget_id': 'budget-1024', 'effort_level': 'medium', 'max_output_tokens': 1200, 'provider_controls': {'reasoning_effort': 'medium'}, 'prompt_template_version': 'v2', 'legacy_budget': 1024}","```python
+def total_match(lst1, lst2):
+    '''
+    Write a function that accepts two lists of strings and returns the list that has 
+    total number of chars in the all strings of the list less than the other list.
+
+    if the two lists have the same number of chars, return the first list.
+
+    Examples
+    total_match([], []) ➞ []
+    total_match(['hi', 'admin'], ['hI', 'Hi']) ➞ ['hI', 'Hi']
+    total_match(['hi', 'admin'], ['hi', 'hi', 'admin', 'project']) ➞ ['hi', 'admin']
+    total_match(['hi', 'admin'], ['hI', 'hi', 'hi']) ➞ ['hI', 'hi', 'hi']
+    total_match(['4'], ['1', '2', '3', '4', '5']) ➞ ['4']
+    '''
+    # Calculate total characters in lst1
+    total_chars1 = sum(len(s) for s in lst1)
+    
+    # Calculate total characters in lst2
+    total_chars2 = sum(len(s) for s in lst2)
+    
+    # Return the list with fewer characters, or lst1 if equal
+    if total_chars1 <= total_chars2:
+        return lst1
+    else:
+        return lst2
+```","def total_match(lst1, lst2):
+    '''
+    Write a function that accepts two lists of strings and returns the list that has 
+    total number of chars in the all strings of the list less than the other list.
+
+    if the two lists have the same number of chars, return the first list.
+
+    Examples
+    total_match([], []) ➞ []
+    total_match(['hi', 'admin'], ['hI', 'Hi']) ➞ ['hI', 'Hi']
+    total_match(['hi', 'admin'], ['hi', 'hi', 'admin', 'project']) ➞ ['hi', 'admin']
+    total_match(['hi', 'admin'], ['hI', 'hi', 'hi']) ➞ ['hI', 'hi', 'hi']
+    total_match(['4'], ['1', '2', '3', '4', '5']) ➞ ['4']
+    '''
+    # Calculate total characters in lst1
+    total_chars1 = sum(len(s) for s in lst1)
+    
+    # Calculate total characters in lst2
+    total_chars2 = sum(len(s) for s in lst2)
+    
+    # Return the list with fewer characters, or lst1 if equal
+    if total_chars1 <= total_chars2:
+        return lst1
+    else:
+        return lst2",1.0,True,pass,"def total_match(lst1, lst2):
+    '''
+    Write a function that accepts two lists of strings and returns the list that has 
+    total number of chars in the all strings of the list less than the other list.
+
+    if the two lists have the same number of chars, return the first list.
+
+    Examples
+    total_match([], []) ➞ []
+    total_match(['hi', 'admin'], ['hI', 'Hi']) ➞ ['hI', 'Hi']
+    total_match(['hi', 'admin'], ['hi', 'hi', 'admin', 'project']) ➞ ['hi', 'admin']
+    total_match(['hi', 'admin'], ['hI', 'hi', 'hi']) ➞ ['hI', 'hi', 'hi']
+    total_match(['4'], ['1', '2', '3', '4', '5']) ➞ ['4']
+    '''
+    # Calculate total characters in lst1
+    total_chars1 = sum(len(s) for s in lst1)
+    
+    # Calculate total characters in lst2
+    total_chars2 = sum(len(s) for s in lst2)
+    
+    # Return the list with fewer characters, or lst1 if equal
+    if total_chars1 <= total_chars2:
+        return lst1
+    else:
+        return lst2","{'task_type': 'humaneval', 'entry_point': 'total_match', 'tests_passed': True}",225,891,1116,0.000320292,7.26328279999143,,{},,"models=qwen3.5-flash-2026-02-23,qwen3.5-plus-2026-02-15,qwen3-max-2026-01-23|budgets=0,256,1024",v2,"{'id': 'chatcmpl-1fec99ca-d1c4-97af-b9fb-b4052282c15c', 'model': 'qwen3.5-flash-2026-02-23', 'provider': 'qwen', 'tier': 'cheap', 'budget_id': 'budget-1024', 'cache_hit': False}",0.9999148997715895,False,,2026-04-26 09:08:33.695589+00:00,"{'sample_id': 'humaneval_dev_015', 'split': 'dev', 'experiment': 'jsonl_grid', 'cache_hit': False, 'selected_model_provider': 'qwen', 'selected_model_tier': 'cheap', 'selected_model_alias': 'qwen-flash'}",humaneval_dev_015,phase2_uncertainty_aware,uncertainty_aware
+138,2,humaneval_dev_016,humaneval,"
+def is_multiply_prime(a):
+    """"""Write a function that returns true if the given number is the multiplication of 3 prime numbers
+    and false otherwise.
+    Knowing that (a) is less then 100. 
+    Example:
+    is_multiply_prime(30) == True
+    30 = 2 * 3 * 5
+    """"""
+","
+def is_multiply_prime(a):
+    """"""Write a function that returns true if the given number is the multiplication of 3 prime numbers
+    and false otherwise.
+    Knowing that (a) is less then 100. 
+    Example:
+    is_multiply_prime(30) == True
+    30 = 2 * 3 * 5
+    """"""
+",humaneval,qwen3.5-flash-2026-02-23,qwen,cheap,qwen-flash,1024,budget-1024,"{'budget_id': 'budget-1024', 'effort_level': 'medium', 'max_output_tokens': 1200, 'provider_controls': {'reasoning_effort': 'medium'}, 'prompt_template_version': 'v2', 'legacy_budget': 1024}","Here's the corrected and complete implementation of the function that determines whether a given number is the product of exactly three prime numbers (counting multiplicity), assuming the input is less than 100:
+
+```python
+def is_multiply_prime(a):
+    """"""Returns True if the given number is the multiplication of 3 prime numbers,
+    and False otherwise. Knowing that (a) is less than 100.""""""
+    
+    if a < 2:
+        return False
+
+    count = 0
+    n = a
+
+    # Count factor 2
+    while n % 2 == 0:
+        count += 1
+        n //= 2
+
+    # Count odd prime factors
+    i = 3
+    while i * i <= n:
+        while n % i == 0:
+            count += 1
+            n //= i
+        i += 2
+
+    # If remaining n is a prime
+    if n > 1:
+        count += 1
+
+    return count == 3
+```
+
+### Explanation:
+- The function counts all prime factors of `a`, including repetitions.
+- It returns `True` only if the total number of prime factors is exactly 3.
+- This includes cases like 8 = 2 × 2 × 2, where the same prime appears multiple times.
+
+### Test Cases:
+```python
+print(is_multiply_prime(30))  # True (2 * 3 * 5)
+print(is_multiply_prime(8))   # True (2 * 2 * 2)
+print(is_multiply_prime(12))  # True (2 * 2 * 3)
+print(is_multiply_prime(6))   # False (2 * 3)
+print(is_multiply_prime(7))   # False (7)
+print(is_multiply_prime(1))   # False
+print(is_multiply_prime(100)) # False (2 * 2 * 5 * 5)
+```
+
+This implementation correctly handles all valid inputs under 100 and accurately identifies numbers that are the product of exactly three prime factors.","print(is_multiply_prime(30))  # True (2 * 3 * 5)
+print(is_multiply_prime(8))   # True (2 * 2 * 2)
+print(is_multiply_prime(12))  # True (2 * 2 * 3)
+print(is_multiply_prime(6))   # False (2 * 3)
+print(is_multiply_prime(7))   # False (7)
+print(is_multiply_prime(1))   # False
+print(is_multiply_prime(100)) # False (2 * 2 * 5 * 5)",0.0,False,pass,"print(is_multiply_prime(30))  # True (2 * 3 * 5)
+print(is_multiply_prime(8))   # True (2 * 2 * 2)
+print(is_multiply_prime(12))  # True (2 * 2 * 3)
+print(is_multiply_prime(6))   # False (2 * 3)
+print(is_multiply_prime(7))   # False (7)
+print(is_multiply_prime(1))   # False
+print(is_multiply_prime(100)) # False (2 * 2 * 5 * 5)","{'task_type': 'humaneval', 'entry_point': 'is_multiply_prime', 'exception': 'NameError'}",109,1052,1161,0.0003332069999999,7.927947000003769,execution_error,{},,"models=qwen3.5-flash-2026-02-23,qwen3.5-plus-2026-02-15,qwen3-max-2026-01-23|budgets=0,256,1024",v2,"{'id': 'chatcmpl-be23e9f3-7ccb-9af3-82bb-1a4ee198e635', 'model': 'qwen3.5-flash-2026-02-23', 'provider': 'qwen', 'tier': 'cheap', 'budget_id': 'budget-1024', 'cache_hit': False}",0.9966266687673409,False,,2026-04-26 09:12:42.977181+00:00,"{'sample_id': 'humaneval_dev_016', 'split': 'dev', 'experiment': 'jsonl_grid', 'cache_hit': False, 'selected_model_provider': 'qwen', 'selected_model_tier': 'cheap', 'selected_model_alias': 'qwen-flash'}",humaneval_dev_016,phase2_uncertainty_aware,uncertainty_aware
+147,2,humaneval_dev_017,humaneval,"
+def is_simple_power(x, n):
+    """"""Your task is to write a function that returns true if a number x is a simple
+    power of n and false in other cases.
+    x is a simple power of n if n**int=x
+    For example:
+    is_simple_power(1, 4) => true
+    is_simple_power(2, 2) => true
+    is_simple_power(8, 2) => true
+    is_simple_power(3, 2) => false
+    is_simple_power(3, 1) => false
+    is_simple_power(5, 3) => false
+    """"""
+","
+def is_simple_power(x, n):
+    """"""Your task is to write a function that returns true if a number x is a simple
+    power of n and false in other cases.
+    x is a simple power of n if n**int=x
+    For example:
+    is_simple_power(1, 4) => true
+    is_simple_power(2, 2) => true
+    is_simple_power(8, 2) => true
+    is_simple_power(3, 2) => false
+    is_simple_power(3, 1) => false
+    is_simple_power(5, 3) => false
+    """"""
+",humaneval,qwen3.5-flash-2026-02-23,qwen,cheap,qwen-flash,1024,budget-1024,"{'budget_id': 'budget-1024', 'effort_level': 'medium', 'max_output_tokens': 1200, 'provider_controls': {'reasoning_effort': 'medium'}, 'prompt_template_version': 'v2', 'legacy_budget': 1024}","Here's a complete and correct implementation of the `is_simple_power` function based on your requirements:
+
+```python
+def is_simple_power(x, n):
+    """"""Returns True if x is a simple power of n (i.e., x = n**k for some integer k >= 0),
+    otherwise returns False.""""""
+    
+    # Special case: n = 0
+    if n == 0:
+        return x == 0  # Only 0^k = 0 for k > 0; 0^0 is undefined
+
+    # Special case: n = 1
+    if n == 1:
+        return x == 1  # 1^k = 1 for all k
+
+    # Special case: x = 1
+    if x == 1:
+        return True  # n^0 = 1 for any valid n
+
+    # Invalid cases: negative or zero base/exponent combinations
+    if x <= 0 or n <= 0:
+        return False
+
+    # Repeatedly divide x by n to check if it reduces to 1
+    while x % n == 0:
+        x //= n
+        if x == 1:
+            return True
+
+    return False
+```
+
+### Explanation:
+- **Edge Cases:**
+  - If `n == 0`, only `x == 0` qualifies (since 0^k = 0 for k > 0).
+  - If `n == 1`, only `x == 1` qualifies (since 1^k = 1 for all k).
+  - If `x == 1`, it's always a power (`n^0 = 1`) unless `n == 0`.
+  - Negative values for `x` or `n` are invalid in this context.
+
+- **General Case:**
+  - While `x` is divisible by `n`, divide it.
+  - If `x` becomes 1, then it was a power of `n`.
+  - Otherwise, it's not a simple power.
+
+### Example Test Cases:
+```python
+print(is_simple_power(1, 4))   # True  (4^0 = 1)
+print(is_simple_power(2, 2))   # True  (2^1 = 2)
+print(is_simple_power(8, 2))   # True  (2^3 = 8)
+print(is_simple_power(3, 2))   # False
+print(is_simple_power(3, 1))   # False
+print(is_simple_power(5, 3))   # False
+print(is_simple_power(0, 0))   # True  (0^k = 0 for k > 0)
+print(is_simple_power(16, 2))  # True  (2^4 = 16)
+print(is_simple_power(9, 3))   # True  (3^2 = 9)
+print(is_simple_power(7, 2))   # False
+```
+
+This function correctly handles all specified conditions and edge cases using an efficient iterative method.","print(is_simple_power(1, 4))   # True  (4^0 = 1)
+print(is_simple_power(2, 2))   # True  (2^1 = 2)
+print(is_simple_power(8, 2))   # True  (2^3 = 8)
+print(is_simple_power(3, 2))   # False
+print(is_simple_power(3, 1))   # False
+print(is_simple_power(5, 3))   # False
+print(is_simple_power(0, 0))   # True  (0^k = 0 for k > 0)
+print(is_simple_power(16, 2))  # True  (2^4 = 16)
+print(is_simple_power(9, 3))   # True  (3^2 = 9)
+print(is_simple_power(7, 2))   # False",0.0,False,pass,"print(is_simple_power(1, 4))   # True  (4^0 = 1)
+print(is_simple_power(2, 2))   # True  (2^1 = 2)
+print(is_simple_power(8, 2))   # True  (2^3 = 8)
+print(is_simple_power(3, 2))   # False
+print(is_simple_power(3, 1))   # False
+print(is_simple_power(5, 3))   # False
+print(is_simple_power(0, 0))   # True  (0^k = 0 for k > 0)
+print(is_simple_power(16, 2))  # True  (2^4 = 16)
+print(is_simple_power(9, 3))   # True  (3^2 = 9)
+print(is_simple_power(7, 2))   # False","{'task_type': 'humaneval', 'entry_point': 'is_simple_power', 'exception': 'NameError'}",168,1376,1544,0.000443128,11.77856169998995,execution_error,{},,"models=qwen3.5-flash-2026-02-23,qwen3.5-plus-2026-02-15,qwen3-max-2026-01-23|budgets=0,256,1024",v2,"{'id': 'chatcmpl-b301f3b7-3837-9e04-9e82-0de7ef437711', 'model': 'qwen3.5-flash-2026-02-23', 'provider': 'qwen', 'tier': 'cheap', 'budget_id': 'budget-1024', 'cache_hit': False}",0.9955116278371965,False,,2026-04-26 09:18:09.640141+00:00,"{'sample_id': 'humaneval_dev_017', 'split': 'dev', 'experiment': 'jsonl_grid', 'cache_hit': False, 'selected_model_provider': 'qwen', 'selected_model_tier': 'cheap', 'selected_model_alias': 'qwen-flash'}",humaneval_dev_017,phase2_uncertainty_aware,uncertainty_aware
+156,2,humaneval_dev_018,humaneval,"
+def iscube(a):
+    '''
+    Write a function that takes an integer a and returns True 
+    if this ingeger is a cube of some integer number.
+    Note: you may assume the input is always valid.
+    Examples:
+    iscube(1) ==> True
+    iscube(2) ==> False
+    iscube(-1) ==> True
+    iscube(64) ==> True
+    iscube(0) ==> True
+    iscube(180) ==> False
+    '''
+","
+def iscube(a):
+    '''
+    Write a function that takes an integer a and returns True 
+    if this ingeger is a cube of some integer number.
+    Note: you may assume the input is always valid.
+    Examples:
+    iscube(1) ==> True
+    iscube(2) ==> False
+    iscube(-1) ==> True
+    iscube(64) ==> True
+    iscube(0) ==> True
+    iscube(180) ==> False
+    '''
+",humaneval,qwen3.5-flash-2026-02-23,qwen,cheap,qwen-flash,1024,budget-1024,"{'budget_id': 'budget-1024', 'effort_level': 'medium', 'max_output_tokens': 1200, 'provider_controls': {'reasoning_effort': 'medium'}, 'prompt_template_version': 'v2', 'legacy_budget': 1024}","```python
+def iscube(a):
+    '''
+    Write a function that takes an integer a and returns True 
+    if this integer is a cube of some integer number.
+    Note: you may assume the input is always valid.
+    Examples:
+    iscube(1) ==> True
+    iscube(2) ==> False
+    iscube(-1) ==> True
+    iscube(64) ==> True
+    iscube(0) ==> True
+    iscube(180) ==> False
+    '''
+    # Handle zero explicitly
+    if a == 0:
+        return True
+    
+    # Work with absolute value to handle negative numbers
+    abs_a = abs(a)
+    
+    # Calculate approximate cube root
+    cube_root = round(abs_a ** (1/3))
+    
+    # Check if cubing the rounded root gives us back the original absolute value
+    return cube_root ** 3 == abs_a
+```
+
+**Explanation:**
+
+1. **Zero Case:** `0` is a perfect cube (`0³ = 0`), so we return `True` immediately.
+2. **Negative Numbers:** We take the absolute value since `(-n)³ = -(n³)`. If the absolute value is a perfect cube, the original number is also a perfect cube.
+3. **Cube Root Calculation:** We compute the cube root using exponentiation and round it to the nearest integer.
+4. **Verification:** We cube the rounded root and compare it to the original absolute value. If they match, the number is a perfect cube.
+
+**Example Traces:**
+- `iscube(64)` → `abs(64)=64`, `round(64^(1/3))=4`, `4³=64` → `True`
+- `iscube(-1)` → `abs(-1)=1`, `round(1^(1/3))=1`, `1³=1` → `True`
+- `iscube(180)` → `abs(180)=180`, `round(180^(1/3))≈6`, `6³=216≠180` → `False`
+
+This method is efficient and avoids potential floating-point inaccuracies by verifying the result through integer arithmetic.","def iscube(a):
+    '''
+    Write a function that takes an integer a and returns True 
+    if this integer is a cube of some integer number.
+    Note: you may assume the input is always valid.
+    Examples:
+    iscube(1) ==> True
+    iscube(2) ==> False
+    iscube(-1) ==> True
+    iscube(64) ==> True
+    iscube(0) ==> True
+    iscube(180) ==> False
+    '''
+    # Handle zero explicitly
+    if a == 0:
+        return True
+    
+    # Work with absolute value to handle negative numbers
+    abs_a = abs(a)
+    
+    # Calculate approximate cube root
+    cube_root = round(abs_a ** (1/3))
+    
+    # Check if cubing the rounded root gives us back the original absolute value
+    return cube_root ** 3 == abs_a",1.0,True,pass,"def iscube(a):
+    '''
+    Write a function that takes an integer a and returns True 
+    if this integer is a cube of some integer number.
+    Note: you may assume the input is always valid.
+    Examples:
+    iscube(1) ==> True
+    iscube(2) ==> False
+    iscube(-1) ==> True
+    iscube(64) ==> True
+    iscube(0) ==> True
+    iscube(180) ==> False
+    '''
+    # Handle zero explicitly
+    if a == 0:
+        return True
+    
+    # Work with absolute value to handle negative numbers
+    abs_a = abs(a)
+    
+    # Calculate approximate cube root
+    cube_root = round(abs_a ** (1/3))
+    
+    # Check if cubing the rounded root gives us back the original absolute value
+    return cube_root ** 3 == abs_a","{'task_type': 'humaneval', 'entry_point': 'iscube', 'tests_passed': True}",141,1061,1202,0.0003449739999999,10.112986799998907,,{},,"models=qwen3.5-flash-2026-02-23,qwen3.5-plus-2026-02-15,qwen3-max-2026-01-23|budgets=0,256,1024",v2,"{'id': 'chatcmpl-96271d76-08db-9687-8ca0-e8f1887d76b9', 'model': 'qwen3.5-flash-2026-02-23', 'provider': 'qwen', 'tier': 'cheap', 'budget_id': 'budget-1024', 'cache_hit': False}",0.9980584625207046,False,,2026-04-26 09:25:18.501200+00:00,"{'sample_id': 'humaneval_dev_018', 'split': 'dev', 'experiment': 'jsonl_grid', 'cache_hit': False, 'selected_model_provider': 'qwen', 'selected_model_tier': 'cheap', 'selected_model_alias': 'qwen-flash'}",humaneval_dev_018,phase2_uncertainty_aware,uncertainty_aware
+165,2,humaneval_dev_019,humaneval,"
+def hex_key(num):
+    """"""You have been tasked to write a function that receives 
+    a hexadecimal number as a string and counts the number of hexadecimal 
+    digits that are primes (prime number, or a prime, is a natural number 
+    greater than 1 that is not a product of two smaller natural numbers).
+    Hexadecimal digits are 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, A, B, C, D, E, F.
+    Prime numbers are 2, 3, 5, 7, 11, 13, 17,...
+    So you have to determine a number of the following digits: 2, 3, 5, 7, 
+    B (=decimal 11), D (=decimal 13).
+    Note: you may assume the input is always correct or empty string, 
+    and symbols A,B,C,D,E,F are always uppercase.
+    Examples:
+    For num = ""AB"" the output should be 1.
+    For num = ""1077E"" the output should be 2.
+    For num = ""ABED1A33"" the output should be 4.
+    For num = ""123456789ABCDEF0"" the output should be 6.
+    For num = ""2020"" the output should be 2.
+    """"""
+","
+def hex_key(num):
+    """"""You have been tasked to write a function that receives 
+    a hexadecimal number as a string and counts the number of hexadecimal 
+    digits that are primes (prime number, or a prime, is a natural number 
+    greater than 1 that is not a product of two smaller natural numbers).
+    Hexadecimal digits are 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, A, B, C, D, E, F.
+    Prime numbers are 2, 3, 5, 7, 11, 13, 17,...
+    So you have to determine a number of the following digits: 2, 3, 5, 7, 
+    B (=decimal 11), D (=decimal 13).
+    Note: you may assume the input is always correct or empty string, 
+    and symbols A,B,C,D,E,F are always uppercase.
+    Examples:
+    For num = ""AB"" the output should be 1.
+    For num = ""1077E"" the output should be 2.
+    For num = ""ABED1A33"" the output should be 4.
+    For num = ""123456789ABCDEF0"" the output should be 6.
+    For num = ""2020"" the output should be 2.
+    """"""
+",humaneval,qwen3.5-flash-2026-02-23,qwen,cheap,qwen-flash,1024,budget-1024,"{'budget_id': 'budget-1024', 'effort_level': 'medium', 'max_output_tokens': 1200, 'provider_controls': {'reasoning_effort': 'medium'}, 'prompt_template_version': 'v2', 'legacy_budget': 1024}","Here's the complete implementation of the `hex_key` function, which counts how many characters in a hexadecimal string represent prime numbers:
+
+```python
+def hex_key(num):
+    """"""Counts the number of hexadecimal digits that are prime.
+    
+    Prime hexadecimal digits are: 2, 3, 5, 7, B (11), D (13).
+    Input is assumed to be valid and uppercase where applicable.
+    """"""
+    prime_hex_digits = {'2', '3', '5', '7', 'B', 'D'}
+    return sum(1 for digit in num if digit in prime_hex_digits)
+```
+
+### Explanation:
+- The function uses a set of known prime hexadecimal digits: `'2'`, `'3'`, `'5'`, `'7'`, `'B'`, and `'D'`.
+- It iterates over each character in the input string and increments a counter if the character is in the set.
+- This approach is efficient and handles all provided test cases correctly.
+
+### Example Test Cases:
+```python
+print(hex_key(""AB""))           # Output: 1
+print(hex_key(""1077E""))        # Output: 2
+print(hex_key(""ABED1A33""))     # Output: 4
+print(hex_key(""123456789ABCDEF0""))  # Output: 6
+print(hex_key(""2020""))         # Output: 2
+print(hex_key(""""))             # Output: 0
+```
+
+This solution is concise, readable, and fully aligned with the requirements.","print(hex_key(""AB""))           # Output: 1
+print(hex_key(""1077E""))        # Output: 2
+print(hex_key(""ABED1A33""))     # Output: 4
+print(hex_key(""123456789ABCDEF0""))  # Output: 6
+print(hex_key(""2020""))         # Output: 2
+print(hex_key(""""))             # Output: 0",0.0,False,pass,"print(hex_key(""AB""))           # Output: 1
+print(hex_key(""1077E""))        # Output: 2
+print(hex_key(""ABED1A33""))     # Output: 4
+print(hex_key(""123456789ABCDEF0""))  # Output: 6
+print(hex_key(""2020""))         # Output: 2
+print(hex_key(""""))             # Output: 0","{'task_type': 'humaneval', 'entry_point': 'hex_key', 'exception': 'NameError'}",350,1222,1572,0.000451164,9.27877659999649,execution_error,{},,"models=qwen3.5-flash-2026-02-23,qwen3.5-plus-2026-02-15,qwen3-max-2026-01-23|budgets=0,256,1024",v2,"{'id': 'chatcmpl-652e9e1c-f062-9376-a569-9eeaf2ffe3f0', 'model': 'qwen3.5-flash-2026-02-23', 'provider': 'qwen', 'tier': 'cheap', 'budget_id': 'budget-1024', 'cache_hit': False}",0.9999975895120182,False,,2026-04-26 09:30:14.666068+00:00,"{'sample_id': 'humaneval_dev_019', 'split': 'dev', 'experiment': 'jsonl_grid', 'cache_hit': False, 'selected_model_provider': 'qwen', 'selected_model_tier': 'cheap', 'selected_model_alias': 'qwen-flash'}",humaneval_dev_019,phase2_uncertainty_aware,uncertainty_aware
+174,2,humaneval_dev_020,humaneval,"
+def decimal_to_binary(decimal):
+    """"""You will be given a number in decimal form and your task is to convert it to
+    binary format. The function should return a string, with each character representing a binary
+    number. Each character in the string will be '0' or '1'.
+
+    There will be an extra couple of characters 'db' at the beginning and at the end of the string.
+    The extra characters are there to help with the format.
+
+    Examples:
+    decimal_to_binary(15)   # returns ""db1111db""
+    decimal_to_binary(32)   # returns ""db100000db""
+    """"""
+","
+def decimal_to_binary(decimal):
+    """"""You will be given a number in decimal form and your task is to convert it to
+    binary format. The function should return a string, with each character representing a binary
+    number. Each character in the string will be '0' or '1'.
+
+    There will be an extra couple of characters 'db' at the beginning and at the end of the string.
+    The extra characters are there to help with the format.
+
+    Examples:
+    decimal_to_binary(15)   # returns ""db1111db""
+    decimal_to_binary(32)   # returns ""db100000db""
+    """"""
+",humaneval,qwen3.5-flash-2026-02-23,qwen,cheap,qwen-flash,1024,budget-1024,"{'budget_id': 'budget-1024', 'effort_level': 'medium', 'max_output_tokens': 1200, 'provider_controls': {'reasoning_effort': 'medium'}, 'prompt_template_version': 'v2', 'legacy_budget': 1024}","Here's the complete solution for converting a decimal number to a custom binary format with ""db"" wrapping:
+
+```python
+def decimal_to_binary(decimal):
+    """"""Converts a decimal number to a binary string wrapped with 'db' at both ends.""""""
+    binary = bin(decimal)[2:]  # Convert to binary and remove '0b' prefix
+    return f""db{binary}db""
+```
+
+### Explanation:
+- `bin(decimal)` converts the integer to a binary string prefixed with `'0b'` (e.g., `bin(15)` → `'0b1111'`).
+- `[2:]` slices off the first two characters (`'0b'`) to get just the binary digits.
+- The result is formatted with `""db""` added at the start and end of the binary string.
+
+### Example Usage:
+```python
+print(decimal_to_binary(15))   # Output: ""db1111db""
+print(decimal_to_binary(32))   # Output: ""db100000db""
+print(decimal_to_binary(0))    # Output: ""db0db""
+print(decimal_to_binary(1))    # Output: ""db1db""
+```
+
+This function correctly handles non-negative integers and produces the expected output format as specified.","print(decimal_to_binary(15))   # Output: ""db1111db""
+print(decimal_to_binary(32))   # Output: ""db100000db""
+print(decimal_to_binary(0))    # Output: ""db0db""
+print(decimal_to_binary(1))    # Output: ""db1db""",0.0,False,pass,"print(decimal_to_binary(15))   # Output: ""db1111db""
+print(decimal_to_binary(32))   # Output: ""db100000db""
+print(decimal_to_binary(0))    # Output: ""db0db""
+print(decimal_to_binary(1))    # Output: ""db1db""","{'task_type': 'humaneval', 'entry_point': 'decimal_to_binary', 'exception': 'NameError'}",177,756,933,0.000267771,6.259991699989769,execution_error,{},,"models=qwen3.5-flash-2026-02-23,qwen3.5-plus-2026-02-15,qwen3-max-2026-01-23|budgets=0,256,1024",v2,"{'id': 'chatcmpl-fcce184f-84ed-9208-8fb3-b5a5a2818a35', 'model': 'qwen3.5-flash-2026-02-23', 'provider': 'qwen', 'tier': 'cheap', 'budget_id': 'budget-1024', 'cache_hit': False}",0.991372408165112,False,,2026-04-26 09:32:58.869627+00:00,"{'sample_id': 'humaneval_dev_020', 'split': 'dev', 'experiment': 'jsonl_grid', 'cache_hit': False, 'selected_model_provider': 'qwen', 'selected_model_tier': 'cheap', 'selected_model_alias': 'qwen-flash'}",humaneval_dev_020,phase2_uncertainty_aware,uncertainty_aware

@@ -159,4 +159,4 @@ Offline replay supports:
 
 ## Current Project State
 
-Methodologically, the system is already structured around the final official protocol. What is still missing is not the method definition, but the committed full official rerun and the resulting official report artifacts.
+Methodologically, the system is now aligned with the completed official protocol and its final report artifacts. The remaining work, if any, is extension work rather than unfinished core routing/evaluation work.

@@ -2,24 +2,25 @@
 
 ThinkRouter is a routing system for reasoning workloads that selects `model + budget` jointly and records cost, latency, correctness, and route metadata for offline replay.
 
-## Current State
+## Final State
 
-- official protocol is frozen
+- official protocol is frozen and completed
 - Phase 2 router stack is the default online route
-- semantic features now use `sentence-transformers`
-- deterministic GSM8K, MATH, and HumanEval evaluation paths exist
+- semantic features use `sentence-transformers`
+- deterministic `GSM8K`, `MATH-500`, and `HumanEval` evaluation paths are complete
 - one-command official rerun pipeline exists
+- final official results and final official report are present
 
-## Current Main Committed Reference Result
+## Final Main Result
 
-The main committed multi-model reference slice is GSM8K `dev20` on the Qwen pool:
+The key acceptance result is:
 
-- strongest fixed point: `qwen-max @ 0`
-- learned routers: operational, but not yet better on utility in the committed slice
+- on official `GSM8K`, the learned router `phase2_logreg_joint` beats both the strongest fixed baseline and the aggregate baseline
 
-## Not Yet Committed
+The repository also contains official negative results:
 
-The final official protocol rerun across `GSM8K`, `MATH-500`, and `HumanEval` has not yet been committed, so the repository does not yet include the definitive official result table and final official report artifacts.
+- on `MATH-500`, the learned router does not win
+- on `HumanEval`, the learned router does not win
 
 ## Official Entry Point
 

@@ -1,0 +1,4 @@
+benchmark,error_type,count,avg_cost,avg_latency
+gsm8k,wrong_answer,1,0.000436,1.2801575000048615
+math500,no_final_answer,15,0.0,0.0
+humaneval,malformed_answer,8,0.0003550548749999,9.189228512495902
