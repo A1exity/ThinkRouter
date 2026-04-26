@@ -2,7 +2,7 @@
 
 ThinkRouter is a routing system for reasoning workloads where the decision is `(model, budget)`, not just `model`. The repository now includes the completed official protocol, real semantic features, Phase 2 online routing defaults, full official reruns for `GSM8K`, `MATH-500`, and `HumanEval`, and a single final official report.
 
-## Current System
+## Official Protocol
 
 - Model pool: `qwen-flash`, `qwen-plus`, `qwen-max`
 - Budget set: `0`, `256`, `1024`
@@ -21,7 +21,7 @@ ThinkRouter is a routing system for reasoning workloads where the decision is `(
 - Semantic feature backend:
   - `sentence-transformers/all-MiniLM-L6-v2`
 
-## Main Official Results
+## Final Official Results
 
 The only official top-level results are:
 
@@ -57,24 +57,24 @@ Formal settings:
 | --- | --- |
 | model pool | `qwen-flash,qwen-plus,qwen-max` |
 | budgets | `0,256,1024` |
-| benchmarks | `gsm8k`, `math500`, `humaneval` |
+| benchmarks | `GSM8K`, `MATH-500`, `HumanEval` |
 | split sizes | `60 train / 20 dev / 20 test` |
 | baselines | `fixed_model_budget`, `model_only`, `budget_only`, `joint_aggregate_utility`, `joint_safe_fallback` |
 | routers | `threshold`, `logreg_joint`, `mlp_factorized`, `uncertainty_aware` |
-| utility | `1.0 * accuracy - 5.0 * cost - 0.02 * latency` |
+| utility | `accuracy - 5 * cost - 0.02 * latency` |
 | default online router | `uncertainty_aware` |
 
 Historical smoke/dev slices remain in the repo, but they are appendix artifacts only.
 
-## Official Pipeline
+## Official Reproducible Pipeline
 
-The official command chain is fixed:
+The only official command chain is fixed:
 
 ```powershell
 .\scripts\run_official_pipeline.ps1
 ```
 
-Equivalent stages:
+Expanded stages:
 
 ```bash
 python -m thinkrouter.experiments.run_official_pipeline --stage prepare-data
@@ -83,7 +83,14 @@ python -m thinkrouter.experiments.run_official_pipeline --stage routers
 python -m thinkrouter.experiments.run_official_pipeline --stage report
 ```
 
-This is the only supported path for future formal reruns.
+Stage meanings:
+
+- `prepare-data`: exports the official `60/20/20` splits for `GSM8K`, `MATH-500`, and `HumanEval`
+- `grids`: collects the official model-budget traces
+- `routers`: trains, calibrates, selects, and replays the learned routers
+- `report`: writes `final_official_results.csv`, `final_official_pareto.png`, `final_official_failures.csv`, and `final_official_report.md`
+
+Historical smoke scripts, debug scripts, and slice-specific reruns remain in the repository for debugging only. They are not part of the official reproduction path.
 
 ## Setup
 
@@ -108,3 +115,5 @@ THINKROUTER_QWEN_MAX_MODEL=qwen3-max-2026-01-23
 - [`RESULTS.md`](C:/Users/23965/Desktop/ThinkRouter/RESULTS.md): final result inventory and appendix/historical index
 - [`FINAL_REPORT.md`](C:/Users/23965/Desktop/ThinkRouter/FINAL_REPORT.md): final repository-wide closeout summary
 - [`results/reports/final_official_report.md`](C:/Users/23965/Desktop/ThinkRouter/results/reports/final_official_report.md): final official benchmark report
+- [`scripts/run_official_pipeline.ps1`](C:/Users/23965/Desktop/ThinkRouter/scripts/run_official_pipeline.ps1): one-command official rerun entrypoint
+- [`thinkrouter/experiments/run_official_pipeline.py`](C:/Users/23965/Desktop/ThinkRouter/thinkrouter/experiments/run_official_pipeline.py): staged official pipeline implementation

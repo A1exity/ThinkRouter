@@ -18,5 +18,10 @@ def test_api_config_exposes_default_router_and_protocol_version() -> None:
     payload = response.json()
 
     assert response.status_code == 200
+    assert payload["budgets"] == list(OFFICIAL_PROTOCOL.budgets)
     assert payload["default_router"] == OFFICIAL_PROTOCOL.default_router
     assert payload["official_protocol_version"] == OFFICIAL_PROTOCOL.version
+    assert payload["model_pool"] == list(OFFICIAL_PROTOCOL.model_pool)
+    assert set(payload["models"].keys()) == set(OFFICIAL_PROTOCOL.model_pool)
+    for model_payload in payload["models"].values():
+        assert "api_key" not in model_payload

@@ -58,10 +58,9 @@ Formal settings:
 | --- | --- |
 | model pool | `qwen-flash,qwen-plus,qwen-max` |
 | budgets | `0,256,1024` |
-| benchmarks | `gsm8k`, `math500`, `humaneval` |
+| benchmarks | `GSM8K`, `MATH-500`, `HumanEval` |
 | split sizes | `60 train / 20 dev / 20 test` |
-| learned routers | `logreg_joint`, `mlp_factorized`, `uncertainty_aware` |
-| explanation baseline | `threshold` |
+| routers | `threshold`, `logreg_joint`, `mlp_factorized`, `uncertainty_aware` |
 | utility | `accuracy - 5 * cost - 0.02 * latency` |
 | online default router | `uncertainty_aware` |
 

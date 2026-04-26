@@ -27,6 +27,7 @@ The only official protocol is:
 - split sizes: `60 train / 20 dev / 20 test`
 - routers: `threshold`, `logreg_joint`, `mlp_factorized`, `uncertainty_aware`
 - utility: `accuracy - 5 * cost - 0.02 * latency`
+- default online router: `uncertainty_aware`
 
 Implementation paths:
 

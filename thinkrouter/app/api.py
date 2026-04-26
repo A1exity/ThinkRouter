@@ -28,6 +28,19 @@ def get_default_router_name() -> str:
     return os.getenv("THINKROUTER_OFFICIAL_RUNTIME_ROUTER", OFFICIAL_PROTOCOL.default_router)
 
 
+def public_model_config(config) -> dict[str, object]:
+    return {
+        "model_id": config.model_id,
+        "backend": config.backend,
+        "model_name": config.model_name,
+        "base_url": config.base_url,
+        "cost_per_1k_tokens": config.cost_per_1k_tokens,
+        "provider": config.provider,
+        "tier": config.tier,
+        "alias": config.alias,
+    }
+
+
 def get_runtime() -> tuple[dict, TraceStore, JointPolicyEngine]:
     configs = default_model_configs()
     store = TraceStore(get_db_path())
@@ -152,11 +165,12 @@ def list_traces(limit: int = 100) -> list[TraceRecord]:
 @app.get("/config")
 def config() -> dict[str, object]:
     configs = default_model_configs()
+    public_models = {value.alias or key: public_model_config(value) for key, value in configs.items()}
     return {
         "db_path": str(Path(get_db_path())),
-        "models": {key: value.__dict__ for key, value in configs.items()},
-        "model_pool": list(configs.keys()),
-        "budgets": [0, 256, 1024, 4096],
+        "models": public_models,
+        "model_pool": list(public_models.keys()),
+        "budgets": list(OFFICIAL_PROTOCOL.budgets),
         "routers": available_router_names(),
         "default_router": get_default_router_name(),
         "official_protocol_version": OFFICIAL_PROTOCOL.version,

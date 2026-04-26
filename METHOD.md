@@ -27,6 +27,7 @@ Protocol settings:
 | split sizes | `60 train / 20 dev / 20 test` |
 | routers | `threshold`, `logreg_joint`, `mlp_factorized`, `uncertainty_aware` |
 | utility | `accuracy - 5 * cost - 0.02 * latency` |
+| online default router | `uncertainty_aware` |
 
 All future formal results are expected to come from the official pipeline, not from ad hoc `dev5/dev10/dev20` slices.
 
