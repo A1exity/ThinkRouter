@@ -25,10 +25,10 @@ ThinkRouter is a routing system for reasoning workloads where the decision is `(
 
 The only official top-level results are:
 
-- [final_official_results.csv](C:/Users/23965/Desktop/ThinkRouter/results/tables/final_official_results.csv)
-- [final_official_pareto.png](C:/Users/23965/Desktop/ThinkRouter/results/figures/final_official_pareto.png)
-- [final_official_failures.csv](C:/Users/23965/Desktop/ThinkRouter/results/tables/final_official_failures.csv)
-- [final_official_report.md](C:/Users/23965/Desktop/ThinkRouter/results/reports/final_official_report.md)
+- [final_official_results.csv](results/tables/final_official_results.csv)
+- [final_official_pareto.png](results/figures/final_official_pareto.png)
+- [final_official_failures.csv](results/tables/final_official_failures.csv)
+- [final_official_report.md](results/reports/final_official_report.md)
 
 Official summary:
 
@@ -48,8 +48,8 @@ Main conclusion:
 
 The only formal protocol is defined in:
 
-- [`configs/official_protocol.json`](C:/Users/23965/Desktop/ThinkRouter/configs/official_protocol.json)
-- [`official_protocol.py`](C:/Users/23965/Desktop/ThinkRouter/thinkrouter/official_protocol.py)
+- [`configs/official_protocol.json`](configs/official_protocol.json)
+- [`official_protocol.py`](thinkrouter/official_protocol.py)
 
 Formal settings:
 
@@ -111,9 +111,9 @@ THINKROUTER_QWEN_MAX_MODEL=qwen3-max-2026-01-23
 
 ## Key Paths
 
-- [`METHOD.md`](C:/Users/23965/Desktop/ThinkRouter/METHOD.md): current method and protocol definition
-- [`RESULTS.md`](C:/Users/23965/Desktop/ThinkRouter/RESULTS.md): final result inventory and appendix/historical index
-- [`FINAL_REPORT.md`](C:/Users/23965/Desktop/ThinkRouter/FINAL_REPORT.md): final repository-wide closeout summary
-- [`results/reports/final_official_report.md`](C:/Users/23965/Desktop/ThinkRouter/results/reports/final_official_report.md): final official benchmark report
-- [`scripts/run_official_pipeline.ps1`](C:/Users/23965/Desktop/ThinkRouter/scripts/run_official_pipeline.ps1): one-command official rerun entrypoint
-- [`thinkrouter/experiments/run_official_pipeline.py`](C:/Users/23965/Desktop/ThinkRouter/thinkrouter/experiments/run_official_pipeline.py): staged official pipeline implementation
+- [`METHOD.md`](METHOD.md): current method and protocol definition
+- [`RESULTS.md`](RESULTS.md): final result inventory and appendix/historical index
+- [`FINAL_REPORT.md`](FINAL_REPORT.md): final repository-wide closeout summary
+- [`results/reports/final_official_report.md`](results/reports/final_official_report.md): final official benchmark report
+- [`scripts/run_official_pipeline.ps1`](scripts/run_official_pipeline.ps1): one-command official rerun entrypoint
+- [`thinkrouter/experiments/run_official_pipeline.py`](thinkrouter/experiments/run_official_pipeline.py): staged official pipeline implementation
