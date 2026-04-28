@@ -29,7 +29,7 @@ Protocol settings:
 | utility | `accuracy - 5 * cost - 0.02 * latency` |
 | online default router | `uncertainty_aware` |
 
-All future formal results are expected to come from the official pipeline, not from ad hoc `dev5/dev10/dev20` slices.
+All future formal results are expected to come from the official pipeline only.
 
 ## Budgets
 

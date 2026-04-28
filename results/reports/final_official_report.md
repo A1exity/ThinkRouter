@@ -22,4 +22,4 @@ This report contains the only official benchmark results tracked by the reposito
 | math500     | no_final_answer  |      15 | 0           |       0       |
 | humaneval   | malformed_answer |       8 | 0.000355055 |       9.18923 |
 
-Historical smoke/dev slices are appendix-only artifacts and are not part of this official report.
+Historical smoke/dev/test20 artifacts are not part of this official report and are not kept in the public result tree.

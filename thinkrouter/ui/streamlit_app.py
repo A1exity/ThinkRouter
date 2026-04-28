@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import os
+from pathlib import Path
 
 import pandas as pd
 import streamlit as st
@@ -13,7 +14,7 @@ from thinkrouter.app.budgets import BUDGET_LEVELS
 from thinkrouter.app.models import default_model_configs
 from thinkrouter.app.schemas import RunRequest, model_to_dict
 from thinkrouter.app.store import TraceStore
-from thinkrouter.experiments.sample_data import load_day1_samples
+from thinkrouter.experiments.datasets import load_samples_jsonl
 from thinkrouter.ui.streamlit_pages import render_dashboard, render_failure_browser, render_route_inspector
 
 load_dotenv()
@@ -22,12 +23,19 @@ st.set_page_config(page_title="ThinkRouter", layout="wide")
 st.title("ThinkRouter")
 st.caption("Adaptive thinking-budget routing for verifiable reasoning tasks")
 
+
+def load_ui_samples(limit: int = 20):
+    official_path = Path("data/splits/official_gsm8k.jsonl")
+    if official_path.exists():
+        return load_samples_jsonl(official_path, task_type="gsm8k", split="dev", limit=limit)
+    return []
+
 configs = default_model_configs()
 model_ids = list(configs.keys())
 runtime_config = api_config()
 default_router = runtime_config.get("default_router")
 router_names = ["legacy_joint_policy"] + list(runtime_config["routers"])
-samples = load_day1_samples()
+samples = load_ui_samples()
 config_rows = pd.DataFrame(
     [
         {
@@ -52,10 +60,12 @@ with st.sidebar:
     db_path = st.text_input("SQLite DB", os.getenv("THINKROUTER_DB_PATH", "results/traces/thinkrouter.sqlite"))
 
 sample_labels = [f"{sample.sample_id}: {sample.query[:60]}" for sample in samples]
-selected_label = st.selectbox("Sample", sample_labels)
-selected_sample = samples[sample_labels.index(selected_label)]
-query = st.text_area("Query", selected_sample.query, height=120)
-expected_answer = st.text_input("Expected answer", selected_sample.expected_answer)
+selected_sample = samples[0] if samples else None
+if sample_labels:
+    selected_label = st.selectbox("Sample", sample_labels)
+    selected_sample = samples[sample_labels.index(selected_label)]
+query = st.text_area("Query", selected_sample.query if selected_sample else "", height=120)
+expected_answer = st.text_input("Expected answer", selected_sample.expected_answer if selected_sample else "")
 
 if st.button("Run query", type="primary"):
     os.environ["THINKROUTER_DB_PATH"] = db_path
@@ -125,7 +135,7 @@ try:
         with failure_tab:
             render_failure_browser("results/official/gsm8k/gsm8k_official_learned_selected.csv")
     else:
-        st.info("No traces yet. Run a query or execute the Day-1 grid script.")
+        st.info("No traces yet. Run a query or execute the official pipeline.")
 except Exception as exc:
     st.warning(f"Could not load traces: {exc}")
 

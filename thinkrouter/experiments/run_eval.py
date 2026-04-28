@@ -11,7 +11,7 @@ from thinkrouter.experiments.make_plots import make_pareto_plot
 def main() -> None:
     parser = argparse.ArgumentParser(description="Unified evaluation entrypoint for baseline and Phase 2 summaries.")
     parser.add_argument("csv", help="Completed grid CSV path.")
-    parser.add_argument("--out-prefix", required=True, help="Output prefix, for example results/eval/qwen35_pool_gsm8k_dev20")
+    parser.add_argument("--out-prefix", required=True, help="Output prefix, for example results/official/gsm8k/gsm8k")
     parser.add_argument(
         "--phase2-router",
         action="append",

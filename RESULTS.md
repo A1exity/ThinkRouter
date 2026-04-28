@@ -75,14 +75,6 @@ Official artifacts include:
 
 On the official `test` split, the learned router does not beat the strongest fixed or aggregate baseline, but the benchmark is fully represented in the final official report.
 
-## Historical Appendix
+## Historical Note
 
-The following remain historical or debugging artifacts only:
-
-- Day-1 seed runs
-- smoke runs
-- `dev5`, `dev10`, `dev20` slices
-- old single-model held-out `test20` summaries
-- older pre-official policy report assets
-
-They remain useful for debugging and provenance, but they are appendix-only.
+Historical smoke, `dev*`, and old `test20` assets have been pruned from the public repository. The public result tree now keeps only the official protocol outputs and the final official report.

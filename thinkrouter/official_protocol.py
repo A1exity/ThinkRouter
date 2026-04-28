@@ -94,7 +94,7 @@ OFFICIAL_PROTOCOL = OfficialProtocol(
     ),
     semantic_backend="sentence-transformers",
     semantic_model_name="sentence-transformers/all-MiniLM-L6-v2",
-    appendix_prefixes=("day1", "dev5", "dev10", "dev20", "smoke", "seed"),
+    appendix_prefixes=("dev5", "dev10", "dev20", "smoke", "seed"),
 )
 
 

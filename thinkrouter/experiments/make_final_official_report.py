@@ -117,7 +117,7 @@ def build_final_outputs(
         "",
         failures_df.to_markdown(index=False) if not failures_df.empty else "No failure rows were produced.",
         "",
-        "Historical smoke/dev slices are appendix-only artifacts and are not part of this official report.",
+        "Historical smoke/dev/test20 artifacts are not part of this official report and are not kept in the public result tree.",
         "",
     ]
     md_path.write_text("\n".join(lines), encoding="utf-8")

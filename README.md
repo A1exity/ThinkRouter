@@ -64,7 +64,7 @@ Formal settings:
 | utility | `accuracy - 5 * cost - 0.02 * latency` |
 | default online router | `uncertainty_aware` |
 
-Historical smoke/dev slices remain in the repo, but they are appendix artifacts only.
+Historical smoke/dev/test20 artifacts have been pruned from the public repository. The tracked result assets are now limited to the official protocol outputs.
 
 ## Official Reproducible Pipeline
 
@@ -90,7 +90,7 @@ Stage meanings:
 - `routers`: trains, calibrates, selects, and replays the learned routers
 - `report`: writes `final_official_results.csv`, `final_official_pareto.png`, `final_official_failures.csv`, and `final_official_report.md`
 
-Historical smoke scripts, debug scripts, and slice-specific reruns remain in the repository for debugging only. They are not part of the official reproduction path.
+Legacy smoke/debug rerun scripts have been removed from the public repository. The official pipeline above is the only tracked reproduction path.
 
 ## Setup
 

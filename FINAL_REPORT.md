@@ -70,13 +70,4 @@ The benchmark that satisfies the learned-router win condition is `GSM8K`.
 
 ## Historical Versus Official Results
 
-The repository still contains older slices:
-
-- seed runs
-- smoke runs
-- `dev5`
-- `dev10`
-- `dev20`
-- old single-model held-out `test20` summaries
-
-Those files are retained for debugging and provenance. They are not part of the final official result story.
+Older smoke, `dev*`, and legacy `test20` assets have been pruned from the public repository. The tracked repository state now centers on the frozen official protocol and its final official outputs.

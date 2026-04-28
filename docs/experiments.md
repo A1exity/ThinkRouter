@@ -1,11 +1,6 @@
 # Experiments
 
-This repository now distinguishes between:
-
-1. the frozen official protocol
-2. historical appendix slices
-
-Only the official protocol should be used for future formal results.
+This repository now tracks only the frozen official protocol for formal public results.
 
 ## Official Entry Point
 
@@ -45,6 +40,6 @@ Top-level official report targets are:
 - `results/tables/final_official_failures.csv`
 - `results/reports/final_official_report.md`
 
-## Historical Appendix
+## Historical Note
 
-Older `dev5/dev10/dev20`, smoke, and seed slices remain in the repository for debugging only. They should not be cited as the official benchmark protocol.
+Older `dev*`, smoke, and legacy held-out slices have been pruned from the public repository. They are not part of the official benchmark protocol.
