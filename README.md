@@ -1,6 +1,6 @@
 # ThinkRouter
 
-ThinkRouter is a routing system for reasoning workloads where the decision is `(model, budget)`, not just `model`. The repository now includes the completed official protocol, real semantic features, Phase 2 online routing defaults, full official reruns for `GSM8K`, `MATH-500`, and `HumanEval`, and a single final official report.
+ThinkRouter is a routing system for reasoning workloads where the decision is `(model, budget)`, not just `model`. The repository now includes the completed official protocol, real semantic features, Phase 2 online routing defaults, and full official reruns for `GSM8K`, `MATH-500`, and `HumanEval`.
 
 ## Official Protocol
 
@@ -112,8 +112,7 @@ THINKROUTER_QWEN_MAX_MODEL=qwen3-max-2026-01-23
 ## Key Paths
 
 - [`METHOD.md`](METHOD.md): current method and protocol definition
-- [`RESULTS.md`](RESULTS.md): final result inventory and appendix/historical index
-- [`FINAL_REPORT.md`](FINAL_REPORT.md): final repository-wide closeout summary
+- [`RESULTS.md`](RESULTS.md): final result inventory, closeout conclusion, and acceptance summary
 - [`results/reports/final_official_report.md`](results/reports/final_official_report.md): final official benchmark report
 - [`scripts/run_official_pipeline.ps1`](scripts/run_official_pipeline.ps1): one-command official rerun entrypoint
 - [`thinkrouter/experiments/run_official_pipeline.py`](thinkrouter/experiments/run_official_pipeline.py): staged official pipeline implementation

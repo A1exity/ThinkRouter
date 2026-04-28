@@ -8,4 +8,5 @@
 Top-level summaries:
 
 - [../README.md](../README.md)
-- [../FINAL_REPORT.md](../FINAL_REPORT.md)
+- [../METHOD.md](../METHOD.md)
+- [../RESULTS.md](../RESULTS.md)

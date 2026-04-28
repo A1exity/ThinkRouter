@@ -1,6 +1,6 @@
 # RESULTS
 
-This file is the result inventory for the completed repository state. It uses the same narrative as `README.md`, `FINAL_REPORT.md`, and `METHOD.md`.
+This file is the result inventory and closeout summary for the completed repository state. It uses the same narrative as `README.md` and `METHOD.md`.
 
 ## Final Status
 
@@ -42,6 +42,26 @@ Final interpretation:
 - `GSM8K` is the benchmark where the learned router clearly wins under the official protocol.
 - `MATH-500` and `HumanEval` do not support the same learned-router win claim.
 - The repository therefore contains both positive and negative official outcomes rather than a single benchmark-specific success story.
+
+## Final Conclusion
+
+ThinkRouter is now closed out as a model-and-budget routing system with a frozen official protocol, reproducible official reruns, deterministic math/code evaluation, and a Phase 2 router stack as the online default path.
+
+## Acceptance Condition
+
+The closeout acceptance conditions are satisfied:
+
+- the documentation wording is unified around the official protocol
+- the public repository keeps a single final official report plus official result assets
+- the learned router beats strongest fixed and aggregate baselines on at least one official benchmark
+- HumanEval is included as a formal benchmark line
+- the online default route uses the Phase 2 router stack
+
+The benchmark that satisfies the learned-router win condition is `GSM8K`.
+
+## Negative Controls
+
+`MATH-500` and `HumanEval` remain important negative controls. They confirm that the system can run the full official pipeline across multiple reasoning tasks even when the learned router is not the utility-optimal policy on those benchmarks.
 
 ## Frozen Official Protocol
 
