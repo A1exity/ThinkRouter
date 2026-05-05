@@ -3,6 +3,7 @@ from __future__ import annotations
 import joblib
 import pandas as pd
 
+from thinkrouter.app.budgets import BUDGET_LEVELS
 from thinkrouter.app.router import JointPolicyEngine, SklearnBudgetPredictor, SklearnDifficultyEstimator
 from thinkrouter.experiments.train_budget import derive_budget_training_examples, train_budget_from_traces
 from thinkrouter.experiments.train_difficulty import train_difficulty_from_traces
@@ -58,7 +59,7 @@ def test_trainers_save_load_and_route(tmp_path) -> None:
     decision = engine.route("Add 1 and 2.", "gsm8k")
 
     assert decision.difficulty in {"easy", "medium", "hard"}
-    assert decision.budget in {0, 256, 1024, 4096}
+    assert decision.budget in BUDGET_LEVELS
     assert "budget_hint" in decision.explanation
 
 
@@ -68,5 +69,5 @@ def test_derive_budget_examples_picks_lowest_cost_correct_budget(tmp_path) -> No
     examples = derive_budget_training_examples(pd.read_csv(csv_path))
 
     assert not examples.empty
-    assert set(examples["selected_budget"]).issubset({0, 256, 1024, 4096})
+    assert set(examples["selected_budget"]).issubset(BUDGET_LEVELS)
     assert {"query", "task_type", "selected_model", "difficulty", "selected_budget"}.issubset(examples.columns)

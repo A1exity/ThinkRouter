@@ -1,6 +1,10 @@
 # ThinkRouter
 
-ThinkRouter is a routing system for reasoning workloads where the decision is `(model, budget)`, not just `model`. The repository now includes the completed official protocol, real semantic features, Phase 2 online routing defaults, and full official reruns for `GSM8K`, `MATH-500`, and `HumanEval`.
+ThinkRouter is a cost-aware routing system for verifiable LLM reasoning workloads.
+
+Instead of selecting only a model, ThinkRouter selects a joint `(model, reasoning budget)` action. It supports offline grid collection, learned router training, trace replay, deterministic evaluation, and an online FastAPI runtime.
+
+The frozen official protocol evaluates Qwen Flash/Plus/Max under budgets `0/256/1024` on `GSM8K`, `MATH-500`, and `HumanEval`.
 
 ## Official Protocol
 

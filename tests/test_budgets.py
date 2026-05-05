@@ -2,7 +2,8 @@ from __future__ import annotations
 
 import pytest
 
-from thinkrouter.app.budgets import budget_instruction, compile_budget_config, validate_budget
+from thinkrouter.app.budgets import BUDGET_LEVELS, budget_instruction, compile_budget_config, validate_budget
+from thinkrouter.official_protocol import OFFICIAL_PROTOCOL
 
 
 def test_validate_budget_accepts_fixed_levels() -> None:
@@ -11,9 +12,17 @@ def test_validate_budget_accepts_fixed_levels() -> None:
     assert "brief" in budget_instruction(256).lower()
 
 
+def test_public_budget_levels_match_official_protocol() -> None:
+    assert BUDGET_LEVELS == tuple(OFFICIAL_PROTOCOL.budgets)
+    assert BUDGET_LEVELS == (0, 256, 1024)
+
+
 def test_validate_budget_rejects_unknown_level() -> None:
     with pytest.raises(ValueError):
         validate_budget(512)
+
+    with pytest.raises(ValueError):
+        validate_budget(2048)
 
 
 def test_compile_budget_config_keeps_legacy_budget_and_structured_fields() -> None:

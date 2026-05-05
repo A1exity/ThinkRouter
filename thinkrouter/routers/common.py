@@ -25,7 +25,7 @@ def estimate_latency(tier: str | None, budget: int, task_type: str) -> float:
 
 def estimate_accuracy(tier: str | None, budget: int, difficulty_score: float, task_type: str) -> float:
     tier_base = {"cheap": 0.72, "mid": 0.84, "strong": 0.9}.get(tier or "", 0.78)
-    budget_bonus = {0: 0.0, 256: 0.04, 1024: 0.08, 4096: 0.1}.get(int(budget), 0.08)
+    budget_bonus = {0: 0.0, 256: 0.04, 1024: 0.08}.get(int(budget), 0.08)
     task_penalty = {"gsm8k": 0.0, "math": 0.05, "humaneval": 0.1}.get(task_type, 0.02)
     return max(0.05, min(0.98, tier_base + budget_bonus - difficulty_score * 0.25 - task_penalty))
 

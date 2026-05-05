@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import pandas as pd
 
+from thinkrouter.app.budgets import BUDGET_LEVELS
 from thinkrouter.adapters.base import ModelConfig
 from thinkrouter.routers import MLPFactorizedRouter, ThresholdRouter, UncertaintyAwareRouter, available_routers, train_factorized_router, train_logreg_joint_router
 from thinkrouter.training import derive_factorized_examples, derive_joint_examples
@@ -62,7 +63,7 @@ def test_factorized_router_uses_trained_artifact() -> None:
     decision = MLPFactorizedRouter(_models(), artifact=artifact).route("Solve x^2 + 5x + 6 = 0.", "math")
 
     assert decision.router_name == "mlp_factorized"
-    assert decision.budget in {0, 256, 1024, 4096}
+    assert decision.budget in BUDGET_LEVELS
 
 
 def test_uncertainty_router_falls_back_without_artifact() -> None:

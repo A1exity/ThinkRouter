@@ -156,7 +156,7 @@ class JointPolicyEngine:
     def _estimate_accuracy(self, model_index: int, budget: int, difficulty: DifficultyLabel, task_type: str) -> float:
         base_by_model = [0.45, 0.65, 0.78]
         base = base_by_model[min(model_index, len(base_by_model) - 1)]
-        budget_bonus = {0: 0.0, 256: 0.05, 1024: 0.10, 4096: 0.13}[budget]
+        budget_bonus = {0: 0.0, 256: 0.05, 1024: 0.10}[budget]
         difficulty_penalty = {"easy": 0.0, "medium": 0.12, "hard": 0.22}[difficulty]
         if task_type == "humaneval":
             difficulty_penalty += 0.05

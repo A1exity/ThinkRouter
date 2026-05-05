@@ -32,4 +32,4 @@ The Phase 2 router stack is now the default online path. The old `JointPolicyEng
 
 ## Current Conclusion
 
-The router stack is implemented and reportable. The current committed historical GSM8K reference slice still favors the strongest fixed baseline on utility, so the remaining gap is experimental outcome, not missing router infrastructure.
+The Phase 2 router stack is implemented and reportable under the frozen official protocol. In the final official report, `GSM8K` is the positive benchmark where the learned router beats both strongest-fixed and aggregate baselines, while `MATH-500` and `HumanEval` remain negative controls.
