@@ -41,11 +41,10 @@ def public_model_config(config) -> dict[str, object]:
     }
 
 
-def get_runtime() -> tuple[dict, TraceStore, JointPolicyEngine]:
+def get_runtime() -> tuple[dict, TraceStore]:
     configs = default_model_configs()
     store = TraceStore(get_db_path())
-    policy = JointPolicyEngine(list(configs.keys()))
-    return configs, store, policy
+    return configs, store
 
 
 @app.get("/health")
@@ -55,13 +54,14 @@ def health() -> dict[str, str]:
 
 @app.post("/run", response_model=RunResponse)
 def run_query(request: RunRequest) -> RunResponse:
-    configs, store, policy = get_runtime()
+    configs, store = get_runtime()
     route = None
     model_id = request.model_id
     budget = request.budget
     if request.use_router:
         router_name = request.router_name or get_default_router_name()
         if router_name == "legacy_joint_policy":
+            policy = JointPolicyEngine(list(configs.keys()))
             route = policy.route(request.query, request.task_type)
         else:
             router = build_runtime_router(list(configs.values()), router_name)
